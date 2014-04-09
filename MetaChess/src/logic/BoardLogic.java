@@ -1,12 +1,11 @@
 package logic;
 
-import graphic.TileGraphic;
-
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.Random;
 
+import userinterface.TileGraphic;
 import model.MetaModel;
 
 public class BoardLogic implements Logic {
@@ -49,7 +48,7 @@ public class BoardLogic implements Logic {
 
 	// Use the recursive coordinates I and J to find a tile;
 	public static TileGraphic getTile(int[] I, int[] J) {
-		TileGraphic currTile =(TileGraphic) MetaModel.getBoardModel().getGraphic();
+		TileGraphic currTile =(TileGraphic) MetaModel.getBoardModel().getRootTile();
 		int i = 0;
 		while (currTile.getChildren() != null && i < I.length && i < J.length) {
 			currTile = currTile.getChildren()[I[i]][J[i]];

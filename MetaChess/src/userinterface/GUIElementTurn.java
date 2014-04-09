@@ -1,4 +1,4 @@
-package graphic;
+package userinterface;
 
 
 public class GUIElementTurn extends GUIElement{

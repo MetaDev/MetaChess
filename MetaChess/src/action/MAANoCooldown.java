@@ -1,10 +1,10 @@
 package action;
 
-import model.PieceExtendedModel;
+import model.ExtendedPieceModel;
 
 public class MAANoCooldown implements MetaActionActivity{
 	@Override
-	public boolean isActive(PieceExtendedModel model, MetaAction action) {
+	public boolean isActive(ExtendedPieceModel model, MetaAction action) {
 		int cooldown = model.getCooldown(action.getName());
 		return cooldown>=0;
 	}

@@ -1,4 +1,4 @@
-package graphic;
+package userinterface;
 
 import logic.MetaClock;
 

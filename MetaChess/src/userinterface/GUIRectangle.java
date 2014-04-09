@@ -1,4 +1,4 @@
-package graphic;
+package userinterface;
 
 public abstract class GUIRectangle {
 	//return ints as floats to avoid having to casting every time a percentage is calculated

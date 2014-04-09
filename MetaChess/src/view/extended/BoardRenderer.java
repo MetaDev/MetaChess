@@ -1,16 +1,16 @@
 package view.extended;
 
-import graphic.Graphic;
-import graphic.TileGraphic;
-import view.basic.RectangleRenderer;
+import meta.MetaMapping;
+import meta.MetaMapping.PieceRendererType;
+import model.ExtendedBoardModel;
+import model.MetaModel;
+import userinterface.TileGraphic;
+import view.openglImpl.RectangleRenderer;
 
-public class BoardRenderer implements Renderer {
+public class BoardRenderer {
 
-
-	@Override
-	public void render(Graphic graphic) {
-		recursiveRender(((TileGraphic) graphic));
-
+	public void render(ExtendedBoardModel model) {
+		recursiveRender(model.getRootTile());
 	}
 
 	// render a FloorGrpahic recursively
@@ -19,19 +19,31 @@ public class BoardRenderer implements Renderer {
 		// if no children anymore draw square
 		if (tile.getChildren() == null) {
 			RectangleRenderer.drawRectangle(tile.getX(), tile.getY(),
-					tile.getWidth(),
-					tile.getWidth(), tile.getColor());
-			//render also the piece of a tile and also the metaaction of the tile
+					tile.getWidth(), tile.getWidth(), tile.getColor());
+			// there's a piece located on the tile
+			if (MetaModel.getModelOnPosition(tile) != null) {
+				PieceRendererType piece = (MetaModel.getModelOnPosition(tile))
+						.getRenderType();
+				if (piece != null)
+					MetaMapping.getPieceRenderer(piece).render(
+							MetaModel.getModelOnPosition(tile));
+			}
+			// there's an active metaaction on the tile
+			if (tile.getActiveMetaAction() != null) {
+				//
+			}
+			// render also the piece of a tile and also the metaaction of the
+			// tile
 		}
 		// recursive render
 		else {
 			for (int i = 0; i < tile.getChildFraction(); i++) {
 				for (int j = 0; j < tile.getChildFraction(); j++) {
-					
+
 					if (tile.getChildren()[i][j] != null) {
 						recursiveRender(tile.getChildren()[i][j]);
 					}
-					
+
 				}
 			}
 		}

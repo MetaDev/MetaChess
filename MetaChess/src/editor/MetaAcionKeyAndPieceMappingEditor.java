@@ -7,7 +7,7 @@ import java.util.List;
 import meta.MetaMapping;
 import meta.MetaMapping.ActionType;
 import meta.MetaMapping.ControllerType;
-import model.PieceExtendedModel;
+import model.ExtendedPieceModel;
 
 import org.lwjgl.input.Keyboard;
 
@@ -154,14 +154,14 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 			// add acts
 			for (ActionType type : acttypes) {
 				methods.add(Class.forName("logic.ActionLogic").getMethod(
-						type.name(), new Class[] { PieceExtendedModel.class }));
+						type.name(), new Class[] { ExtendedPieceModel.class }));
 			}
 			// add revert acts
 			if (reverttypes != null)
 				for (ActionType type : reverttypes) {
 					revertmethods.add(Class.forName("logic.ActionLogic")
 							.getMethod(type.name(),
-									new Class[] { PieceExtendedModel.class }));
+									new Class[] { ExtendedPieceModel.class }));
 				}
 
 		} catch (NoSuchMethodException | SecurityException

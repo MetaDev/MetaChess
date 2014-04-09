@@ -1,19 +1,16 @@
 package view.extended;
 
-import graphic.Graphic;
-import graphic.PieceGraphic;
-import view.basic.RectangleRenderer;
+import model.ExtendedPieceModel;
+import view.openglImpl.RectangleRenderer;
 
-public class PieceRenderer implements Renderer {
+public class PieceRenderer {
 
-	@Override
-	public void render(Graphic graphic) {
-		PieceGraphic pieceGraphic = (PieceGraphic) graphic;
-		float x = graphic.getX();
-		float y = graphic.getY();
-		float w_8 = (pieceGraphic.getTile().getWidth()) / 8;
-		float w_16 = (pieceGraphic.getTile().getWidth()) / 16;
-		int main = graphic.getColor();
+	public void render(ExtendedPieceModel model) {
+		float x = model.getX();
+		float y = model.getY();
+		float w_8 = (model.getWidth()) / 8;
+		float w_16 = (model.getWidth()) / 16;
+		int main = model.getColor();
 		int invert = (main + 1) % 2;
 		// core
 		RectangleRenderer.drawRectangle(x + 3 * w_8 + w_16, y + 3 * w_8, w_8,

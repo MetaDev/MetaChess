@@ -5,27 +5,24 @@
  */
 package control;
 
-import graphic.PieceGraphic;
-import graphic.TileGraphic;
 import logic.MetaClock;
 import meta.MetaMapping.ControllerType;
 import meta.MetaMapping.ControllerType.ControllerGroup;
+import model.ExtendedPieceModel;
 import model.MetaModel;
-import model.PieceExtendedModel;
+import userinterface.TileGraphic;
 
 public class MetaLoop {
 
 	public static void decisionTurn() {
-		for (int i = 0; i < MetaModel.getEntityModels().size(); i++) {
-			PieceExtendedModel model = (PieceExtendedModel) MetaModel
-					.getEntityModels().get(i);
+		for (ExtendedPieceModel model: MetaModel.getEntityModels().keySet()) {
 			ControllerType type = model.getControllerType();
 
 			// check if the turn changed for the model
 			// if so, call the change method and set new absolute turn and
 			// frationOnTurnChange
 
-			TileGraphic tile = ((PieceGraphic) model.getGraphic()).getTile();
+			TileGraphic tile = MetaModel.getPiecePosition(model);
 			// save absolute time
 			// then check if the turn changed based on that
 			// check if turn changed based on absolute turntime and fraction

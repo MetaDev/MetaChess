@@ -1,20 +1,19 @@
 package view.extended;
 
-import graphic.Graphic;
-import graphic.PieceGraphic;
-import view.basic.RectangleRenderer;
+import model.MetaModel;
+import model.ExtendedPieceModel;
+import view.openglImpl.RectangleRenderer;
 
 public class BischopRenderer extends PieceRenderer {
 
 	
 	@Override
-	public void render(Graphic graphic) {
-		PieceGraphic pieceGraphic = (PieceGraphic) graphic;
-		float x = graphic.getX();
-		float y = graphic.getY();
-		float w_8 = (pieceGraphic.getTile().getWidth()) / 8;
-		float w_16 = (pieceGraphic.getTile().getWidth()) / 16;
-		int main = graphic.getColor();
+	public void render(ExtendedPieceModel model) {
+		float x = model.getX();
+		float y = model.getY();
+		float w_8 = (model.getWidth()) / 8;
+		float w_16 = (model.getWidth()) / 16;
+		int main = model.getColor();
 		
 		// body
 		RectangleRenderer.drawRectangle( x + 2 * w_8 + w_16, y + w_8,
@@ -26,7 +25,7 @@ public class BischopRenderer extends PieceRenderer {
 				y + 6 * w_8 + w_16,  2 * w_8, w_16,
 				main);
 		//render core
-		super.render(pieceGraphic);
+		super.render(model);
 
 	}
 }

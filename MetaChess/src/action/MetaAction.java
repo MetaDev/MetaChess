@@ -1,15 +1,14 @@
 package action;
 
-import graphic.PieceGraphic;
-import graphic.TileGraphic;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import userinterface.TileGraphic;
 import logic.MetaClock;
 import meta.MetaMapping;
-import model.PieceExtendedModel;
+import model.ExtendedPieceModel;
+import model.MetaModel;
 
 public class MetaAction {
 
@@ -29,10 +28,9 @@ public class MetaAction {
 	// the MetaAction locks the piece for 1 turn
 	private boolean locks;
 
-	public void act(PieceExtendedModel model) {
+	public void act(ExtendedPieceModel model) {
 		// if actions still cooling down
 		
-		System.out.println(model.getRange());
 		if (model.getCooldown(name) > 0)
 			return;
 		// if action already active and reverts
@@ -60,8 +58,7 @@ public class MetaAction {
 			// lock model
 			// if not playing real-time
 			// TODO change to model.getAbsfraction
-			if (MetaClock.getMaxFraction() > ((PieceGraphic) model.getGraphic())
-					.getTile().absoluteFraction()) {
+			if (MetaClock.getMaxFraction() >MetaModel.getPiecePosition(model).absoluteFraction()) {
 				model.setLocked(true);
 			}
 		}
@@ -71,7 +68,7 @@ public class MetaAction {
 		model.setMetaActionActivity(name, true);
 	}
 
-	public void revert(PieceExtendedModel model) {
+	public void revert(ExtendedPieceModel model) {
 		// don't revert
 		// if MetaAction has no revert or
 		// if it's still active
@@ -119,7 +116,7 @@ public class MetaAction {
 		this.acts = methods;
 	}
 
-	public boolean isActive(PieceExtendedModel model) {
+	public boolean isActive(ExtendedPieceModel model) {
 		if (activity != null)
 			return activity.isActive(model,this);
 		return true;
@@ -129,7 +126,7 @@ public class MetaAction {
 		this.activity = activity;
 	}
 
-	public List<TileGraphic> getRange(PieceExtendedModel model) {
+	public List<TileGraphic> getRange(ExtendedPieceModel model) {
 		if (range != null)
 			return range.getRange(model, this);
 		return null;
@@ -142,4 +139,5 @@ public class MetaAction {
 	public void setRevertMethods(List<Method> methods) {
 		revertActs = methods;
 	}
+	
 }

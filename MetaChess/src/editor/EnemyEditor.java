@@ -1,13 +1,5 @@
 package editor;
 
-import graphic.PieceGraphic;
-import graphic.TileGraphic;
-import logic.BoardLogic;
-import meta.MetaMapping.ControllerType;
-import meta.MetaMapping.PieceRendererType;
-import model.ExtendedModel;
-import model.MetaModel;
-import model.PieceExtendedModel;
 
 public class EnemyEditor extends Editor {
 	public static void init() {

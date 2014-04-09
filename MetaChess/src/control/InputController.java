@@ -1,6 +1,6 @@
 package control;
 
-import graphic.Graphic;
+import userinterface.Graphic;
 
 public abstract class InputController implements Controller{
 	

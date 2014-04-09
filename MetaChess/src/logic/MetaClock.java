@@ -1,6 +1,5 @@
 package logic;
 
-import graphic.PieceGraphic;
 import model.MetaModel;
 
 //the clock never stops
@@ -41,10 +40,10 @@ public class MetaClock {
 
 	// absolute turn of player
 	public static int getTileTurn() {
-		if (((PieceGraphic) MetaModel.getPlayer().getGraphic()).getTile() == null)
+		
+		if (MetaModel.getPiecePosition(MetaModel.getPlayer()) == null)
 			return -1;
-		int fraction = ((PieceGraphic) MetaModel.getPlayer().getGraphic())
-				.getTile().absoluteFraction();
+		int fraction = MetaModel.getPiecePosition(MetaModel.getPlayer()).absoluteFraction();
 		return getTileTurn(fraction);
 	}
 
@@ -55,12 +54,10 @@ public class MetaClock {
 
 	// return if the player is in turn
 	public static boolean getTurn() {
-		if (((PieceGraphic) MetaModel.getPlayer().getGraphic()).getTile() == null)
+		if (MetaModel.getPiecePosition(MetaModel.getPlayer()) == null)
 			return false;
-		int fraction = ((PieceGraphic) MetaModel.getPlayer().getGraphic())
-				.getTile().absoluteFraction();
-		int side = ((PieceGraphic) MetaModel.getPlayer().getGraphic())
-				.getColor();
+		int fraction = (MetaModel.getPiecePosition(MetaModel.getPlayer())).absoluteFraction();
+		int side =  MetaModel.getPlayer().getSide();
 		return getTurn(fraction, side);
 	}
 

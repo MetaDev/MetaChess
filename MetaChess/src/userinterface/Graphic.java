@@ -4,7 +4,7 @@
  * save model of classes
  * Capabilities:
  */
-package graphic;
+package userinterface;
 
 import org.lwjgl.util.Color;
 

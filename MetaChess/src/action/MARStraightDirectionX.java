@@ -1,21 +1,20 @@
 package action;
 
-import graphic.PieceGraphic;
-import graphic.TileGraphic;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import userinterface.TileGraphic;
 import logic.BoardLogic;
-import model.PieceExtendedModel;
+import model.ExtendedPieceModel;
+import model.MetaModel;
 
 public class MARStraightDirectionX implements MetaActionRange{
 
 	@Override
-	public List<TileGraphic> getRange(PieceExtendedModel model, MetaAction action) {
+	public List<TileGraphic> getRange(ExtendedPieceModel model, MetaAction action) {
 		int[] dir = model.getDirection();
 		int range = model.getDecisionRange();
-		TileGraphic currTile =((PieceGraphic) model.getGraphic()).getTile();
+		TileGraphic currTile =MetaModel.getPiecePosition(model);
 		List<TileGraphic> list = new ArrayList<TileGraphic>();
 		TileGraphic tempTile = currTile;
 		int i = range;

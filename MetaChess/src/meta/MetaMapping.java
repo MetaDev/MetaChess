@@ -1,22 +1,18 @@
 package meta;
 
-import editor.MetaAcionKeyAndPieceMappingEditor;
-import graphic.PieceGraphic;
-import graphic.TileGraphic;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import logic.BoardLogic;
-import model.ExtendedModel;
+import model.ExtendedBoardModel;
 import model.MetaModel;
-import model.PlayerExtendedModel;
+import model.ExtendedPlayerModel;
 
 import org.lwjgl.util.Color;
 
-import action.MetaAction;
+import userinterface.TileGraphic;
 import view.extended.BischopRenderer;
 import view.extended.BoardRenderer;
 import view.extended.GUIRenderer;
@@ -26,7 +22,9 @@ import view.extended.PawnRenderer;
 import view.extended.PieceRenderer;
 import view.extended.QueenRenderer;
 import view.extended.RookRenderer;
+import action.MetaAction;
 import control.Controller;
+import editor.MetaAcionKeyAndPieceMappingEditor;
 
 //contains and initialises all unique instances
 public class MetaMapping {
@@ -148,12 +146,9 @@ public class MetaMapping {
 		boardRenderer = new BoardRenderer();
 		guiRenderer = new GUIRenderer();
 		TileGraphic floor = new TileGraphic(0, 0, 1, tileSize, 0, 0, 0, null);
-		MetaModel.setBoardModel(new ExtendedModel(floor, null));
-
-		PieceGraphic graphic = new PieceGraphic(0, (TileGraphic) MetaModel
-				.getBoardModel().getGraphic(), PieceRendererType.PAWN);
-		MetaModel.setPlayer(new PlayerExtendedModel(graphic,
-				ControllerType.INPUTROOK, 8, 8, 1));
+		MetaModel.setBoardModel(new ExtendedBoardModel(floor));
+		
+		
 	}
 
 	public static void addPieceAction(ControllerType controller, String action) {

@@ -3,17 +3,16 @@ package view.extended;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
-import graphic.GUI;
-import graphic.GUIElement;
-import graphic.GUIRectangle;
-import graphic.Graphic;
-import view.basic.RectangleRenderer;
+import model.ExtendedGUIModel;
+import userinterface.GUI;
+import userinterface.GUIElement;
+import userinterface.GUIRectangle;
+import view.openglImpl.RectangleRenderer;
 
-public class GUIRenderer implements Renderer{
+public class GUIRenderer {
 
-	@Override
-	public void render(Graphic graphic) {
-		GUI gui = (GUI) graphic;
+	public void render(ExtendedGUIModel model) {
+		GUI gui =  model.getGui();
 		float x = gui.getX();
 		float y = gui.getY();
 		float height = gui.getHeight();

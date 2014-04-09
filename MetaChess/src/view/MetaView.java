@@ -21,15 +21,14 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glScissor;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glViewport;
-import graphic.Graphic;
-import graphic.PieceGraphic;
-import graphic.TileGraphic;
 import meta.MetaMapping;
 import meta.MetaMapping.GUIPosition;
-import meta.MetaMapping.PieceRendererType;
+import model.ExtendedGUIModel;
 import model.MetaModel;
 
 import org.lwjgl.opengl.Display;
+
+import userinterface.TileGraphic;
 
 public class MetaView {
 
@@ -38,12 +37,9 @@ public class MetaView {
 		float height = Display.getHeight();
 		float centerBoardX = 0;
 		float centerBoardY = 0;
-		boolean horGUI;
 		if (width > height) {
-			horGUI = true;
 			centerBoardX = (width - height) / 2;
 		} else {
-			horGUI = false;
 			centerBoardY = (height - width) / 2;
 		}
 
@@ -71,60 +67,56 @@ public class MetaView {
 		// scale to display
 		glScalef(resizeToDisplay, resizeToDisplay, 0);
 
+		TileGraphic PlayerTile = MetaModel.getPiecePosition(MetaModel.getPlayer());
 		// (zoom in) scale to 1 tile in playerview
-		int zoomIn = ((PieceGraphic) MetaModel.getPlayer().getGraphic())
-				.getTile().absoluteFraction();
+		int zoomIn = PlayerTile.absoluteFraction();
 		glScalef(zoomIn, zoomIn, 1);
 		// zoom out depending on nr of tiles allowed to see
-		int tiles=1;
-		if(MetaModel.getPlayer()!=null){
+		int tiles = 1;
+		if (MetaModel.getPlayer() != null) {
 			tiles = MetaModel.getPlayer().getNrOfViewTiles();
 		}
 		glScalef((float) 1 / (2 * tiles + 1), (float) 1 / (2 * tiles + 1), 1);
 		// move player to center
-		float currentTileSize = ((PieceGraphic) MetaModel.getPlayer()
-				.getGraphic()).getTile().getHeight();
+		float currentTileSize = PlayerTile.getHeight();
 		float centerPlayer = tiles * currentTileSize;
-		TileGraphic PlayerTile = ((PieceGraphic)MetaModel.getPlayer().getGraphic()).getTile();
+		
 		glTranslatef(-PlayerTile.getX() + centerPlayer, -PlayerTile.getY()
 				+ centerPlayer, 0);
 		// render board
-		MetaMapping.getBoardRenderer().render(
-				MetaModel.getBoardModel().getGraphic());
+		MetaMapping.getBoardRenderer().render(MetaModel.getBoardModel());
 		// render entities
 		// iterate the list of entity models
-		for (int i = 0; i < MetaModel.getEntityModels().size(); i++) {
-			PieceRendererType piece = ((PieceGraphic) MetaModel
-					.getEntityModels().get(i).getGraphic()).getPiece();
-			MetaMapping.getPieceRenderer(piece).render(
-					MetaModel.getEntityModels().get(i).getGraphic());
-		}
+		// for (int i = 0; i < MetaModel.getEntityModels().size(); i++) {
+		// PieceRendererType piece = ((PieceGraphic) MetaModel
+		// .getEntityModels().get(i).getGraphic()).getPiece();
+		// MetaMapping.getPieceRenderer(piece).render(
+		// MetaModel.getEntityModels().get(i).getGraphic());
+		// }
 		glPopMatrix();
 		glDisable(GL_SCISSOR_TEST);
 		// draw UI
-		//ipv de width en height mee te geven beter herschalen
+		// ipv de width en height mee te geven beter herschalen
 		// different depending if GUI draws left, right, top or bottom
-		//an optimisation could be to only resize when the window resizes
+		// an optimisation could be to only resize when the window resizes
 		for (int i = 0; i < MetaModel.getGuiModels().size(); i++) {
-			
 
 			GUIPosition position = MetaModel.getGuiModels().get(i)
 					.getPosition();
-			Graphic guiGraphic = MetaModel.getGuiModels().get(i)
-					.getGraphic();
+			ExtendedGUIModel guiModel = MetaModel.getGuiModels().get(i);
 			if (position == GUIPosition.LEFT || position == GUIPosition.BOTTOM) {
-				guiGraphic.setWidth(centerBoardX);
-				guiGraphic.setHeight(centerBoardX);
+				guiModel.getGui().setWidth(centerBoardX);
+				guiModel.getGui().setHeight(centerBoardX);
 			} else if (position == GUIPosition.RIGHT) {
-				guiGraphic.setWidth(centerBoardX);
-				guiGraphic.setHeight(centerBoardX);
-				guiGraphic.setX(((Display.getWidth() - centerBoardX)));
+				guiModel.getGui().setWidth(centerBoardX);
+				guiModel.getGui().setHeight(centerBoardX);
+				guiModel.getGui().setX(((Display.getWidth() - centerBoardX)));
 			} else if (position == GUIPosition.TOP) {
-				guiGraphic.setWidth(centerBoardY);
-				guiGraphic.setHeight(centerBoardY);
-				guiGraphic.setY((Display.getHeight() - centerBoardY));
+				guiModel.getGui().setWidth(centerBoardY);
+				guiModel.getGui().setHeight(centerBoardY);
+				guiModel.getGui().setY((Display.getHeight() - centerBoardY));
 			}
-			MetaMapping.getGuiRenderer().render(guiGraphic);
+			MetaMapping.getGuiRenderer().render(guiModel);
 
 		}
 

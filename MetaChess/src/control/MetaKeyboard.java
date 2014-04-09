@@ -1,14 +1,14 @@
 package control;
 
 import meta.MetaMapping;
-import model.PieceExtendedModel;
+import model.ExtendedPieceModel;
 
 import org.lwjgl.input.Keyboard;
 
 import action.MetaAction;
 
 public class MetaKeyboard {
-	public static void processInput(PieceExtendedModel model) {
+	public static void processInput(ExtendedPieceModel model) {
 		while (Keyboard.next()) {
 			String MetaInput = Integer.toString(Keyboard.getEventKey());
 			if (Keyboard.getEventKeyState()) {

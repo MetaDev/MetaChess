@@ -1,4 +1,4 @@
-package graphic;
+package userinterface;
 
 
 //class handels GUI and GUI elements

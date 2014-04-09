@@ -3,9 +3,10 @@
  * Because of the recursive nature of the floor it would be inefficient to
  * have to create 2 instances for every tile.
  */
-package graphic;
+package userinterface;
 
 import model.MetaModel;
+import model.ExtendedPieceModel;
 
 
 public class TileGraphic extends Graphic {
@@ -14,31 +15,28 @@ public class TileGraphic extends Graphic {
 	private int level;
 	private int childFraction =1;
 	private String ActiveMetaAction;
-	public String getActiveMetaAction() {
-		return ActiveMetaAction;
-	}
-
-	public void setActiveMetaAction(String activeMetaAction) {
-		ActiveMetaAction = activeMetaAction;
-	}
+	private ExtendedPieceModel modelOfMetaAction;
+	
 
 	// relative position in parent
 	private int i;
 	private int j;
-	private PieceGraphic piece;
 
-	public PieceGraphic getPiece() {
-		return piece;
+	
+	public String getActiveMetaAction() {
+		return ActiveMetaAction;
 	}
 
-	public void setPiece(PieceGraphic piece) {
-
-		this.piece = piece;
-
+	public ExtendedPieceModel getModelOfMetaAction() {
+		return modelOfMetaAction;
 	}
 
+	public void setActiveMetaActionAndModel(String activeMetaAction,ExtendedPieceModel model) {
+		ActiveMetaAction = activeMetaAction;
+		modelOfMetaAction =model;
+	}
 	public boolean isOccupied() {
-		if (piece != null)
+		if (MetaModel.getModelOnPosition(this) != null)
 			return true;
 		if (children==null)
 			return false;
@@ -87,7 +85,7 @@ public class TileGraphic extends Graphic {
 	}
 	// don't allow empty (null) children
 	public void divide(int fraction) {
-		TileGraphic board = ((TileGraphic)MetaModel.getBoardModel().getGraphic());
+		TileGraphic board = ((TileGraphic)MetaModel.getBoardModel().getRootTile());
 		int absoluteFraction = absoluteFraction() * fraction;
 		System.out.println(1 / absoluteFraction);
 		childFraction = fraction;

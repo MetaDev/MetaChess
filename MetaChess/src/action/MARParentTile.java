@@ -1,18 +1,17 @@
 package action;
 
-import graphic.PieceGraphic;
-import graphic.TileGraphic;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import model.PieceExtendedModel;
+import userinterface.TileGraphic;
+import model.ExtendedPieceModel;
+import model.MetaModel;
 
 public class MARParentTile implements MetaActionRange{
 
 	@Override
-	public List<TileGraphic> getRange(PieceExtendedModel model, MetaAction action) {
-		TileGraphic currTile =((PieceGraphic) model.getGraphic()).getTile();
+	public List<TileGraphic> getRange(ExtendedPieceModel model, MetaAction action) {
+		TileGraphic currTile =MetaModel.getPiecePosition(model);
 		TileGraphic parent = currTile.getParent();
 		if(parent!=null){
 			return convert2DArrayToList(parent.getChildren());
