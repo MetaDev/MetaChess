@@ -1,0 +1,9 @@
+# Files #
+.cache
+.target
+.classpath
+
+# Folders #
+MetaChess/dist
+MetaChess/bin
+.metadata
