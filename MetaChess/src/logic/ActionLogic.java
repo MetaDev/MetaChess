@@ -1,9 +1,9 @@
 package logic;
 
-import model.MetaModel;
+import meta.MetaMapping;
 import model.ExtendedPieceModel;
 import model.ExtendedPlayerModel;
-import userinterface.TileGraphic;
+import model.ExtendedTileModel;
 
 //geef builder mee omdat controller het hele object moet kunnen vernietigen
 public class ActionLogic implements Logic {
@@ -153,25 +153,29 @@ public class ActionLogic implements Logic {
 	public static boolean movement(int i, int j, ExtendedPieceModel model,
 			boolean isSideStep) {
 		model.setDirection(i, j);
-		TileGraphic tile = BoardLogic.getTileNeighbour(MetaModel.getPiecePosition(model), i, j,
-				BoardLogic.isHoover(), model.isIgnoreOccupationOfTile(),
+		ExtendedTileModel previousTile = MetaMapping.getBoardModel()
+				.getPiecePosition(model);
+		ExtendedTileModel newTile = BoardLogic.getTileNeighbour(previousTile,
+				i, j, BoardLogic.isHoover(), model.isIgnoreOccupationOfTile(),
 				model.isPenetrateLowerFraction());
 		// movement did not succeed
-		if (tile == null)
+		if (newTile == null)
 			return false;
 		// tile is occupied and the movement isn't a sidestep->there doesn't
 		// immediately follow a next move
-		if (!isSideStep && MetaModel.getModelOnPosition(tile) != null) {
+		if (!isSideStep
+				&& MetaMapping.getBoardModel().getModelOnPosition(newTile) != null) {
 			// here a piece loses a life or more or get's killed
 			// when killed the Metamodel should be alerted
 
 			// delete piece model
-			//should this be the player, then it's game over
-			MetaModel.deleteModel(tile);
-			
+			// should this be the player, then it's game over
+			MetaMapping.getBoardModel().deleteModel(newTile);
 
 		}
-		MetaModel.setEntityModel(model, tile);
+
+		// set new position for model
+		MetaMapping.getBoardModel().setPiecePosition(model, newTile);
 		return true;
 	}
 

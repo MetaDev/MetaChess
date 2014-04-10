@@ -1,6 +1,5 @@
 package model;
 
-import userinterface.Graphic;
 import meta.MetaMapping.ControllerType;
 import meta.MetaMapping.PieceRendererType;
 

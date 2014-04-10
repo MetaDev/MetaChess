@@ -5,34 +5,56 @@
  */
 package control;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import logic.MetaClock;
+import meta.MetaMapping;
 import meta.MetaMapping.ControllerType;
 import meta.MetaMapping.ControllerType.ControllerGroup;
+import model.ExtendedBoardModel;
 import model.ExtendedPieceModel;
-import model.MetaModel;
-import userinterface.TileGraphic;
+import model.ExtendedTileModel;
+import model.TileGraphic;
+import action.MetaAction;
 
 public class MetaLoop {
 
 	public static void decisionTurn() {
-		for (ExtendedPieceModel model: MetaModel.getEntityModels().keySet()) {
+		ExtendedBoardModel board = MetaMapping.getBoardModel();
+		
+		//alert the board if the turn changed for it's active MetaAcations
+		for(Map.Entry<ExtendedTileModel, MetaAction> pair: MetaMapping.getBoardModel().getActiveMetaActions().entrySet()){
+			ExtendedTileModel tile = pair.getKey();
+			MetaAction metaAction = pair.getValue();
+			ExtendedPieceModel model = board.getMetaActionActor(metaAction);
+			
+			
+			if (MetaClock.getTurn(tile.absoluteFraction(), model.getSide()) != MetaClock
+					.getTurn(tile.absoluteFraction(), model.getSide(),
+							board.getMetaActionTimeStamp(metaAction))) {
+				MetaMapping.getBoardModel().metaActionTurnChanged(metaAction);
+			}
+		}
+		//handle MetaActions acting on piece models
+		for (ExtendedPieceModel model: MetaMapping.getBoardModel().getEntityModels().keySet()) {
+			//an active piece
 			ControllerType type = model.getControllerType();
 
-			// check if the turn changed for the model
-			// if so, call the change method and set new absolute turn and
-			// frationOnTurnChange
-
-			TileGraphic tile = MetaModel.getPiecePosition(model);
-			// save absolute time
-			// then check if the turn changed based on that
-			// check if turn changed for player based on absolute turntime and fraction
-			if (MetaClock.getTurn(tile.absoluteFraction(), tile.getColor()) != MetaClock
-					.getTurn(tile.absoluteFraction(), tile.getColor(),
+			//alert the piece the turn changed for it
+			ExtendedTileModel tile = MetaMapping.getBoardModel().getPiecePosition(model);
+			if (MetaClock.getTurn(tile.absoluteFraction(), model.getSide()) != MetaClock
+					.getTurn(tile.absoluteFraction(),model.getSide(),
 							model.getAbsTime())) {
 				model.turnChange();
 			}
-			//revert all inactive MetaAcions
+
+			
+			//revert all active piece MetaAcions that turned inactive, included board MetaActions
 			model.revertMetaActions();
+			//act all MetaActions: execute piece MetaActions and board MetaActions , set range of ranged piece metaActions
+			model.actMetaActions();
+			
 			// TODO
 			// if highest fraction reached, the piece won't be locked anymore,
 			// but the cooldwon still counts with

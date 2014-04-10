@@ -11,7 +11,7 @@ import model.ExtendedPieceModel;
 
 import org.lwjgl.input.Keyboard;
 
-import action.MAAHalfCooldown;
+import action.MAAHalfCooldownInput;
 import action.MAAKeyRelease;
 import action.MAANoCooldown;
 import action.MARCurrentTile;
@@ -113,7 +113,7 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 				Keyboard.KEY_P + "press",
 				initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
 						new ActionType[] { ActionType.TILEVIEWDOWN },
-						new MAAHalfCooldown(), null, 8, true, "TILEVIEW"));
+						new MAAHalfCooldownInput(), null, 8, true, "TILEVIEW"));
 		// decision to be able to pentrate lower tile fraction, active while
 		// pressed
 		MetaMapping.bindMetaActionToInput(

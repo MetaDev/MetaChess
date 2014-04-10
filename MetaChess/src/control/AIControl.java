@@ -1,6 +1,5 @@
 package control;
 
-import userinterface.Graphic;
 
 
 public class AIControl implements Controller{

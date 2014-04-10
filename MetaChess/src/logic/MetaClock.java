@@ -1,6 +1,9 @@
 package logic;
 
-import model.MetaModel;
+import meta.MetaMapping;
+import model.ExtendedPieceModel;
+import model.ExtendedTileModel;
+
 
 //the clock never stops
 public class MetaClock {
@@ -33,18 +36,25 @@ public class MetaClock {
 		int absTurn = getTileTurn(fraction,time);
 		return absTurn % 2 == side;
 	}
-
+	//return turn based on Piece
+	public static boolean getTurn(ExtendedPieceModel piece){
+		ExtendedTileModel tile = MetaMapping.getBoardModel().getPiecePosition(piece);
+		return getTurn(tile.absoluteFraction(),piece.getSide());
+	}
 	public static int getAbsoluteTime() {
 		return (int) (System.currentTimeMillis() % maxWaitTime);
 	}
-
+	// absolute turn of player
+		public static int getTileTurn(ExtendedPieceModel piece) {
+			ExtendedTileModel tile = MetaMapping.getBoardModel().getPiecePosition(piece);
+			if (tile == null)
+				return -1;
+			int fraction =tile.absoluteFraction();
+			return getTileTurn(fraction);
+		}
 	// absolute turn of player
 	public static int getTileTurn() {
-		
-		if (MetaModel.getPiecePosition(MetaModel.getPlayer()) == null)
-			return -1;
-		int fraction = MetaModel.getPiecePosition(MetaModel.getPlayer()).absoluteFraction();
-		return getTileTurn(fraction);
+		return getTileTurn(MetaMapping.getBoardModel().getPlayer());
 	}
 
 	public static boolean getTurn(int fraction, int side) {

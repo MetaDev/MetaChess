@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.Random;
 
-import userinterface.TileGraphic;
-import model.MetaModel;
+import meta.MetaMapping;
+import model.ExtendedTileModel;
 
 public class BoardLogic implements Logic {
 
@@ -47,8 +47,8 @@ public class BoardLogic implements Logic {
 	// }
 
 	// Use the recursive coordinates I and J to find a tile;
-	public static TileGraphic getTile(int[] I, int[] J) {
-		TileGraphic currTile =(TileGraphic) MetaModel.getBoardModel().getRootTile();
+	public static ExtendedTileModel getTile(int[] I, int[] J) {
+		ExtendedTileModel currTile =(ExtendedTileModel) MetaMapping.getBoardModel().getRootTile();
 		int i = 0;
 		while (currTile.getChildren() != null && i < I.length && i < J.length) {
 			currTile = currTile.getChildren()[I[i]][J[i]];
@@ -125,9 +125,9 @@ public class BoardLogic implements Logic {
 	//parameters: floating, never go to lower fraction, float on it
 	// ignoreoccupation, allowed to jump over pieces
 	// penetraLowerFraction, continue movement when entering a lower fractioned tile
-	public static TileGraphic getTileNeighbour(TileGraphic tile, int horDir,
+	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile, int horDir,
 			int vertDir, boolean floating, boolean ignoreOccupation, boolean penetrateLowerFraction) {
-		TileGraphic it = tile;
+		ExtendedTileModel it = tile;
 		int startFraction = it.absoluteFraction();
 		// root tile
 		if (it.getParent() == null) {
@@ -183,7 +183,7 @@ public class BoardLogic implements Logic {
 						&& Math.abs(remainingHorMov)
 								+ Math.abs(remainingVerMov) != 0)
 					break;
-				TileGraphic temp = enterLowerFractionOfTile(it, horMov, verMov);
+				ExtendedTileModel temp = enterLowerFractionOfTile(it, horMov, verMov);
 				// avoid loop
 				if (temp == it) {
 					break;
@@ -212,9 +212,9 @@ public class BoardLogic implements Logic {
 	// one of many implementations to come
 	// return a child with the highest fraction and the opposit colour as the
 	// parent that is positioned on the border accesed by the movement.
-	public static TileGraphic enterLowerFractionOfTile(TileGraphic tile,
+	public static ExtendedTileModel enterLowerFractionOfTile(ExtendedTileModel tile,
 			int horMov, int verMov) {
-		TileGraphic it = tile;
+		ExtendedTileModel it = tile;
 		// c==1 -> tile your on is white, if you want to use colour in your
 		// function
 		// int c = (int) it.getColor().b;

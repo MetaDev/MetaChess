@@ -18,7 +18,7 @@ public class PlayerEditor extends Editor {
 		int[] I = {0,0,0};
 		TileGraphic pos = BoardLogic.getTile(I, I);
 		System.out.println(pos.absoluteFraction());
-		MetaModel.setPlayer(player,pos);
+		MetaModel.setPlayerPosition(player,pos);
 	}
 	
 	

@@ -7,8 +7,8 @@ import java.util.Map;
 
 import logic.BoardLogic;
 import model.ExtendedBoardModel;
+import model.ExtendedGUI;
 import model.MetaModel;
-import model.ExtendedPlayerModel;
 
 import org.lwjgl.util.Color;
 
@@ -91,6 +91,21 @@ public class MetaMapping {
 	private static Map<String, MetaAction> keyToAction = new HashMap<>();
 	// board renderer
 	private static BoardRenderer boardRenderer;
+	//also keep extended models here
+
+	private static ExtendedBoardModel boardModel;
+	private static ExtendedGUI guiModel;
+
+	
+
+
+	public static ExtendedBoardModel getBoardModel() {
+		return boardModel;
+	}
+
+	public static void setBoardModel(ExtendedBoardModel boardModel) {
+		MetaMapping.boardModel = boardModel;
+	}
 
 	// guirenderer
 	private static GUIRenderer guiRenderer;
@@ -146,7 +161,7 @@ public class MetaMapping {
 		boardRenderer = new BoardRenderer();
 		guiRenderer = new GUIRenderer();
 		TileGraphic floor = new TileGraphic(0, 0, 1, tileSize, 0, 0, 0, null);
-		MetaModel.setBoardModel(new ExtendedBoardModel(floor));
+		MetaMapping.setBoardModel(new ExtendedBoardModel(floor));
 		
 		
 	}
