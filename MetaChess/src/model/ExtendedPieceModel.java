@@ -246,4 +246,7 @@ public class ExtendedPieceModel {
 	public float getY() {
 		return MetaModel.getPiecePosition(this).getY();
 	}
+	public TileGraphic getTilePosition(){
+		return MetaModel.getPiecePosition(this);
+	}
 }

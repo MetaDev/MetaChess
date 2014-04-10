@@ -79,5 +79,6 @@ public class MetaModel {
 	public static void deleteModel(ExtendedPieceModel model) {
 		piecesOnBoard.remove(model);
 	}
+	
 
 }

@@ -14,6 +14,7 @@ import org.lwjgl.input.Keyboard;
 import action.MAAHalfCooldown;
 import action.MAAKeyRelease;
 import action.MAANoCooldown;
+import action.MARCurrentTile;
 import action.MARParentTile;
 import action.MetaAction;
 import action.MetaActionActivity;
@@ -27,11 +28,12 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// range 1
 
 		MetaActionActivity keyRealease = new MAAKeyRelease();
+		MetaActionRange currentTileRange = new MARCurrentTile();
 		MetaAction action;
 		action = initMetaAction(new ActionType[] { ActionType.RANGEPLUS1 },
 				new ActionType[] { ActionType.RANGEMIN1 },
 
-				keyRealease, null, 0, false, "RANGE1");
+				keyRealease, currentTileRange, 0, false, "RANGE1");
 
 		MetaMapping.bindMetaActionToInput(Keyboard.KEY_NUMPAD1 + "press",
 				action);
@@ -40,7 +42,7 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		action = initMetaAction(new ActionType[] { ActionType.RANGEPLUS2 },
 				new ActionType[] { ActionType.RANGEMIN2 },
 
-				keyRealease, null, 0, false, "RANGE2");
+				keyRealease, currentTileRange, 0, false, "RANGE2");
 
 		MetaMapping.bindMetaActionToInput(Keyboard.KEY_NUMPAD2 + "press",
 				action);
@@ -49,7 +51,7 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		action = initMetaAction(new ActionType[] { ActionType.RANGEPLUS4 },
 				new ActionType[] { ActionType.RANGEMIN4 },
 
-				keyRealease, null, 0, false, "RANGE4");
+				keyRealease, currentTileRange, 0, false, "RANGE4");
 
 		MetaMapping.bindMetaActionToInput(Keyboard.KEY_NUMPAD4 + "press",
 				action);

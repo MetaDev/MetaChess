@@ -25,7 +25,7 @@ public class MetaLoop {
 			TileGraphic tile = MetaModel.getPiecePosition(model);
 			// save absolute time
 			// then check if the turn changed based on that
-			// check if turn changed based on absolute turntime and fraction
+			// check if turn changed for player based on absolute turntime and fraction
 			if (MetaClock.getTurn(tile.absoluteFraction(), tile.getColor()) != MetaClock
 					.getTurn(tile.absoluteFraction(), tile.getColor(),
 							model.getAbsTime())) {
