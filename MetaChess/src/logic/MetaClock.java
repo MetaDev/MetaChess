@@ -2,6 +2,7 @@ package logic;
 
 import meta.MetaMapping;
 import model.ExtendedPieceModel;
+import model.ExtendedPlayerModel;
 import model.ExtendedTileModel;
 
 
@@ -64,10 +65,12 @@ public class MetaClock {
 
 	// return if the player is in turn
 	public static boolean getTurn() {
-		if (MetaModel.getPiecePosition(MetaModel.getPlayer()) == null)
+		ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
+		ExtendedTileModel playerTile = MetaMapping.getBoardModel().getPiecePosition(player);
+		if (playerTile == null)
 			return false;
-		int fraction = (MetaModel.getPiecePosition(MetaModel.getPlayer())).absoluteFraction();
-		int side =  MetaModel.getPlayer().getSide();
+		int fraction = (playerTile).absoluteFraction();
+		int side =  player.getSide();
 		return getTurn(fraction, side);
 	}
 

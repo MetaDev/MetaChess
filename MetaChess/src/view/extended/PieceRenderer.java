@@ -8,8 +8,8 @@ public class PieceRenderer {
 	public void render(ExtendedPieceModel model) {
 		float x = model.getX();
 		float y = model.getY();
-		float w_8 = (model.getWidth()) / 8;
-		float w_16 = (model.getWidth()) / 16;
+		float w_8 = (model.getSize()) / 8;
+		float w_16 = (model.getSize()) / 16;
 		int main = model.getColor();
 		int invert = (main + 1) % 2;
 		// core

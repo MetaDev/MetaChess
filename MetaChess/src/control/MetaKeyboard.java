@@ -1,11 +1,8 @@
 package control;
 
-import meta.MetaMapping;
 import model.ExtendedPieceModel;
 
 import org.lwjgl.input.Keyboard;
-
-import action.MetaAction;
 
 public class MetaKeyboard {
 	public static void processInput(ExtendedPieceModel model) {
@@ -26,11 +23,7 @@ public class MetaKeyboard {
 			else {
 				MetaInput += "release";
 			}
-			MetaAction action = MetaMapping.getMetaActionFromKey(MetaInput);
-			if (action != null) {				
-				if (MetaMapping.getPieceMetaActions(model.getControllerType()).contains(action.getName()))
-					action.act(model);
-			}
+			
 		}
 	}
 

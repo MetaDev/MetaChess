@@ -8,11 +8,11 @@ import java.util.Map;
 import logic.BoardLogic;
 import model.ExtendedBoardModel;
 import model.ExtendedGUI;
-import model.MetaModel;
+import model.ExtendedTileModel;
 
+import org.lwjgl.input.Controller;
 import org.lwjgl.util.Color;
 
-import userinterface.TileGraphic;
 import view.extended.BischopRenderer;
 import view.extended.BoardRenderer;
 import view.extended.GUIRenderer;
@@ -23,7 +23,6 @@ import view.extended.PieceRenderer;
 import view.extended.QueenRenderer;
 import view.extended.RookRenderer;
 import action.MetaAction;
-import control.Controller;
 import editor.MetaAcionKeyAndPieceMappingEditor;
 
 //contains and initialises all unique instances
@@ -94,7 +93,7 @@ public class MetaMapping {
 	//also keep extended models here
 
 	private static ExtendedBoardModel boardModel;
-	private static ExtendedGUI guiModel;
+
 
 	
 
@@ -160,7 +159,7 @@ public class MetaMapping {
 		MetaAcionKeyAndPieceMappingEditor.init();
 		boardRenderer = new BoardRenderer();
 		guiRenderer = new GUIRenderer();
-		TileGraphic floor = new TileGraphic(0, 0, 1, tileSize, 0, 0, 0, null);
+		ExtendedTileModel floor = new ExtendedTileModel(0, 0, 1, tileSize, 0, 0, 0, null);
 		MetaMapping.setBoardModel(new ExtendedBoardModel(floor));
 		
 		

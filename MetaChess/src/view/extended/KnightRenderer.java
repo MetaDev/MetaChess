@@ -9,8 +9,8 @@ public class KnightRenderer extends PieceRenderer {
 	public void render(ExtendedPieceModel model) {
 		float x = model.getX();
 		float y = model.getY();
-		float w_8 = (model.getWidth()) / 8;
-		float w_16 = (model.getWidth()) / 16;
+		float w_8 = (model.getSize()) / 8;
+		float w_16 = (model.getSize()) / 16;
 		int main = model.getColor();
 		// body
 		RectangleRenderer.drawRectangle(x + 2 * w_8, y + 2 * w_8, 2 * w_8

@@ -1,7 +1,7 @@
 package editor;
 
-import userinterface.TileGraphic;
-import model.MetaModel;
+import meta.MetaMapping;
+import model.ExtendedTileModel;
 
 
 public class BoardEditor extends Editor {
@@ -11,7 +11,7 @@ public class BoardEditor extends Editor {
 		//make this equal to initial windowsize or else->problem
 		
 		// draw floor tiles
-		TileGraphic floor = (TileGraphic)MetaModel.getBoardModel().getRootTile();
+		ExtendedTileModel floor = (ExtendedTileModel)MetaMapping.getBoardModel().getRootTile();
 		floor.divide(8);
 		floor.getChildren()[0][1].divide(2);
 		floor.getChildren()[2][4].divide(8);

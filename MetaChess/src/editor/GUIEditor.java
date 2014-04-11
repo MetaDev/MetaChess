@@ -1,11 +1,11 @@
 package editor;
 
+import meta.MetaMapping.GUIPosition;
+import model.ExtendedGUI;
+import model.ExtendedGUIModel;
 import userinterface.GUI;
 import userinterface.GUIElement;
 import userinterface.GUIElementTurn;
-import meta.MetaMapping.GUIPosition;
-import model.ExtendedGUIModel;
-import model.MetaModel;
 
 public class GUIEditor extends Editor {
 	public static void init() {
@@ -16,7 +16,7 @@ public class GUIEditor extends Editor {
 		gui1.addElement(0, 0, turn);
 		ExtendedGUIModel model1 = new ExtendedGUIModel(gui1,GUIPosition.LEFT);
 		//GUIExtendedModel model2 = new GUIExtendedModel(gui2, null,GUIPosition.RIGHT);
-		MetaModel.addGuiModel(model1);
+		ExtendedGUI.addGuiModel(model1);
 		//MetaModel.addGuiModel(model2);
 	}
 }

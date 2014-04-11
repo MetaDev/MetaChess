@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import logic.MetaClock;
 import meta.MetaMapping;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;

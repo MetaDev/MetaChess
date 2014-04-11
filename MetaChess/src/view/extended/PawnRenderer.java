@@ -12,7 +12,7 @@ public class PawnRenderer extends PieceRenderer{
 		
 		float x = model.getX();
 		float y = model.getY();
-		float w_8 = (model.getWidth()) / 8;
+		float w_8 = (model.getSize()) / 8;
 		int main = model.getColor();
 		//body
 		RectangleRenderer.drawRectangle( x + 3 * w_8, y + w_8,

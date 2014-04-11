@@ -21,14 +21,18 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glScissor;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glViewport;
+
+import java.util.List;
+
 import meta.MetaMapping;
 import meta.MetaMapping.GUIPosition;
+import model.ExtendedBoardModel;
+import model.ExtendedGUI;
 import model.ExtendedGUIModel;
-import model.MetaModel;
+import model.ExtendedPlayerModel;
+import model.ExtendedTileModel;
 
 import org.lwjgl.opengl.Display;
-
-import userinterface.TileGraphic;
 
 public class MetaView {
 
@@ -66,44 +70,41 @@ public class MetaView {
 		glTranslatef(centerBoardX, centerBoardY, 0);
 		// scale to display
 		glScalef(resizeToDisplay, resizeToDisplay, 0);
-
-		TileGraphic PlayerTile = MetaModel.getPiecePosition(MetaModel.getPlayer());
+		ExtendedBoardModel board = MetaMapping.getBoardModel();
+		ExtendedPlayerModel player = board.getPlayer();
+		ExtendedTileModel PlayerTile = board.getPiecePosition(player);
+		
 		// (zoom in) scale to 1 tile in playerview
 		int zoomIn = PlayerTile.absoluteFraction();
 		glScalef(zoomIn, zoomIn, 1);
 		// zoom out depending on nr of tiles allowed to see
 		int tiles = 1;
-		if (MetaModel.getPlayer() != null) {
-			tiles = MetaModel.getPlayer().getNrOfViewTiles();
+		if (player != null) {
+			tiles = player.getNrOfViewTiles();
 		}
 		glScalef((float) 1 / (2 * tiles + 1), (float) 1 / (2 * tiles + 1), 1);
 		// move player to center
-		float currentTileSize = PlayerTile.getHeight();
+		float currentTileSize = PlayerTile.getSize();
 		float centerPlayer = tiles * currentTileSize;
 		
 		glTranslatef(-PlayerTile.getX() + centerPlayer, -PlayerTile.getY()
 				+ centerPlayer, 0);
 		// render board
-		MetaMapping.getBoardRenderer().render(MetaModel.getBoardModel());
-		// render entities
-		// iterate the list of entity models
-		// for (int i = 0; i < MetaModel.getEntityModels().size(); i++) {
-		// PieceRendererType piece = ((PieceGraphic) MetaModel
-		// .getEntityModels().get(i).getGraphic()).getPiece();
-		// MetaMapping.getPieceRenderer(piece).render(
-		// MetaModel.getEntityModels().get(i).getGraphic());
-		// }
+		MetaMapping.getBoardRenderer().render(board);
+		
 		glPopMatrix();
 		glDisable(GL_SCISSOR_TEST);
+		
 		// draw UI
 		// ipv de width en height mee te geven beter herschalen
 		// different depending if GUI draws left, right, top or bottom
 		// an optimisation could be to only resize when the window resizes
-		for (int i = 0; i < MetaModel.getGuiModels().size(); i++) {
+		List<ExtendedGUIModel> guiModels = ExtendedGUI.getGuiModels();
+		for (int i = 0; i < guiModels.size(); i++) {
 
-			GUIPosition position = MetaModel.getGuiModels().get(i)
+			GUIPosition position =guiModels.get(i)
 					.getPosition();
-			ExtendedGUIModel guiModel = MetaModel.getGuiModels().get(i);
+			ExtendedGUIModel guiModel = guiModels.get(i);
 			if (position == GUIPosition.LEFT || position == GUIPosition.BOTTOM) {
 				guiModel.getGui().setWidth(centerBoardX);
 				guiModel.getGui().setHeight(centerBoardX);
