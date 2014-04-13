@@ -67,8 +67,10 @@ public class MetaWindow {
 		
 		//initialize editors
 		BoardEditor.init();
-		GUIEditor.init();
+		
 		PlayerEditor.init();
+		//the GUI is initialized the last
+		GUIEditor.init();
 		
 		// EnemyBuilder enemyBuilder = new EnemyBuilder();
 		// enemyBuilder.assemble(worldBuilder);

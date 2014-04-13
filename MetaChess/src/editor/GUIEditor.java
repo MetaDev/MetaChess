@@ -1,22 +1,23 @@
 package editor;
 
+import meta.MetaMapping;
 import meta.MetaMapping.GUIPosition;
 import model.ExtendedGUI;
-import model.ExtendedGUIModel;
-import userinterface.GUI;
-import userinterface.GUIElement;
-import userinterface.GUIElementTurn;
+import userinterface.generic.GUITile;
+import userinterface.implementations.GTTurn;
 
 public class GUIEditor extends Editor {
 	public static void init() {
-		GUI gui1 = new GUI(2,2);
-		GUI gui2 = new GUI(2,2);
+		int playerColor = MetaMapping.getBoardModel().getPlayer().getColor();
+		int oppositePlayerColor = (playerColor+1)%2;
+		GUITile rootLeft = new GUITile(8, 4, playerColor, null, 0, 0);
+		rootLeft.addElement(0, 0, new GTTurn(oppositePlayerColor, rootLeft, 0, 0));
+		//GUIPanel metaActionViewUp = new GUIPanelMetaAction(1, 1, playerColor, MetaMapping.getMetaAction("TILEVIEW"));
 		
-		GUIElement turn = new GUIElementTurn(1,1,1);
-		gui1.addElement(0, 0, turn);
-		ExtendedGUIModel model1 = new ExtendedGUIModel(gui1,GUIPosition.LEFT);
-		//GUIExtendedModel model2 = new GUIExtendedModel(gui2, null,GUIPosition.RIGHT);
-		ExtendedGUI.addGuiModel(model1);
-		//MetaModel.addGuiModel(model2);
+		//gui2.addElement(0, 0, metaActionViewUp);
+
+		//ExtendedGUIModel model2 = new ExtendedGUIModel(gui2,GUIPosition.RIGHT);
+		ExtendedGUI.addGuiBlock(GUIPosition.LEFT,rootLeft);
+		//ExtendedGUI.addGuiModel(model2);
 	}
 }

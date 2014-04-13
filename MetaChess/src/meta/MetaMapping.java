@@ -7,7 +7,6 @@ import java.util.Map;
 
 import logic.BoardLogic;
 import model.ExtendedBoardModel;
-import model.ExtendedGUI;
 import model.ExtendedTileModel;
 
 import org.lwjgl.input.Controller;
@@ -106,7 +105,7 @@ public class MetaMapping {
 		MetaMapping.boardModel = boardModel;
 	}
 
-	// guirenderer
+	// guirenderers
 	private static GUIRenderer guiRenderer;
 
 	private static int tileSize = 8 * 64;

@@ -9,7 +9,6 @@ import view.openglImpl.RectangleRenderer;
 public class BoardRenderer {
 
 	public void render(ExtendedBoardModel model) {
-		
 		recursiveRender(model.getRootTile());
 	}
 

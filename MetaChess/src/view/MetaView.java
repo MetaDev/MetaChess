@@ -22,17 +22,18 @@ import static org.lwjgl.opengl.GL11.glScissor;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glViewport;
 
-import java.util.List;
+import java.util.Map;
 
 import meta.MetaMapping;
 import meta.MetaMapping.GUIPosition;
 import model.ExtendedBoardModel;
 import model.ExtendedGUI;
-import model.ExtendedGUIModel;
 import model.ExtendedPlayerModel;
 import model.ExtendedTileModel;
 
 import org.lwjgl.opengl.Display;
+
+import userinterface.generic.GUITile;
 
 public class MetaView {
 
@@ -50,6 +51,10 @@ public class MetaView {
 		float min = Math.min(height, width);
 		float startSize = Display.getDisplayMode().getWidth();
 		float resizeToDisplay = min / startSize;
+
+		ExtendedBoardModel board = MetaMapping.getBoardModel();
+		ExtendedPlayerModel player = board.getPlayer();
+		ExtendedTileModel PlayerTile = board.getPiecePosition(player);
 		// set the drawing as absolute
 		glClear(GL_COLOR_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
@@ -70,10 +75,7 @@ public class MetaView {
 		glTranslatef(centerBoardX, centerBoardY, 0);
 		// scale to display
 		glScalef(resizeToDisplay, resizeToDisplay, 0);
-		ExtendedBoardModel board = MetaMapping.getBoardModel();
-		ExtendedPlayerModel player = board.getPlayer();
-		ExtendedTileModel PlayerTile = board.getPiecePosition(player);
-		
+
 		// (zoom in) scale to 1 tile in playerview
 		int zoomIn = PlayerTile.absoluteFraction();
 		glScalef(zoomIn, zoomIn, 1);
@@ -86,40 +88,46 @@ public class MetaView {
 		// move player to center
 		float currentTileSize = PlayerTile.getSize();
 		float centerPlayer = tiles * currentTileSize;
-		
+
 		glTranslatef(-PlayerTile.getX() + centerPlayer, -PlayerTile.getY()
 				+ centerPlayer, 0);
 		// render board
 		MetaMapping.getBoardRenderer().render(board);
-		
+
 		glPopMatrix();
+		glPushMatrix();
 		glDisable(GL_SCISSOR_TEST);
-		
+
 		// draw UI
 		// ipv de width en height mee te geven beter herschalen
 		// different depending if GUI draws left, right, top or bottom
 		// an optimisation could be to only resize when the window resizes
-		List<ExtendedGUIModel> guiModels = ExtendedGUI.getGuiModels();
-		for (int i = 0; i < guiModels.size(); i++) {
+		Map<GUIPosition, GUITile> guis = ExtendedGUI.getGuis();
 
-			GUIPosition position =guiModels.get(i)
-					.getPosition();
-			ExtendedGUIModel guiModel = guiModels.get(i);
-			if (position == GUIPosition.LEFT || position == GUIPosition.BOTTOM) {
-				guiModel.getGui().setWidth(centerBoardX);
-				guiModel.getGui().setHeight(centerBoardX);
+		for (Map.Entry<GUIPosition, GUITile> gui : guis.entrySet()) {
+			GUIPosition position = gui.getKey();
+			GUITile guiBlock = gui.getValue();
+			if (position == GUIPosition.LEFT) {
+				//position 0,0
+				guiBlock.setWidth(centerBoardX);
+				guiBlock.setHeight(Display.getHeight());
+			} else if (position == GUIPosition.BOTTOM) {
+				//position 0,0
+				guiBlock.setWidth(Display.getWidth());
+				guiBlock.setHeight(centerBoardY);
 			} else if (position == GUIPosition.RIGHT) {
-				guiModel.getGui().setWidth(centerBoardX);
-				guiModel.getGui().setHeight(centerBoardX);
-				guiModel.getGui().setX(((Display.getWidth() - centerBoardX)));
+				guiBlock.setWidth(centerBoardX);
+				guiBlock.setHeight(Display.getHeight());
+				guiBlock.setX(((Display.getWidth() - centerBoardX)));
 			} else if (position == GUIPosition.TOP) {
-				guiModel.getGui().setWidth(centerBoardY);
-				guiModel.getGui().setHeight(centerBoardY);
-				guiModel.getGui().setY((Display.getHeight() - centerBoardY));
+				guiBlock.setWidth(Display.getWidth());
+				guiBlock.setHeight(centerBoardY);
+				guiBlock.setY((Display.getHeight() - centerBoardY));
 			}
-			MetaMapping.getGuiRenderer().render(guiModel);
+			MetaMapping.getGuiRenderer().render(guiBlock);
 
 		}
+		glPopMatrix();
 
 	}
 }

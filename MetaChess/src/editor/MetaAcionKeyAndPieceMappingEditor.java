@@ -11,6 +11,7 @@ import model.ExtendedPieceModel;
 
 import org.lwjgl.input.Keyboard;
 
+import action.MAAHalfCooldownInput;
 import action.MAAInput;
 import action.MetaAction;
 import action.MetaActionActivity;
@@ -24,57 +25,42 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// range 1
 
 		MetaActionActivity keyInput1 = new MAAInput(Keyboard.KEY_NUMPAD1);
-		MetaAction action;
-		action = initMetaAction(new ActionType[] { ActionType.RANGEPLUS1 },
+		initMetaAction(new ActionType[] { ActionType.RANGEPLUS1 },
 				new ActionType[] { ActionType.RANGEMIN1 },
 
 				keyInput1, null, 0, false, "RANGE1");
 
-		MetaMapping.bindMetaActionToInput(Keyboard.KEY_NUMPAD1 + "press",
-				action);
-
 		// // range 2
-		// action = initMetaAction(new ActionType[] { ActionType.RANGEPLUS2 },
-		// new ActionType[] { ActionType.RANGEMIN2 },
-		//
-		// keyRealease, currentTileRange, 0, false, "RANGE2");
-		//
-		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_NUMPAD2 + "press",
-		// action);
-		//
+		MetaActionActivity keyInput2 = new MAAInput(Keyboard.KEY_NUMPAD2);
+		initMetaAction(new ActionType[] { ActionType.RANGEPLUS2 },
+				new ActionType[] { ActionType.RANGEMIN2 },
+
+				keyInput2, null, 0, false, "RANGE2");
+
 		// // range 4
-		// action = initMetaAction(new ActionType[] { ActionType.RANGEPLUS4 },
-		// new ActionType[] { ActionType.RANGEMIN4 },
-		//
-		// keyRealease, currentTileRange, 0, false, "RANGE4");
-		//
-		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_NUMPAD4 + "press",
-		// action);
-		//
+		MetaActionActivity keyInput4 = new MAAInput(Keyboard.KEY_NUMPAD4);
+		initMetaAction(new ActionType[] { ActionType.RANGEPLUS4 },
+				new ActionType[] { ActionType.RANGEMIN4 },
+
+				keyInput4, null, 0, false, "RANGE4");
+
 		// init orthog movement
 		MetaActionActivity keyInputZ = new MAAInput(Keyboard.KEY_Z);
-		action = initMetaAction(new ActionType[] { ActionType.UP }, null,
+		initMetaAction(new ActionType[] { ActionType.UP }, null,
+		keyInputZ, null, 0, true, "UP");
 		
-				keyInputZ, null, 0, true, "UP");
+		MetaActionActivity keyInputS = new MAAInput(Keyboard.KEY_S);
+		initMetaAction(new ActionType[] { ActionType.DOWN }, null,
+		keyInputS, null, 0, true, "DOWN");
 		
+		MetaActionActivity keyInputQ = new MAAInput(Keyboard.KEY_Q);
+		initMetaAction(new ActionType[] { ActionType.LEFT }, null,
+		keyInputQ, null, 0, true, "LEFT");
+		
+		MetaActionActivity keyInputD = new MAAInput(Keyboard.KEY_D);
+		initMetaAction(new ActionType[] { ActionType.RIGHT }, null,
+		keyInputD, null, 0, true, "RIGHT");
 
-		// action = initMetaAction(new ActionType[] { ActionType.DOWN }, null,
-		//
-		// noCoolDown, null, 0, true, "DOWN");
-		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_S + "press", action);
-		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_S + "hold", action);
-		//
-		// action = initMetaAction(new ActionType[] { ActionType.LEFT }, null,
-		//
-		// noCoolDown, null, 0, true, "LEFT");
-		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_Q + "press", action);
-		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_Q + "hold", action);
-		//
-		// action = initMetaAction(new ActionType[] { ActionType.RIGHT }, null,
-		//
-		// noCoolDown, null, 0, true, "RIGHT");
-		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_D + "press", action);
-		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_D + "hold", action);
 		//
 		// // init orthog movement
 		// action = initMetaAction(new ActionType[] { ActionType.DOWNLEFT },
@@ -103,13 +89,12 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// noCoolDown, null, 0, true, "DOWNRIGHT");
 		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_C + "press", action);
 		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_C + "hold", action);
-		//
-		// // decision tile view up, active for half the cooldown, not locking
-		// MetaMapping.bindMetaActionToInput(
-		// Keyboard.KEY_P + "press",
-		// initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
-		// new ActionType[] { ActionType.TILEVIEWDOWN },
-		// new MAAHalfCooldownInput(), null, 8, true, "TILEVIEW"));
+		
+		 // decision tile view up, active for half the cooldown, not locking
+		
+		 initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
+		 new ActionType[] { ActionType.TILEVIEWDOWN },
+		 new MAAHalfCooldownInput(Keyboard.KEY_P), null, 8, true, "TILEVIEW");
 		// // decision to be able to pentrate lower tile fraction, active while
 		// // pressed
 		// MetaMapping.bindMetaActionToInput(

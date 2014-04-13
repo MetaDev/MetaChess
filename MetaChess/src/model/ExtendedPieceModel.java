@@ -107,11 +107,9 @@ public class ExtendedPieceModel {
 				else
 				// revert if MetaAction is no longer active, but has been active
 				if (entry.getKey().getTurnsOfActivity(this) == 0) {
-					System.out.println(entry.getValue());
 					entry.getKey().revert(this);
 					// set inactive in model
 					entry.setValue(false);
-					System.out.println(entry.getValue());
 				}
 
 			}
@@ -144,7 +142,9 @@ public class ExtendedPieceModel {
 		// iterate over all MetaAction that the piece can execute
 		for (Map.Entry<MetaAction, Integer> entry : cooldownOfMetaActions
 				.entrySet()) {
+
 			MetaAction metaAction = entry.getKey();
+
 			int cooldown = entry.getValue();
 			// execute the MetaAction if it's not locking and the models not
 			// locked or if it's your turn
@@ -153,6 +153,7 @@ public class ExtendedPieceModel {
 				if (cooldown == 0) {
 					// act if the activity conditions of the MetaAction are met
 					if (metaAction.getTurnsOfActivity(this) > 0) {
+
 						// if the MetaAction is ranged,the execution of the
 						// MetaAction
 						// doesn't act, unless the model is on a tile of the
@@ -168,7 +169,10 @@ public class ExtendedPieceModel {
 								MetaMapping.getBoardModel()
 										.setActiveMetaAction(metaAction, tile,
 												this);
-
+							entry.setValue(metaAction.getCooldown());
+							if (metaAction.isLocking()) {
+								locked = true;
+							}
 						}
 
 						// if it's not a ranged MetaAction, you can execute it
@@ -176,15 +180,17 @@ public class ExtendedPieceModel {
 						else if (!metaActionIsActive.get(metaAction)) {
 							metaActionIsActive.put(metaAction, true);
 							metaAction.act(this);
+							entry.setValue(metaAction.getCooldown());
+							if (metaAction.isLocking()) {
+								locked = true;
+							}
 						}
 						// set locking for executed normal as well as ranged
 						// MetaActions
-						if (metaAction.isLocking()) {
-							locked = true;
-						}
+
 						// set cooldown for executed normal as well as ranged
 						// MetaActions
-						entry.setValue(metaAction.getCooldown());
+
 					}
 				}
 			}

@@ -20,6 +20,8 @@ public class BoardEditor extends Editor {
 		floor.getChildren()[6][2].divide(4);
 		floor.getChildren()[0][0].divide(2);
 		floor.getChildren()[0][0].getChildren()[0][0].divide(2);
+		System.out.println(floor.getChildren()[0][0].getChildren()[0][0].absoluteFraction());
+
 		
 		
 	}

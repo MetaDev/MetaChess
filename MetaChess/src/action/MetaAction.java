@@ -25,6 +25,8 @@ public class MetaAction {
 	private MetaActionRange range;
 	// the MetaAction locks the piece for 1 turn
 	private boolean locking;
+	//icon shown in GUI
+	private int[][] icon;
 
 	public boolean isLocking() {
 		return locking;
@@ -69,11 +71,11 @@ public class MetaAction {
 	}
 
 	public MetaAction(int cooldown, MetaActionActivity activity,
-			List<Method> methods, String name, boolean locks) {
+			List<Method> methods, String name, boolean locking) {
 		this.cooldown = cooldown;
 		this.acts = methods;
 		this.name = name;
-		this.locking = locks;
+		this.locking = locking;
 		this.activity = activity;
 		MetaMapping.addMetaAction(name, this);
 	}

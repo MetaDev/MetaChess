@@ -131,6 +131,7 @@ public class ActionLogic implements Logic {
 	}
 
 	public static void TILEVIEWUP(ExtendedPieceModel model) {
+		System.out.println("test");
 		((ExtendedPlayerModel) model)
 				.setNrOfViewTiles(((ExtendedPlayerModel) model)
 						.getNrOfViewTiles() + 1);
