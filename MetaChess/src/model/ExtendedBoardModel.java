@@ -2,23 +2,26 @@ package model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import logic.MetaClock;
 import meta.MetaUtil;
 import action.MetaAction;
 
 public class ExtendedBoardModel {
 	private ExtendedTileModel rootTile;
 	// the pieces and there position on the board
-	private Map<ExtendedPieceModel, ExtendedTileModel> piecesOnBoard = new HashMap<>();
+	private Map<ExtendedPieceModel, ExtendedTileModel> piecesOnBoard = new ConcurrentHashMap<>();
 	// the tile and name of board MetaAction
-	private Map<ExtendedTileModel, MetaAction> activeMetaActions = new HashMap<>();
+	// made this a concurrent hashmap because the activity is constantly update while in the logic loop this map is read all the time
+	private Map<ExtendedTileModel, MetaAction> activeMetaActions = new ConcurrentHashMap <>();
 	// the piece which executed the board MetaAction
-	private Map<MetaAction, ExtendedPieceModel> activeMetaActionsActor = new HashMap<>();
+	private Map<ExtendedTileModel, ExtendedPieceModel> activeMetaActionsActor = new ConcurrentHashMap<>();
 	// the time that past since execution
-	private Map<MetaAction, Integer> activeMetaActionsTimeLeft = new HashMap<>();
+	private Map<ExtendedTileModel, Integer> activeMetaActionsTimeLeft = new ConcurrentHashMap<>();
 	// the absolute time at the moment of execution, needed to check if passed
 	// time has to be increased.
-	private Map<MetaAction, Integer> activeMetaActionsTimeStamp = new HashMap<>();
+	private Map<ExtendedTileModel, Integer> activeMetaActionsTimeStamp = new ConcurrentHashMap<>();
 
 	public Map<ExtendedPieceModel, ExtendedTileModel> getPiecesOnBoard() {
 		return piecesOnBoard;
@@ -28,16 +31,20 @@ public class ExtendedBoardModel {
 		return activeMetaActions;
 	}
 
-	public Map<MetaAction, ExtendedPieceModel> getActiveMetaActionsActor() {
+	public Map<ExtendedTileModel, ExtendedPieceModel> getActiveMetaActionsActor() {
 		return activeMetaActionsActor;
 	}
 
-	public Map<MetaAction, Integer> getActiveMetaActionsPassedTime() {
+	public Map<ExtendedTileModel, Integer> getActiveMetaActionsTimeLeft() {
 		return activeMetaActionsTimeLeft;
 	}
 
-	public Map<MetaAction, Integer> getActiveMetaActionsTimeStamp() {
+	public Map<ExtendedTileModel, Integer> getActiveMetaActionsTimeStamp() {
 		return activeMetaActionsTimeStamp;
+	}
+
+	public int getActiveMetaActionTimeLeft(ExtendedTileModel pos) {
+		return activeMetaActionsTimeLeft.get(pos);
 	}
 
 	private ExtendedPlayerModel player;
@@ -74,20 +81,29 @@ public class ExtendedBoardModel {
 	}
 
 	public void setActiveMetaAction(MetaAction metaAction,
-			ExtendedTileModel position, ExtendedPieceModel actor) {
+			ExtendedTileModel position, ExtendedPieceModel actor, int turnsOfActivity) {
 		activeMetaActions.put(position, metaAction);
-		activeMetaActionsActor.put(metaAction, actor);
-		activeMetaActionsTimeLeft.put(metaAction, 0);
-		activeMetaActionsTimeStamp.put(metaAction, actor.getAbsTime());
+		activeMetaActionsActor.put(position, actor);
+		activeMetaActionsTimeLeft.put(position, turnsOfActivity);
+		activeMetaActionsTimeStamp.put(position, actor.getAbsTime());
 	}
-
-	public void metaActionTurnChanged(MetaAction metaAction) {
-		if (activeMetaActionsTimeLeft.get(metaAction) > 1) {
-			activeMetaActionsTimeLeft.put(metaAction,
-					activeMetaActionsTimeLeft.get(metaAction) - 1);
+	
+	public void metaActionTurnChanged(ExtendedTileModel position) {
+		System.out.println(activeMetaActionsTimeLeft.get(position)+"  "+ position);
+		if (activeMetaActionsTimeLeft.get(position) > 1) {
+			activeMetaActionsTimeLeft.put(position,
+					activeMetaActionsTimeLeft.get(position) - 1);
+			//save timestamp, to check next time if turn changed
+			activeMetaActionsTimeStamp.put(position, MetaClock.getAbsoluteTime());
+			System.out.println(activeMetaActionsTimeLeft.get(position));
 		} else {
-			activeMetaActionsTimeLeft.remove(metaAction);
+			System.out.println("test");
+			activeMetaActionsTimeLeft.remove(position);
+			activeMetaActionsActor.remove(position);
+			activeMetaActions.remove(position);
+			activeMetaActionsTimeStamp.remove(position);
 		}
+		
 
 	}
 
@@ -97,11 +113,12 @@ public class ExtendedBoardModel {
 		return null;
 	}
 
-	public ExtendedPieceModel getMetaActionActor(MetaAction metaAction) {
-		return activeMetaActionsActor.get(metaAction);
+	public ExtendedPieceModel getMetaActionActor(ExtendedTileModel position) {
+		return activeMetaActionsActor.get(position);
 	}
-	public int getMetaActionTimeStamp(MetaAction metaAction){
-		return activeMetaActionsTimeStamp.get(metaAction);
+
+	public int getMetaActionTimeStamp(ExtendedTileModel position) {
+		return activeMetaActionsTimeStamp.get(position);
 	}
 
 	public Map<ExtendedPieceModel, ExtendedTileModel> getEntityModels() {

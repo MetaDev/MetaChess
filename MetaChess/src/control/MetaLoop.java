@@ -23,19 +23,18 @@ public class MetaLoop {
 		for (Map.Entry<ExtendedTileModel, MetaAction> pair : MetaMapping
 				.getBoardModel().getActiveMetaActions().entrySet()) {
 			ExtendedTileModel tile = pair.getKey();
-			MetaAction metaAction = pair.getValue();
-			ExtendedPieceModel model = board.getMetaActionActor(metaAction);
+			ExtendedPieceModel model = board.getMetaActionActor(tile);
 
 			if (MetaClock.getTurn(tile.absoluteFraction(), model.getSide()) != MetaClock
 					.getTurn(tile.absoluteFraction(), model.getSide(),
-							board.getMetaActionTimeStamp(metaAction))) {
-				MetaMapping.getBoardModel().metaActionTurnChanged(metaAction);
+							board.getMetaActionTimeStamp(tile))) {
+				System.out.println("board turn changed");
+				MetaMapping.getBoardModel().metaActionTurnChanged(tile);
 			}
 		}
 		// handle MetaActions acting on piece models
 		for (ExtendedPieceModel model : MetaMapping.getBoardModel()
 				.getEntityModels().keySet()) {
-			
 
 			// alert the piece the turn changed for it
 			ExtendedTileModel tile = MetaMapping.getBoardModel()

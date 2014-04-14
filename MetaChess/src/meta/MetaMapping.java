@@ -12,6 +12,7 @@ import model.ExtendedTileModel;
 import org.lwjgl.input.Controller;
 import org.lwjgl.util.Color;
 
+import userinterface.specific.iconDrawer;
 import view.extended.BischopRenderer;
 import view.extended.BoardRenderer;
 import view.extended.GUIRenderer;
@@ -52,27 +53,22 @@ public class MetaMapping {
 			INPUT, RANDOMAI;
 		}
 	}
-	//free means that the gui's position is based on absolute coordinates
+
+	// free means that the gui's position is based on absolute coordinates
 	public enum GUIPosition {
 		LEFT, RIGHT, BOTTOM, TOP, FREE
 
 	}
 
 	public enum ActionType {
-		LEFT, RIGHT, UP, DOWN, 
-		RANGE1, RANGEPLUS1, RANGEPLUS2, RANGEPLUS4, RANGEPLUS8, 
-		RANGEMIN1, RANGEMIN2, RANGEMIN4, RANGEMIN8, 
-		UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, 
-		DOWNRIGHT12, DOWNRIGHT21, 
-		DOWNLEFT21, DOWNLEFT12, 
-		UPRIGHT12, UPRIGHT21, 
-		UPLEFT12, UPLEFT21,
-		TILEVIEWUP,TILEVIEWDOWN,
-		PENETRATELFTILE,NPENETRATELFTILE
+		LEFT, RIGHT, UP, DOWN, RANGE1, RANGEPLUS1, RANGEPLUS2, RANGEPLUS4, RANGEPLUS8, RANGEMIN1, RANGEMIN2, RANGEMIN4, RANGEMIN8, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, DOWNRIGHT12, DOWNRIGHT21, DOWNLEFT21, DOWNLEFT12, UPRIGHT12, UPRIGHT21, UPLEFT12, UPLEFT21, TILEVIEWUP, TILEVIEWDOWN, PENETRATELFTILE, NPENETRATELFTILE
 	}
 
-	// map metaAction name to metaAction
+	// map metaAction name to metaAction, save all existing MetaActions
 	private static Map<String, MetaAction> metaActions = new HashMap<>();
+
+	// map String "MetaAction name, number , char" to icons for GUI and board representation
+	private static Map<String, int[][]> metaActionsIcons = new HashMap<>();
 
 	// Mapping MetaAction names to pieces
 	private static Map<ControllerType, List<String>> pieceActions = new HashMap<>();
@@ -85,17 +81,18 @@ public class MetaMapping {
 	// all Controls
 	private static Map<ControllerType, Controller> allControllers = new HashMap<>();
 
-	// key mapping for MetaActions
-	private static Map<String, MetaAction> keyToAction = new HashMap<>();
 	// board renderer
 	private static BoardRenderer boardRenderer;
-	//also keep extended models here
+	// also keep extended models here
 
 	private static ExtendedBoardModel boardModel;
 
-
-	
-
+	public static int[][] getMetaActionIcon(String name) {
+		return metaActionsIcons.get(name);
+	}
+	public static void setMetaActionIcon(String name,int[][] icon){
+		metaActionsIcons.put(name,icon);
+	}
 
 	public static ExtendedBoardModel getBoardModel() {
 		return boardModel;
@@ -110,29 +107,12 @@ public class MetaMapping {
 
 	private static int tileSize = 8 * 64;
 
-	
-
-	
-	public static Map<String, MetaAction> getKeyMapping() {
-		return keyToAction;
-	}
-
-	
-
 	public static int getTileSize() {
 		return tileSize;
 	}
 
 	public static List<String> getPieceMetaActions(ControllerType type) {
 		return pieceActions.get(type);
-	}
-
-	public static MetaAction getMetaActionFromKey(String key) {
-		return keyToAction.get(key);
-	}
-
-	public static void bindMetaActionToInput(String key, MetaAction action) {
-		keyToAction.put(key, action);
 	}
 
 	// init all necessary constants
@@ -158,12 +138,15 @@ public class MetaMapping {
 		MetaAcionKeyAndPieceMappingEditor.init();
 		boardRenderer = new BoardRenderer();
 		guiRenderer = new GUIRenderer();
-		ExtendedTileModel floor = new ExtendedTileModel(0, 0, 1, tileSize, 0, 0, 0, null);
+		ExtendedTileModel floor = new ExtendedTileModel(0, 0, 1, tileSize, 0,
+				0, 0, null);
 		MetaMapping.setBoardModel(new ExtendedBoardModel(floor));
-		
-		
-	}
+		//draw MetaAction icons
+		iconDrawer.drawMetaActionIcons();
+		iconDrawer.drawNumbers();
 
+	}
+	
 	public static void addPieceAction(ControllerType controller, String action) {
 		pieceActions.get(controller).add(action);
 	}

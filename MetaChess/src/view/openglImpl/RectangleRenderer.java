@@ -35,8 +35,6 @@ public class RectangleRenderer {
 		// Set the color to white.
 		Color col = MetaMapping.getColor(c);
 		glColor3f(col.getRed(), col.getGreen(), col.getBlue());
-
-		glRotatef(angle, 0, 0, 1);
 		// glVertex2f function
 		glVertex2f(0,  height); // Top left corner
 		glVertex2f(0, 0); // Bottom left corner

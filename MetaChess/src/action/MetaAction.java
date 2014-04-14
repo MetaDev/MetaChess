@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import userinterface.generic.GUITile;
+import userinterface.generic.GUITileSquare;
 import meta.MetaMapping;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
@@ -25,8 +27,6 @@ public class MetaAction {
 	private MetaActionRange range;
 	// the MetaAction locks the piece for 1 turn
 	private boolean locking;
-	//icon shown in GUI
-	private int[][] icon;
 
 	public boolean isLocking() {
 		return locking;
@@ -37,7 +37,7 @@ public class MetaAction {
 	}
 
 	public void act(ExtendedPieceModel model) {
-		
+
 		try {
 
 			// all methods have signature "static XXX(model)"
@@ -53,7 +53,7 @@ public class MetaAction {
 	}
 
 	public void revert(ExtendedPieceModel model) {
-		
+
 		try {
 			// all methods have signature "static XXX(model)"
 			for (Method method : revertActs)
@@ -63,7 +63,7 @@ public class MetaAction {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public String getName() {
@@ -98,7 +98,7 @@ public class MetaAction {
 
 	public int getTurnsOfActivity(ExtendedPieceModel model) {
 		if (activity != null)
-			return activity.getTurnsOfActivity(model,this);
+			return activity.getTurnsOfActivity(model, this);
 		return 0;
 	}
 
@@ -119,5 +119,14 @@ public class MetaAction {
 	public void setRevertMethods(List<Method> methods) {
 		revertActs = methods;
 	}
-	
+
+	public boolean isRanged() {
+		return range != null;
+	}
+
+	public boolean reverts() {
+		if (revertActs != null)
+			return !revertActs.isEmpty();
+		return false;
+	}
 }

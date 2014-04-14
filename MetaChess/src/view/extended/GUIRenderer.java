@@ -15,14 +15,18 @@ public class GUIRenderer {
 	private void recursiveRender(GUITile tile) {
 
 		glPushMatrix();
-		// move GUI to correct position
+		// move GUI to correct position of container, if the tile is a container, if not just draw itself
+		if(tile.getElements()!=null){
 		glTranslatef(tile.getX(), tile.getY(), 0);
-		// draw the tile itself
+		// draw the conatainer itself
 		RectangleRenderer.drawRectangle(0, 0, tile.getWidth(),
 				tile.getHeight(), tile.getColor());
-		// draw it's children if necessary
-		if (tile.getElements() == null)
+		}else{
+			RectangleRenderer.drawRectangle(tile.getX(), tile.getY(), tile.getWidth(),
+					tile.getHeight(), tile.getColor());
 			return;
+		}
+		
 		GUITile child;
 
 		for (int i = 0; i < tile.getColumns(); i++) {

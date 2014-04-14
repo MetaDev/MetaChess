@@ -27,12 +27,12 @@ public class BoardRenderer {
 					MetaMapping.getPieceRenderer(piece).render(
 							board.getModelOnPosition(tile));
 			}
-			// there's an active metaaction on the tile
+			// there's an active metaAction on the tile
 			if (board.getActiveMetaAction(tile) != null) {
-				//
+				RectangleRenderer.drawRectangle(tile.getX()+tile.getSize()/4, tile.getY()+tile.getSize()/4,
+						tile.getSize()/4, tile.getSize()/4, (tile.getColor()+1)%2);
 			}
-			// render also the piece of a tile and also the metaaction of the
-			// tile
+			
 		}
 		// recursive render
 		else {

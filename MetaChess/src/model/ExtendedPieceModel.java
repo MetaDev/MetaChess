@@ -15,15 +15,8 @@ public class ExtendedPieceModel {
 	protected int color;
 	protected int side;
 	protected int absTime = 0;
-	protected MetaAction boardMetaAction;
 
-	public MetaAction getBoardMetaAction() {
-		return boardMetaAction;
-	}
-
-	public void setBoardMetaAction(MetaAction boardMetaAction) {
-		this.boardMetaAction = boardMetaAction;
-	}
+	
 
 	protected int maxLives;
 	protected int maxRange;
@@ -45,6 +38,10 @@ public class ExtendedPieceModel {
 
 	// save remaining cooldown of all metaActions applied on this model
 	protected Map<MetaAction, Integer> cooldownOfMetaActions;
+	//save metaActions turnsOfActivity if it has a fixed amount of active turns
+	//only decreased of the MetaAction has a cooldown on current model
+	//this means that MetaActions without a cooldown don't change
+	protected Map<MetaAction, Integer> turnsActiveOfmetaActions;
 	// saves all MetaActions executed on this activated on model, needed to
 	// verify if MetaAction has
 	// to be reversed
@@ -69,8 +66,15 @@ public class ExtendedPieceModel {
 			// cooldown metaactions that have a cooldown and are active
 			if (entry.getValue() != null) {
 				if (entry.getValue() > 0) {
+					//decrease cooldown
 					entry.setValue(entry.getValue() - 1);
+					//if it has a cooldown and is not ranged
+					if(turnsActiveOfmetaActions.get(entry.getKey())>0 && !entry.getKey().isRanged()){
+						//decrease turns of activity
+						turnsActiveOfmetaActions.put(entry.getKey(), turnsActiveOfmetaActions.get(entry.getKey())-1);
+					}
 				}
+				
 
 			}
 		}
@@ -100,13 +104,15 @@ public class ExtendedPieceModel {
 							position) != entry.getKey()) {
 						entry.getKey().revert(this);
 						metaActionIsActive.put(entry.getKey(), false);
+						//set turns active back to 0
+						turnsActiveOfmetaActions.put(entry.getKey(), 0);
 					}
 				}
 
 				// it's not a ranged MetaAction
 				else
 				// revert if MetaAction is no longer active, but has been active
-				if (entry.getKey().getTurnsOfActivity(this) == 0) {
+				if (turnsActiveOfmetaActions.get(entry.getKey()) == 0 ) {
 					entry.getKey().revert(this);
 					// set inactive in model
 					entry.setValue(false);
@@ -136,6 +142,10 @@ public class ExtendedPieceModel {
 				// once on
 				// a model
 				metaActionIsActive.put(boardMetaAction, true);
+				//save remaining turnsOfActivity
+				ExtendedBoardModel board =  MetaMapping.getBoardModel();
+				turnsActiveOfmetaActions.put(boardMetaAction, board.getActiveMetaActionTimeLeft(position));
+				System.out.println(board.getActiveMetaActionTimeLeft(position));
 			}
 		}
 
@@ -144,55 +154,55 @@ public class ExtendedPieceModel {
 				.entrySet()) {
 
 			MetaAction metaAction = entry.getKey();
-
-			int cooldown = entry.getValue();
-			// execute the MetaAction if it's not locking and the models not
-			// locked or if it's your turn
-			if ((MetaClock.getTurn(this) && !locked) || !metaAction.isLocking()) {
-				// only execute if cooldown is over
-				if (cooldown == 0) {
-					// act if the activity conditions of the MetaAction are met
-					if (metaAction.getTurnsOfActivity(this) > 0) {
-
-						// if the MetaAction is ranged,the execution of the
-						// MetaAction
-						// doesn't act, unless the model is on a tile of the
-						// range
-						// but set's range of the MetaAction on the board
-						List<ExtendedTileModel> range = metaAction
-								.getRange(this);
-						// range!=null means it's a ranged MetaAction
-
-						if (range != null) {
-							// apply range to board
-							for (ExtendedTileModel tile : range)
-								MetaMapping.getBoardModel()
-										.setActiveMetaAction(metaAction, tile,
-												this);
-							entry.setValue(metaAction.getCooldown());
-							if (metaAction.isLocking()) {
-								locked = true;
-							}
-						}
-
-						// if it's not a ranged MetaAction, you can execute it
-						// directly if MetaAction is not active on this model
-						else if (!metaActionIsActive.get(metaAction)) {
-							metaActionIsActive.put(metaAction, true);
-							metaAction.act(this);
-							entry.setValue(metaAction.getCooldown());
-							if (metaAction.isLocking()) {
-								locked = true;
-							}
-						}
-						// set locking for executed normal as well as ranged
-						// MetaActions
-
-						// set cooldown for executed normal as well as ranged
-						// MetaActions
-
+			int turnsOfActivity = metaAction.getTurnsOfActivity(this);
+			
+			// act if the activity conditions of the MetaAction are met
+			if (turnsOfActivity > 0) {
+				// if the MetaAction is ranged,the execution of the
+				// MetaAction
+				// doesn't act, unless the model is on a tile of the
+				// range
+				// but set's range of the MetaAction on the board
+				List<ExtendedTileModel> range = metaAction.getRange(this);
+				// range!=null means it's a ranged MetaAction
+				
+				if (range != null) {
+					// apply range to board
+					for (ExtendedTileModel tile : range){
+						entry.setValue(metaAction.getCooldown());
+						//apply for each tile if not already applied to board
+						MetaMapping.getBoardModel().setActiveMetaAction(
+								metaAction, tile, this,turnsOfActivity);
+					}
+					if (metaAction.isLocking()) {
+						locked = true;
 					}
 				}
+
+				// if it's not a ranged MetaAction, you can execute it
+				// directly if MetaAction is not active on this model
+				
+				else if (!metaActionIsActive.get(metaAction)) {
+					
+					//lock if needed
+					if (metaAction.isLocking()) {
+						locked = true;
+					}
+					//set active on model if the metaAction has a lasting effect->has to revert
+					//no MetaAction is permanent
+					if(metaAction.reverts()){
+						metaActionIsActive.put(metaAction, true);
+					}
+					//set cooldown
+					entry.setValue(metaAction.getCooldown());
+					System.out.println(turnsOfActivity);
+					//set turns of activity
+					turnsActiveOfmetaActions.put(entry.getKey(), turnsOfActivity);
+					//act
+					metaAction.act(this);
+					
+				}
+
 			}
 		}
 
@@ -238,9 +248,11 @@ public class ExtendedPieceModel {
 		// fill with all available MetaActions
 		cooldownOfMetaActions = new HashMap<>();
 		metaActionIsActive = new HashMap<>();
+		turnsActiveOfmetaActions= new HashMap<>();
 		for (Map.Entry<String, MetaAction> pair : MetaMapping
 				.getAllMetaActions().entrySet()) {
 			cooldownOfMetaActions.put(pair.getValue(), 0);
+			turnsActiveOfmetaActions.put(pair.getValue(), 0);
 			metaActionIsActive.put(pair.getValue(), false);
 		}
 
@@ -300,7 +312,9 @@ public class ExtendedPieceModel {
 	public Integer getCooldown(MetaAction metaAction) {
 		return cooldownOfMetaActions.get(metaAction);
 	}
-
+	public Integer getTurnsOfActivity(MetaAction metaAction){
+		return turnsActiveOfmetaActions.get(metaAction);
+	}
 	public void setMetaActionCooldown(MetaAction metaAction, int cooldown) {
 		cooldownOfMetaActions.put(metaAction, cooldown);
 	}

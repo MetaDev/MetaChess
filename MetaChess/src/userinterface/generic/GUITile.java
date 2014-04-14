@@ -134,20 +134,18 @@ public class GUITile {
 		return elements;
 	}
 
-	public void addElement(GUITile[][] elements, int j, int i, GUITile element) {
+	public void addElement(GUITile[][] elements, GUITile element) {
 		if (elements != null) {
-			element.setI(i);
-			element.setJ(j);
 			element.setContainer(this);
-			elements[i][j] = element;
+			elements[element.getI()][element.getJ()] = element;
 		}
 	}
 
-	public void addElement(int j, int i, GUITile element) {
+	public void addElement( GUITile element) {
 		if (elements == null) {
 			elements = new GUITile[columns][rows];
 		}
-		addElement(elements, i, j, element);
+		addElement(elements,  element);
 	}
 
 	// only in GUITiles the position and size can be set absolutely

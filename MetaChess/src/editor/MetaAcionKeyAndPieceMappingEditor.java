@@ -13,6 +13,7 @@ import org.lwjgl.input.Keyboard;
 
 import action.MAAHalfCooldownInput;
 import action.MAAInput;
+import action.MARParentTile;
 import action.MetaAction;
 import action.MetaActionActivity;
 import action.MetaActionRange;
@@ -105,13 +106,14 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// // decision to double maxrange, active while on same parent tile as
 		// when
 		// // decided
-		// MetaActionRange parentTileRange = new MARParentTile();
-		// MetaMapping.bindMetaActionToInput(
-		// Keyboard.KEY_B + "press",
-		// initMetaAction(new ActionType[] { ActionType.PENETRATELFTILE },
-		// new ActionType[] { ActionType.NPENETRATELFTILE },
-		// keyRealease, parentTileRange, 0, false, "PENTRATELFTILE"));
-		//
+		MetaActionRange parentTile = new MARParentTile();
+		 initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
+		 new ActionType[] { ActionType.TILEVIEWDOWN },
+		 new MAAHalfCooldownInput(Keyboard.KEY_B), parentTile, 16, false, "TILEVIEWRANGED");
+//		 initMetaAction(new ActionType[] { ActionType.PENETRATELFTILE },
+//		 new ActionType[] { ActionType.NPENETRATELFTILE },
+//		 new MAAHalfCooldownInput(Keyboard.KEY_B), parentTile, 0, false, "PENETRATELFTILE");
+		
 		// // decsion to invert vert direction, active on 3 tiles in chosen
 		// direction
 		// //first switch range from movement to decision
@@ -198,7 +200,7 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		MetaMapping.getPieceMetaActions(ControllerType.INPUTROOK).add(
 				"TILEVIEW");
 		MetaMapping.getPieceMetaActions(ControllerType.INPUTROOK).add(
-				"PENTRATELFTILE");
+				"UPRANGERANGED");
 
 	}
 }
