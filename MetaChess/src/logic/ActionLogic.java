@@ -71,6 +71,7 @@ public class ActionLogic implements Logic {
 	}
 
 	public static void UP(ExtendedPieceModel model) {
+		System.out.println(model.getRange());
 		movement(0, model.getRange(), model, false);
 	}
 

@@ -143,7 +143,6 @@ public class MetaMapping {
 		MetaMapping.setBoardModel(new ExtendedBoardModel(floor));
 		//draw MetaAction icons
 		iconDrawer.drawMetaActionIcons();
-		iconDrawer.drawNumbers();
 
 	}
 	

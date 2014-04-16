@@ -34,28 +34,28 @@ public class GTMetaActionNumber extends GUI1Tile {
 		int column0 = oldParam;
 		if (column3 > 0) {
 			for (int i = 0; i < column3; i++) {
-				setColorInGrid(elements, 6, i, oppositeColor);
+				setColorInGrid(elements, 7, i, oppositeColor);
 			}
 		}
 		if (column2 > 0) {
 			for (int i = 0; i < column2; i++) {
-				setColorInGrid(elements, 4, i, oppositeColor);
+				setColorInGrid(elements, 5, i, oppositeColor);
 			}
 		}
 		if (column1 > 0) {
 			for (int i = 0; i < column1; i++) {
-				setColorInGrid(elements, 2, i, oppositeColor);
+				setColorInGrid(elements, 3, i, oppositeColor);
 			}
 		}
 		if (column0 > 0) {
 			for (int i = 0; i < column0; i++) {
-				setColorInGrid(elements, 0, i, oppositeColor);
+				setColorInGrid(elements, 1, i, oppositeColor);
 			}
 		}
 	}
 	private void reset(){
 		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j<=6 ;j+=2 ){
+			for (int j = 1; j<=7 ;j+=2 ){
 				setColorInGrid(elements, j,i, color);
 			}
 		}

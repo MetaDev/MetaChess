@@ -35,7 +35,6 @@ public class MetaLoop {
 		// handle MetaActions acting on piece models
 		for (ExtendedPieceModel model : MetaMapping.getBoardModel()
 				.getEntityModels().keySet()) {
-
 			// alert the piece the turn changed for it
 			ExtendedTileModel tile = MetaMapping.getBoardModel()
 					.getPiecePosition(model);
