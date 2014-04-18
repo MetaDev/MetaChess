@@ -44,7 +44,7 @@ public class MetaLoop {
 			}
 			// revert all active piece MetaAcions that turned inactive, included
 			// board MetaActions
-			model.revertMetaActions();
+			model.regret();
 			// act all MetaActions: execute piece MetaActions and board
 			// MetaActions , set range of ranged piece metaActions
 			model.actMetaActions();

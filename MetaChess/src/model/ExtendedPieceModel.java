@@ -1,8 +1,8 @@
 package model;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import logic.MetaClock;
 import meta.MetaMapping;
@@ -17,13 +17,18 @@ public class ExtendedPieceModel {
 
 	protected int maxMovementRange;
 	protected int maxDecisionRange;
-	protected int movementRange = 1;
-	protected int decisionRange = 1;
+	protected int range = 1;
 	protected int[] direction;
 	protected boolean ignoreOccupationOfTile = false;
 	protected boolean penetrateLowerFraction = false;
+	protected boolean decisionLeavesFraction = false;
 	protected PieceRendererType renderType;
 	protected ControllerType controllerType;
+	// this MetaAction is special because the cooldown and turns of activity
+	// don't have to lowered with every turn change
+	// and it's revert if the piece changes position to a tile without the
+	// MetaAction
+	protected MetaAction boardMetaAction;
 
 	public PieceRendererType getRenderType() {
 		return renderType;
@@ -60,14 +65,13 @@ public class ExtendedPieceModel {
 		// with every change of turn check wether a MetaAction is still active
 		for (Map.Entry<MetaAction, Integer> entry : cooldownOfMetaActions
 				.entrySet()) {
-			// cooldown metaactions that have a cooldown and are active
+			// metaactions that have a cooldown and are active
 			if (entry.getValue() != null) {
 				if (entry.getValue() > 0) {
 					// decrease cooldown
 					entry.setValue(entry.getValue() - 1);
-					// if it has a cooldown and is not ranged
-					if (turnsActiveOfmetaActions.get(entry.getKey()) > 0
-							&& !entry.getKey().isRanged()) {
+					// if it has a cooldown
+					if (turnsActiveOfmetaActions.get(entry.getKey()) > 0) {
 						// decrease turns of activity
 						turnsActiveOfmetaActions
 								.put(entry.getKey(), turnsActiveOfmetaActions
@@ -82,45 +86,32 @@ public class ExtendedPieceModel {
 		absTime = MetaClock.getAbsoluteTime();
 	}
 
-	public void revertMetaActions() {
+	public void regret() {
+		// check if board MetaAction has to be reversed
+		if (boardMetaAction != null) {
+			ExtendedTileModel position = MetaMapping.getBoardModel()
+					.getPiecePosition(this);
+			if (MetaMapping.getBoardModel().getActiveMetaAction(position) != boardMetaAction) {
+				boardMetaAction.revert(this);
+				boardMetaAction = null;
+			}
+		}
 		// if no longer active, do a revert
+		// for all active decisions
 		for (Map.Entry<MetaAction, Boolean> entry : metaActionIsActive
 				.entrySet()) {
 			// revert if MetaAction is active on model
 			if (entry.getValue()) {
 				MetaAction metaAction = entry.getKey();
-				// if the MetaAction is ranged, it's activity is based on the
-				// models position on the board and not it's cooldown
-				// the MetaAction returns a range, which means that it's a
-				// ranged MetaAction
-				if (metaAction.getRange(this) != null) {
-					// check if model is still in range
-					// revert board MetaAction if current tile no longer has
-					// this
-					// MetaAction
-					ExtendedTileModel position = MetaMapping.getBoardModel()
-							.getPiecePosition(this);
-					if (MetaMapping.getBoardModel().getActiveMetaAction(
-							position) != metaAction) {
-						metaAction.revert(this);
-						metaActionIsActive.put(metaAction, false);
-						// set turns active back to 0
-						turnsActiveOfmetaActions.put(metaAction, 0);
-					}
-				}
+				// And if it has still turns active on this model
+				if (turnsActiveOfmetaActions.get(metaAction) == 0) {
+					// maybe optimasation is removing the decision from the map
+					// all together
 
-				// it's not a ranged MetaAction
-				else
-				// revert if MetaAction is no longer active, but has been active
-				// if this MetaAction has a cooldown->has no fixed amount of
-				// turns active and is not active, revert
-				if ((turnsActiveOfmetaActions.get(metaAction) == 0 && metaAction
-						.getCooldown() > 0)
-						|| (metaAction.getCooldown() == 0 && metaAction
-								.getTurnsOfActivity(this) == 0)) {
-					entry.getKey().revert(this);
 					// set inactive in model
 					entry.setValue(false);
+					// regret decision
+					metaAction.revert(this);
 				}
 
 			}
@@ -128,86 +119,77 @@ public class ExtendedPieceModel {
 	}
 
 	public void actMetaActions() {
-		// get current position
-		ExtendedTileModel position = MetaMapping.getBoardModel()
-				.getPiecePosition(this);
+
 		// act if on a tile with a MetaAction, a board MetaAction never locks
 		// the piece
 		// it also doesn't affect the MetaActions cooldown of this piece
-		MetaAction boardMetaAction = MetaMapping.getBoardModel()
-				.getActiveMetaAction(position);
+
 		// check if this MetaAction is already registered
 		// if so, check if not already active
-
-		if (boardMetaAction != null) {
-			if (metaActionIsActive.containsKey(boardMetaAction)
-					&& !metaActionIsActive.get(boardMetaAction)) {
+		// if the board Decision is null, this means that the previous decision
+		// has been reverted
+		ExtendedTileModel position = MetaMapping.getBoardModel()
+				.getPiecePosition(this);
+		if (boardMetaAction == null) {
+			// get current position
+			boardMetaAction = MetaMapping.getBoardModel().getActiveMetaAction(
+					position);
+			// decide board decision
+			if (boardMetaAction != null)
 				boardMetaAction.act(this);
-				// set active, because every MetaAction can only be executed
-				// once on
-				// a model
-				metaActionIsActive.put(boardMetaAction, true);
-				// save remaining turnsOfActivity
-				ExtendedBoardModel board = MetaMapping.getBoardModel();
-				turnsActiveOfmetaActions.put(boardMetaAction,
-						board.getActiveMetaActionTimeLeft(position));
-			}
 		}
 
 		// iterate over all MetaAction that the piece can execute
 		for (Map.Entry<MetaAction, Integer> entry : cooldownOfMetaActions
 				.entrySet()) {
-
 			MetaAction metaAction = entry.getKey();
-			int turnsOfActivity = metaAction.getTurnsOfActivity(this);
 
 			// act if the activity conditions of the MetaAction are met
-			if (turnsOfActivity > 0) {
-				// if the MetaAction is ranged,the execution of the
-				// MetaAction
-				// doesn't act, unless the model is on a tile of the
-				// range
-				// but set's range of the MetaAction on the board
-				List<ExtendedTileModel> range = metaAction.getRange(this);
-				// range!=null means it's a ranged MetaAction
+			if (metaAction.isActive(this)) {
+				// lock if needed
+				if (metaAction.isLocking()) {
+					locked = true;
+				}
+				Set<ExtendedTileModel> range = metaAction.getRange(this);
+				// if the range is non empty, it's a ranged decision
+				if (!range.isEmpty()) {
 
-				if (range != null) {
 					// apply range to board
+					// while applying range calculated absolute affected tile
+					// weight
+					int tileWeight = 0;
 					for (ExtendedTileModel tile : range) {
-						entry.setValue(metaAction.getCooldown());
+						tileWeight += ((float) position.getAbsFraction())
+								/ ((float) tile.getAbsFraction());
 						// apply for each tile if not already applied to board
 						MetaMapping.getBoardModel().setActiveMetaAction(
-								metaAction, tile, this, turnsOfActivity);
+								metaAction, tile, this);
 					}
-					if (metaAction.isLocking()) {
-						locked = true;
-					}
+					// set cooldown
+					entry.setValue(metaAction.getCooldown(tileWeight));
+
 				}
 
 				// if it's not a ranged MetaAction, you can execute it
 				// directly if MetaAction is not active on this model
 
 				else if (!metaActionIsActive.get(metaAction)) {
-
-					// lock if needed
-					if (metaAction.isLocking()) {
-						locked = true;
-					}
-					// set active on model if the metaAction has a lasting
+					// set active on model if the metaAction has a lasting, not
+					// a switch
 					// effect->has to revert
 					// no MetaAction is permanent
 					if (metaAction.reverts()) {
 						metaActionIsActive.put(metaAction, true);
 					}
-					// set cooldown
-					entry.setValue(metaAction.getCooldown());
+					// set cooldown, only 1 tile affected, your own
+					int cooldown = metaAction.getCooldown(1);
 					// set turns of activity if it has a cooldown
-					if (metaAction.getCooldown() > 0) {
+					if (cooldown > 0) {
+						entry.setValue(cooldown);
 						turnsActiveOfmetaActions.put(metaAction,
-								turnsOfActivity);
+								metaAction.getTurnsActive());
 					}
-
-					// act
+					// decide decision
 					metaAction.act(this);
 
 				}
@@ -290,13 +272,17 @@ public class ExtendedPieceModel {
 		this.controllerType = controllerType;
 	}
 
-	public int getRange() {
-		return Math.min(movementRange, maxMovementRange);
+	public int getMovementRange() {
+		return Math.min(range, maxMovementRange);
+	}
+
+	public int getDecisionRange() {
+		return Math.min(range, maxDecisionRange);
 	}
 
 	// if range is set negative the directions are inverted
 	public void setRange(int range) {
-		this.movementRange = range;
+		this.range = range;
 
 	}
 
@@ -312,14 +298,6 @@ public class ExtendedPieceModel {
 		cooldownOfMetaActions.put(metaAction, cooldown);
 	}
 
-	public int getDecisionRange() {
-		return decisionRange;
-	}
-
-	public void setDecisionRange(int decisionRange) {
-		this.decisionRange = decisionRange;
-	}
-
 	public void setDirection(int i, int j) {
 		direction[0] = i;
 		direction[1] = j;
@@ -329,15 +307,9 @@ public class ExtendedPieceModel {
 		return direction;
 	}
 
-	
-
 	public float getRelSize() {
 		return MetaMapping.getBoardModel().getPiecePosition(this).getRelSize();
 	}
-
-	
-
-	
 
 	public ExtendedTileModel getTilePosition() {
 		return MetaMapping.getBoardModel().getPiecePosition(this);

@@ -2,10 +2,10 @@ package action;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import userinterface.generic.GUITile;
-import userinterface.generic.GUITileSquare;
 import meta.MetaMapping;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
@@ -14,9 +14,17 @@ public class MetaAction {
 
 	private String name;
 
-	// number of turns the actions can't be used
+	//weight of the decision
+	//if the decision has no weight it has no cooldown
+	private int weight;
+	// the balance of the decision 0<=balance<=weight
+	//used as parameter when executing valueObject
+	//the balance is how much weight is in a decision in favor of your side
+	private int balance;
+	// number of turn the decision is active
+	private int turnsActive;
+	
 
-	private int cooldown;
 	// methods to execute when input conditions are met
 	private List<Method> acts;
 	// methods to execute when the MetaAction isn't active anymore
@@ -34,6 +42,14 @@ public class MetaAction {
 
 	public void setLocking(boolean locking) {
 		this.locking = locking;
+	}
+
+	// get effect from decision, based on side
+	public int getEffect(boolean friendly) {
+		if(friendly){
+			return balance;
+		}
+		return weight-balance;
 	}
 
 	public void act(ExtendedPieceModel model) {
@@ -70,55 +86,45 @@ public class MetaAction {
 		return name;
 	}
 
-	public MetaAction(int cooldown, MetaActionActivity activity,
-			List<Method> methods, String name, boolean locking) {
-		this.cooldown = cooldown;
-		this.acts = methods;
+	
+
+	public MetaAction(String name, int weight, int balance, int turnsActive,
+			List<Method> acts, List<Method> revertActs,
+			MetaActionActivity activity, MetaActionRange range, boolean locking) {
 		this.name = name;
-		this.locking = locking;
+		this.weight = weight;
+		this.balance = balance;
+		this.turnsActive = turnsActive;
+		this.acts = acts;
+		this.revertActs = revertActs;
 		this.activity = activity;
+		this.range = range;
+		this.locking = locking;
 		MetaMapping.addMetaAction(name, this);
 	}
 
-	public Integer getCooldown() {
-		return cooldown;
+	
+
+	public boolean isActive(ExtendedPieceModel model) {
+		return activity.getTurnsOfActivity(model, this);
 	}
 
-	public void setCooldown(Integer cooldown) {
-		this.cooldown = cooldown;
+	public Set<ExtendedTileModel> getRange(ExtendedPieceModel model) {
+		if(range!=null)
+		return range.getRange(model, this);
+		return	new HashSet<>();
 	}
 
-	public List<Method> getMethods() {
-		return acts;
+
+
+	public int getTurnsActive() {
+		return turnsActive;
 	}
 
-	public void setMethods(List<Method> methods) {
-		this.acts = methods;
+	public int getCooldown(int tileWeight) {
+		return weight * turnsActive * tileWeight;
 	}
 
-	public int getTurnsOfActivity(ExtendedPieceModel model) {
-		if (activity != null)
-			return activity.getTurnsOfActivity(model, this);
-		return 0;
-	}
-
-	public void setActivity(MetaActionActivity activity) {
-		this.activity = activity;
-	}
-
-	public List<ExtendedTileModel> getRange(ExtendedPieceModel model) {
-		if (range != null)
-			return range.getRange(model, this);
-		return null;
-	}
-
-	public void setRange(MetaActionRange range) {
-		this.range = range;
-	}
-
-	public void setRevertMethods(List<Method> methods) {
-		revertActs = methods;
-	}
 
 	public boolean isRanged() {
 		return range != null;

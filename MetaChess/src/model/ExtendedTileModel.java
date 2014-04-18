@@ -36,7 +36,8 @@ public class ExtendedTileModel {
 		this.size = size;
 
 	}
-	//any child tile 
+
+	// any child tile
 	public ExtendedTileModel(int color, int i, int j, int level,
 			ExtendedTileModel parent) {
 		this.color = color;
@@ -109,8 +110,6 @@ public class ExtendedTileModel {
 		return parent;
 	}
 
-	
-
 	// implement recursive positioning and size
 	public float getRelX() {
 		if (parent != null) {
@@ -127,16 +126,26 @@ public class ExtendedTileModel {
 			return 0;
 		}
 	}
-	public float getAbsX(){
+
+	public float getAbsX() {
 		if (parent != null) {
 			return getRelX() + parent.getAbsX();
 		} else {
 			return 0;
 		}
 	}
-	public float getAbsY(){
+
+	public float getAbsY() {
 		if (parent != null) {
 			return getRelY() + parent.getAbsY();
+		} else {
+			return 0;
+		}
+	}
+
+	public int getAbsFraction() {
+		if (parent != null) {
+			return parent.childFraction + parent.getAbsFraction();
 		} else {
 			return 0;
 		}
@@ -150,13 +159,15 @@ public class ExtendedTileModel {
 		}
 		return size;
 	}
-	public float getAbsSize(){
+
+	public float getAbsSize() {
 		if (parent != null) {
-			return parent.getAbsSize()/ parent.getChildFraction();
+			return parent.getAbsSize() / parent.getChildFraction();
 		} else {
 			return size;
 		}
 	}
+
 	public int getColor() {
 		return color;
 	}

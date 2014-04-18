@@ -11,9 +11,8 @@ import model.ExtendedPieceModel;
 
 import org.lwjgl.input.Keyboard;
 
-import action.MAAHalfCooldownInput;
-import action.MAAInput;
-import action.MARParentTile;
+import action.MAAKeyDown;
+import action.MARStraightDirectionX;
 import action.MetaAction;
 import action.MetaActionActivity;
 import action.MetaActionRange;
@@ -25,42 +24,42 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// init range
 		// range 1
 
-		MetaActionActivity keyInput1 = new MAAInput(Keyboard.KEY_NUMPAD1);
+		MetaActionActivity keyInput1 = new MAAKeyDown(Keyboard.KEY_NUMPAD1);
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS1 },
 				new ActionType[] { ActionType.RANGEMIN1 },
 
-				keyInput1, null, 0, false, "RANGE1");
+				keyInput1, null, 0, false, "RANGE1",0,0,0);
 
 		// // range 2
-		MetaActionActivity keyInput2 = new MAAInput(Keyboard.KEY_NUMPAD2);
+		MetaActionActivity keyInput2 = new MAAKeyDown(Keyboard.KEY_NUMPAD2);
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS2 },
 				new ActionType[] { ActionType.RANGEMIN2 },
 
-				keyInput2, null, 0, false, "RANGE2");
+				keyInput2, null, 0, false, "RANGE2",0,0,0);
 
 		// // range 4
-		MetaActionActivity keyInput4 = new MAAInput(Keyboard.KEY_NUMPAD4);
+		MetaActionActivity keyInput4 = new MAAKeyDown(Keyboard.KEY_NUMPAD4);
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS4 },
 				new ActionType[] { ActionType.RANGEMIN4 },
 
-				keyInput4, null, 0, false, "RANGE4");
+				keyInput4, null, 0, false, "RANGE4",0,0,0);
 
 		// init orthog movement
-		MetaActionActivity keyInputZ = new MAAInput(Keyboard.KEY_Z);
-		initMetaAction(new ActionType[] { ActionType.UP }, null,
-		keyInputZ, null, 0, true, "UP");
-		
-		MetaActionActivity keyInputS = new MAAInput(Keyboard.KEY_S);
-		initMetaAction(new ActionType[] { ActionType.DOWN }, null,
-		keyInputS, null, 0, true, "DOWN");
-		
-		MetaActionActivity keyInputQ = new MAAInput(Keyboard.KEY_Q);
-		initMetaAction(new ActionType[] { ActionType.LEFT }, null,
-		keyInputQ, null, 0, true, "LEFT");
-		
-		MetaActionActivity keyInputD = new MAAInput(Keyboard.KEY_D);
-		initMetaAction(new ActionType[] { ActionType.RIGHT }, null,
-		keyInputD, null, 0, true, "RIGHT");
+		MetaActionActivity keyInputZ = new MAAKeyDown(Keyboard.KEY_Z);
+		initMetaAction(new ActionType[] { ActionType.UP }, null, keyInputZ,
+				null, 0, true, "UP",0,0,0);
+
+		MetaActionActivity keyInputS = new MAAKeyDown(Keyboard.KEY_S);
+		initMetaAction(new ActionType[] { ActionType.DOWN }, null, keyInputS,
+				null, 0, true, "DOWN",0,0,0);
+
+		MetaActionActivity keyInputQ = new MAAKeyDown(Keyboard.KEY_Q);
+		initMetaAction(new ActionType[] { ActionType.LEFT }, null, keyInputQ,
+				null, 0, true, "LEFT",0,0,0);
+
+		MetaActionActivity keyInputD = new MAAKeyDown(Keyboard.KEY_D);
+		initMetaAction(new ActionType[] { ActionType.RIGHT }, null, keyInputD,
+				null, 0, true, "RIGHT",0,0,0);
 
 		//
 		// // init orthog movement
@@ -90,12 +89,12 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// noCoolDown, null, 0, true, "DOWNRIGHT");
 		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_C + "press", action);
 		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_C + "hold", action);
-		
-		 // decision tile view up, active for half the cooldown, not locking
-		
-		 initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
-		 new ActionType[] { ActionType.TILEVIEWDOWN },
-		 new MAAHalfCooldownInput(Keyboard.KEY_P), null, 8, true, "TILEVIEW");
+
+		// decision tile view up, active for half the cooldown, not locking
+		MetaActionRange mainRange = new MARStraightDirectionX();
+		initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
+				new ActionType[] { ActionType.TILEVIEWDOWN }, new MAAKeyDown(
+						Keyboard.KEY_P), mainRange, 8, true, "TILEVIEW",2,1,0);
 		// // decision to be able to pentrate lower tile fraction, active while
 		// // pressed
 		// MetaMapping.bindMetaActionToInput(
@@ -106,14 +105,12 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// // decision to double maxrange, active while on same parent tile as
 		// when
 		// // decided
-		MetaActionRange parentTile = new MARParentTile();
-		 initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
-		 new ActionType[] { ActionType.TILEVIEWDOWN },
-		 new MAAHalfCooldownInput(Keyboard.KEY_B), parentTile, 16, false, "TILEVIEWRANGED");
-//		 initMetaAction(new ActionType[] { ActionType.PENETRATELFTILE },
-//		 new ActionType[] { ActionType.NPENETRATELFTILE },
-//		 new MAAHalfCooldownInput(Keyboard.KEY_B), parentTile, 0, false, "PENETRATELFTILE");
-		
+
+		// initMetaAction(new ActionType[] { ActionType.PENETRATELFTILE },
+		// new ActionType[] { ActionType.NPENETRATELFTILE },
+		// new MAAHalfCooldownInput(Keyboard.KEY_B), parentTile, 0, false,
+		// "PENETRATELFTILE");
+
 		// // decsion to invert vert direction, active on 3 tiles in chosen
 		// direction
 		// //first switch range from movement to decision
@@ -133,20 +130,20 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 	// extended initialiser
 	private static MetaAction initMetaAction(ActionType[] acttypes,
 			ActionType[] reverttypes, MetaActionActivity activity,
-			MetaActionRange range, int cooldown, boolean locking, String name) {
+			MetaActionRange range, int cooldown, boolean locking, String name, int turnsActive, int weight, int balance) {
 
-		List<Method> methods = new ArrayList<>();
-		List<Method> revertmethods = new ArrayList<>();
+		List<Method> acts = new ArrayList<>();
+		List<Method> revertActs = new ArrayList<>();
 		try {
 			// add acts
 			for (ActionType type : acttypes) {
-				methods.add(Class.forName("logic.ActionLogic").getMethod(
+				acts.add(Class.forName("logic.ActionLogic").getMethod(
 						type.name(), new Class[] { ExtendedPieceModel.class }));
 			}
 			// add revert acts
 			if (reverttypes != null)
 				for (ActionType type : reverttypes) {
-					revertmethods.add(Class.forName("logic.ActionLogic")
+					revertActs.add(Class.forName("logic.ActionLogic")
 							.getMethod(type.name(),
 									new Class[] { ExtendedPieceModel.class }));
 				}
@@ -156,10 +153,11 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		MetaAction temp = new MetaAction(cooldown, activity, methods, name,
-				locking);
-		temp.setRevertMethods(revertmethods);
-		temp.setRange(range);
+
+		MetaAction temp = new MetaAction(name, weight, balance, turnsActive,
+				acts, revertActs,
+				activity, range, locking);
+
 		return temp;
 	}
 

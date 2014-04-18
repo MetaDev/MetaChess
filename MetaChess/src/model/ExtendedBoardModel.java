@@ -47,7 +47,9 @@ public class ExtendedBoardModel {
 	}
 
 	public int getActiveMetaActionTimeLeft(ExtendedTileModel pos) {
-		return activeMetaActionsTimeLeft.get(pos);
+		if (!activeMetaActionsTimeLeft.isEmpty())
+			return activeMetaActionsTimeLeft.get(pos);
+		return 0;
 	}
 
 	private ExtendedPlayerModel player;
@@ -94,11 +96,10 @@ public class ExtendedBoardModel {
 	}
 
 	public void setActiveMetaAction(MetaAction metaAction,
-			ExtendedTileModel position, ExtendedPieceModel actor,
-			int turnsOfActivity) {
+			ExtendedTileModel position, ExtendedPieceModel actor) {
 		activeMetaActions.put(position, metaAction);
 		activeMetaActionsActor.put(position, actor);
-		activeMetaActionsTimeLeft.put(position, turnsOfActivity);
+		activeMetaActionsTimeLeft.put(position, metaAction.getTurnsActive());
 		activeMetaActionsTimeStamp.put(position, actor.getAbsTime());
 	}
 

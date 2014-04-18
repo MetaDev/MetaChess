@@ -88,7 +88,6 @@ public class MetaView {
 		// move player to center
 		float currentTileSize = PlayerTile.getAbsSize();
 		float centerPlayer = tiles * currentTileSize;
-		System.out.println(PlayerTile.getAbsX());
 		glTranslatef(-PlayerTile.getAbsX() + centerPlayer, -PlayerTile.getAbsY()
 				+ centerPlayer, 0);
 		// render board

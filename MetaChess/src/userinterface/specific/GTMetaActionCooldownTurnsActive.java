@@ -15,13 +15,11 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 	private int oldCooldown;
 	private int oldBoardActiveTurns;
 	private int oldTurnsActive;
-	private boolean ranged;
 
 	public GTMetaActionCooldownTurnsActive(int color, GUITile container, int i,
 			int j, MetaAction metaAction) {
 		super(color, container, i, j);
 		this.metaAction = metaAction;
-		ranged = metaAction.isRanged();
 	}
 
 	@Override
@@ -41,15 +39,7 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 			oldTurnsActive = turnsActive;
 			updateTurnsActiveRows();
 		}
-		if (ranged) {
-			ExtendedBoardModel board = MetaMapping.getBoardModel();
-			int boardActiveTurns = board.getActiveMetaActionTimeLeft(board
-					.getPiecePosition(board.getPlayer()));
-			if (boardActiveTurns != oldBoardActiveTurns) {
-				oldBoardActiveTurns = boardActiveTurns;
-				updateBoardActiveTurnRows();
-			}
-		}
+		
 		return elements;
 
 	}
@@ -64,28 +54,8 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 		}
 	}
 
-	private void clearBoardActiveTurnRows() {
-		for (int i = 0; i < 8; i++) {
-			setColorInGrid(elements, i, 4, color);
-		}
-		for (int i = 0; i < 8; i++) {
-			setColorInGrid(elements, i, 3, color);
-		}
-	}
 
-	private void updateBoardActiveTurnRows() {
-		int oppositeColor = (color + 1) % 2;
-		clearBoardActiveTurnRows();
-		int row4 = oldBoardActiveTurns - 8;
-		int row3 = oldBoardActiveTurns;
-		
-		for (int i = 0; i < row4; i++) {
-			setColorInGrid(elements, i, 4, oppositeColor);
-		}
-		for (int i = 0; i < row3; i++) {
-			setColorInGrid(elements, i, 3, oppositeColor);
-		}
-	}
+	
 
 	private void clearTurnsActiveRows() {
 		for (int i = 0; i < 8; i++) {

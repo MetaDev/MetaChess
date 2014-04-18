@@ -87,6 +87,8 @@ public class MetaMapping {
 
 	private static ExtendedBoardModel boardModel;
 
+	//map piece control types to directions
+	private static Map<ControllerType,int[]> pieceDirections;
 	public static int[][] getIcon(String name) {
 		return metaActionsIcons.get(name);
 	}

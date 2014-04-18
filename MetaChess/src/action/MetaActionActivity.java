@@ -9,17 +9,17 @@ public abstract class MetaActionActivity {
 	// it returns how much turns the MetaAction is still active, if it returns 0
 	// it is no longer active
 	// this can also be based on de metaaction and a pieceextendedmodel
-	public int getTurnsOfActivity(ExtendedPieceModel model, MetaAction metaAction) {
+	public boolean getTurnsOfActivity(ExtendedPieceModel model, MetaAction metaAction) {
 		// check if your turn
 		// check if not action locking and model locked
 		// check if cooldwon is 0
 		if ((MetaClock.getTurn(model) && !model.isLocked())
 				|| !metaAction.isLocking()) {
 			if (model.getCooldown(metaAction) == 0) {
-				return 1;
+				return true;
 			}
 		}
-		return 0;
+		return false;
 
 	}
 
