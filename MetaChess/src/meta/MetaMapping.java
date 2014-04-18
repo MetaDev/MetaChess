@@ -12,7 +12,7 @@ import model.ExtendedTileModel;
 import org.lwjgl.input.Controller;
 import org.lwjgl.util.Color;
 
-import userinterface.specific.iconDrawer;
+import userinterface.specific.IconLoader;
 import view.extended.BischopRenderer;
 import view.extended.BoardRenderer;
 import view.extended.GUIRenderer;
@@ -87,10 +87,10 @@ public class MetaMapping {
 
 	private static ExtendedBoardModel boardModel;
 
-	public static int[][] getMetaActionIcon(String name) {
+	public static int[][] getIcon(String name) {
 		return metaActionsIcons.get(name);
 	}
-	public static void setMetaActionIcon(String name,int[][] icon){
+	public static void setIcon(String name,int[][] icon){
 		metaActionsIcons.put(name,icon);
 	}
 
@@ -138,11 +138,10 @@ public class MetaMapping {
 		MetaAcionKeyAndPieceMappingEditor.init();
 		boardRenderer = new BoardRenderer();
 		guiRenderer = new GUIRenderer();
-		ExtendedTileModel floor = new ExtendedTileModel(0, 0, 1, tileSize, 0,
-				0, 0, null);
+		ExtendedTileModel floor = new ExtendedTileModel( 1, tileSize);
 		MetaMapping.setBoardModel(new ExtendedBoardModel(floor));
 		//draw MetaAction icons
-		iconDrawer.drawMetaActionIcons();
+		IconLoader.loadIcons();
 
 	}
 	

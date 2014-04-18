@@ -1,5 +1,8 @@
 package view.extended;
 
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 import meta.MetaMapping;
 import meta.MetaMapping.PieceRendererType;
 import model.ExtendedBoardModel;
@@ -16,9 +19,12 @@ public class BoardRenderer {
 	private void recursiveRender(ExtendedTileModel tile) {
 		ExtendedBoardModel board = MetaMapping.getBoardModel();
 		// if no children anymore draw square
+		glPushMatrix();
 		if (tile.getChildren() == null) {
-			RectangleRenderer.drawRectangle(tile.getX(), tile.getY(),
-					tile.getSize(), tile.getSize(), tile.getColor());
+			glPushMatrix();
+			glTranslatef(tile.getRelX(), tile.getRelY(), 0);
+			RectangleRenderer.drawRectangle(0, 0,
+					tile.getRelSize(), tile.getRelSize(), tile.getColor());
 			// there's a piece located on the tile
 			if (board.getModelOnPosition(tile) != null) {
 				PieceRendererType piece = (board.getModelOnPosition(tile))
@@ -29,22 +35,26 @@ public class BoardRenderer {
 			}
 			// there's an active metaAction on the tile
 			if (board.getActiveMetaAction(tile) != null) {
-				RectangleRenderer.drawRectangle(tile.getX()+tile.getSize()/4, tile.getY()+tile.getSize()/4,
-						tile.getSize()/4, tile.getSize()/4, (tile.getColor()+1)%2);
+				RectangleRenderer.drawRectangle(tile.getRelSize()/4, tile.getRelSize()/4,
+						tile.getRelSize()/4, tile.getRelSize()/4, (tile.getColor()+1)%2);
 			}
+			glPopMatrix();
 			
 		}
 		// recursive render
 		else {
+			glTranslatef(tile.getRelX(), tile.getRelY(), 0);
 			for (int i = 0; i < tile.getChildFraction(); i++) {
 				for (int j = 0; j < tile.getChildFraction(); j++) {
 					if (tile.getChildren()[i][j] != null) {
+						
 						recursiveRender(tile.getChildren()[i][j]);
 					}
 
 				}
 			}
 		}
+		glPopMatrix();
 	}
 
 }

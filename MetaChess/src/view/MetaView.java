@@ -86,10 +86,10 @@ public class MetaView {
 		}
 		glScalef((float) 1 / (2 * tiles + 1), (float) 1 / (2 * tiles + 1), 1);
 		// move player to center
-		float currentTileSize = PlayerTile.getSize();
+		float currentTileSize = PlayerTile.getAbsSize();
 		float centerPlayer = tiles * currentTileSize;
-
-		glTranslatef(-PlayerTile.getX() + centerPlayer, -PlayerTile.getY()
+		System.out.println(PlayerTile.getAbsX());
+		glTranslatef(-PlayerTile.getAbsX() + centerPlayer, -PlayerTile.getAbsY()
 				+ centerPlayer, 0);
 		// render board
 		MetaMapping.getBoardRenderer().render(board);

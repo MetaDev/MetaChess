@@ -25,7 +25,7 @@ public class ExtendedPlayerModel extends ExtendedPieceModel {
 	public ExtendedPlayerModel(PieceRendererType renderType, int side,
 			ControllerType controllerType, int lives, int maxLives, int range,
 			int nrOfViewTiles, String name) {
-		super(renderType, side, controllerType, lives, maxLives, range);
+		super(renderType, side, controllerType, range);
 		this.nrOfViewTiles = nrOfViewTiles;
 		this.name = name;
 	}

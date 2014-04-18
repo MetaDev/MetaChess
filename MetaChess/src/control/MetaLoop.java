@@ -28,7 +28,6 @@ public class MetaLoop {
 			if (MetaClock.getTurn(tile.absoluteFraction(), model.getSide()) != MetaClock
 					.getTurn(tile.absoluteFraction(), model.getSide(),
 							board.getMetaActionTimeStamp(tile))) {
-				System.out.println("board turn changed");
 				MetaMapping.getBoardModel().metaActionTurnChanged(tile);
 			}
 		}

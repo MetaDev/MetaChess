@@ -106,8 +106,8 @@ public class GUITile {
 
 	
 
-	public GUITile(int rowsInContainer, int columnsInContainer, int rows,
-			int columns, int color, GUITile container, int i, int j) {
+	public GUITile(int columnsInContainer, int  rowsInContainer, int columns,
+			int rows, int color, GUITile container, int i, int j) {
 		this.rowsInContainer = rowsInContainer;
 		this.columnsInContainer = columnsInContainer;
 		this.rows = rows;
@@ -118,8 +118,8 @@ public class GUITile {
 		this.j = j;
 	}
 	//root container
-	public GUITile(int rows,
-			int columns, int color, GUITile container, int i, int j) {
+	public GUITile(int columns,
+			int rows, int color, GUITile container, int i, int j) {
 		this.rowsInContainer =1;
 		this.columnsInContainer = 1;
 		this.rows = rows;

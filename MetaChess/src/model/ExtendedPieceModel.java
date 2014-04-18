@@ -11,13 +11,12 @@ import meta.MetaMapping.PieceRendererType;
 import action.MetaAction;
 
 public class ExtendedPieceModel {
-	protected int lives = 8;
 	protected int color;
 	protected int side;
 	protected int absTime = 0;
 
-	protected int maxLives;
-	protected int maxRange;
+	protected int maxMovementRange;
+	protected int maxDecisionRange;
 	protected int movementRange = 1;
 	protected int decisionRange = 1;
 	protected int[] direction;
@@ -247,12 +246,10 @@ public class ExtendedPieceModel {
 	}
 
 	public ExtendedPieceModel(PieceRendererType renderType, int side,
-			ControllerType controllerType, int lives, int maxLives, int maxRange) {
-		this.lives = lives;
+			ControllerType controllerType, int maxRange) {
 		this.side = side;
 		this.color = side;
-		this.maxLives = maxLives;
-		this.maxRange = maxRange;
+		this.maxMovementRange = maxRange;
 		this.controllerType = controllerType;
 		this.renderType = renderType;
 		// fill with all available MetaActions
@@ -294,29 +291,13 @@ public class ExtendedPieceModel {
 	}
 
 	public int getRange() {
-		return Math.min(movementRange, maxRange);
+		return Math.min(movementRange, maxMovementRange);
 	}
 
 	// if range is set negative the directions are inverted
 	public void setRange(int range) {
 		this.movementRange = range;
 
-	}
-
-	public int getLives() {
-		return lives;
-	}
-
-	public void setLives(int l) {
-		lives = l;
-	}
-
-	public int getMaxLives() {
-		return maxLives;
-	}
-
-	public void setMaxLives(int l) {
-		maxLives = l;
 	}
 
 	public Integer getCooldown(MetaAction metaAction) {
@@ -348,17 +329,15 @@ public class ExtendedPieceModel {
 		return direction;
 	}
 
-	public float getSize() {
-		return MetaMapping.getBoardModel().getPiecePosition(this).getSize();
+	
+
+	public float getRelSize() {
+		return MetaMapping.getBoardModel().getPiecePosition(this).getRelSize();
 	}
 
-	public float getX() {
-		return MetaMapping.getBoardModel().getPiecePosition(this).getX();
-	}
+	
 
-	public float getY() {
-		return MetaMapping.getBoardModel().getPiecePosition(this).getY();
-	}
+	
 
 	public ExtendedTileModel getTilePosition() {
 		return MetaMapping.getBoardModel().getPiecePosition(this);

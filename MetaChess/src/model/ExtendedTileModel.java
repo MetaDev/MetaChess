@@ -3,21 +3,17 @@ package model;
 import meta.MetaMapping;
 
 public class ExtendedTileModel {
-	private float x;
-	private float y;
+
 	private float size;
 	private int color;
 	private ExtendedTileModel[][] children;
 	private ExtendedTileModel parent;
 	private int level;
 	private int childFraction = 1;
-	
-	
+
 	// relative position in parent
 	private int i;
 	private int j;
-
-	
 
 	public boolean isOccupied() {
 		if (MetaMapping.getBoardModel().getModelOnPosition(this) != null)
@@ -34,13 +30,17 @@ public class ExtendedTileModel {
 		return false;
 	}
 
-	public ExtendedTileModel(float x, float y, int color, float size, int i,
-			int j, int level, ExtendedTileModel parent) {
-		this.x=x;
-		this.y=y;
-		this.color=color;
-		this.parent=parent;
+	// mothertile aka "The Board"
+	public ExtendedTileModel(int color, float size) {
+		this.color = color;
 		this.size = size;
+
+	}
+	//any child tile 
+	public ExtendedTileModel(int color, int i, int j, int level,
+			ExtendedTileModel parent) {
+		this.color = color;
+		this.parent = parent;
 		this.level = level;
 		this.i = i;
 		this.j = j;
@@ -70,40 +70,19 @@ public class ExtendedTileModel {
 
 	// don't allow empty (null) children
 	public void divide(int fraction) {
-		childFraction=fraction;
-		ExtendedTileModel board = ((ExtendedTileModel) MetaMapping
-				.getBoardModel().getRootTile());
-		int absoluteFraction = absoluteFraction() * fraction;
+		childFraction = fraction;
 		children = new ExtendedTileModel[fraction][fraction];
 		for (int i = 0; i < fraction; i++) {
 			for (int j = 0; j < fraction; j++) {
 				if (fraction % 2 == 1) {
-					children[i][j] = new ExtendedTileModel(x
-							+ (float) (1 / absoluteFraction) * i
-							* board.getSize(), y
-							+ (float) (1 / absoluteFraction) * j
-							* board.getSize(), ((i + j) % 2 + color) % 2,
-							(float) (1 / absoluteFraction) * board.getSize(),
-							i, j, level + 1, this);
+					children[i][j] = new ExtendedTileModel(
+							((i + j) % 2 + color) % 2, i, j, level + 1, this);
 				} else {
-					children[i][j] = new ExtendedTileModel(x
-							+ ((float) 1 / absoluteFraction) * i
-							* board.getSize(), y
-							+ ((float) 1 / absoluteFraction) * j
-							* board.getSize(), (i + j) % 2,
-							((float) 1 / absoluteFraction) * board.getSize(),
-							i, j, level + 1, this);
+					children[i][j] = new ExtendedTileModel((i + j) % 2, i, j,
+							level + 1, this);
 				}
 			}
 		}
-	}
-
-	public float getSize() {
-		return size;
-	}
-
-	public void setSize(float size) {
-		this.size = size;
 	}
 
 	public int getChildFraction() {
@@ -132,29 +111,52 @@ public class ExtendedTileModel {
 
 	
 
-	
-
-	public void setX(float x) {
-		this.x = x;
+	// implement recursive positioning and size
+	public float getRelX() {
+		if (parent != null) {
+			return i * getRelSize();
+		} else {
+			return 0;
+		}
 	}
 
-	public void setY(float y) {
-		this.y = y;
+	public float getRelY() {
+		if (parent != null) {
+			return j * getRelSize();
+		} else {
+			return 0;
+		}
+	}
+	public float getAbsX(){
+		if (parent != null) {
+			return getRelX() + parent.getAbsX();
+		} else {
+			return 0;
+		}
+	}
+	public float getAbsY(){
+		if (parent != null) {
+			return getRelY() + parent.getAbsY();
+		} else {
+			return 0;
+		}
 	}
 
-	public float getX() {
-		return x;
-	}
+	// get size relative to container
 
-	public float getY() {
-		return y;
+	public float getRelSize() {
+		if (parent != null) {
+			return (parent.getRelSize() / parent.getChildFraction());
+		}
+		return size;
 	}
-
-	public void setXY(float x, float y) {
-		this.x = x;
-		this.y = y;
+	public float getAbsSize(){
+		if (parent != null) {
+			return parent.getAbsSize()/ parent.getChildFraction();
+		} else {
+			return size;
+		}
 	}
-
 	public int getColor() {
 		return color;
 	}

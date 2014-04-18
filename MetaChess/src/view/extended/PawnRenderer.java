@@ -10,12 +10,11 @@ public class PawnRenderer extends PieceRenderer{
 	@Override
 	public void render(ExtendedPieceModel model){
 		
-		float x = model.getX();
-		float y = model.getY();
-		float w_8 = (model.getSize()) / 8;
+
+		float w_8 = (model.getRelSize()) / 8;
 		int main = model.getColor();
 		//body
-		RectangleRenderer.drawRectangle( x + 3 * w_8, y + w_8,
+		RectangleRenderer.drawRectangle( 3 * w_8,  w_8,
 				 4 * w_8, 2 * w_8, main);
 		//core
 		super.render(model);

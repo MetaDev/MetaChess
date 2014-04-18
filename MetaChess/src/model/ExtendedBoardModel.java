@@ -13,8 +13,9 @@ public class ExtendedBoardModel {
 	// the pieces and there position on the board
 	private Map<ExtendedPieceModel, ExtendedTileModel> piecesOnBoard = new ConcurrentHashMap<>();
 	// the tile and name of board MetaAction
-	// made this a concurrent hashmap because the activity is constantly update while in the logic loop this map is read all the time
-	private Map<ExtendedTileModel, MetaAction> activeMetaActions = new ConcurrentHashMap <>();
+	// made this a concurrent hashmap because the activity is constantly update
+	// while in the logic loop this map is read all the time
+	private Map<ExtendedTileModel, MetaAction> activeMetaActions = new ConcurrentHashMap<>();
 	// the piece which executed the board MetaAction
 	private Map<ExtendedTileModel, ExtendedPieceModel> activeMetaActionsActor = new ConcurrentHashMap<>();
 	// the time that past since execution
@@ -22,6 +23,8 @@ public class ExtendedBoardModel {
 	// the absolute time at the moment of execution, needed to check if passed
 	// time has to be increased.
 	private Map<ExtendedTileModel, Integer> activeMetaActionsTimeStamp = new ConcurrentHashMap<>();
+	// map of team-lives
+	private Map<Integer, Integer> teamLives = new ConcurrentHashMap<>();
 
 	public Map<ExtendedPieceModel, ExtendedTileModel> getPiecesOnBoard() {
 		return piecesOnBoard;
@@ -55,6 +58,16 @@ public class ExtendedBoardModel {
 
 	public ExtendedBoardModel(ExtendedTileModel rootTile) {
 		this.rootTile = rootTile;
+		teamLives.put(0, 16);
+		teamLives.put(1, 16);
+	}
+
+	public int getTeamLives(int team) {
+		return teamLives.get(team);
+	}
+
+	public void setTeamLives(int team, int lives) {
+		teamLives.put(team, lives);
 	}
 
 	public ExtendedTileModel getRootTile() {
@@ -81,21 +94,21 @@ public class ExtendedBoardModel {
 	}
 
 	public void setActiveMetaAction(MetaAction metaAction,
-			ExtendedTileModel position, ExtendedPieceModel actor, int turnsOfActivity) {
+			ExtendedTileModel position, ExtendedPieceModel actor,
+			int turnsOfActivity) {
 		activeMetaActions.put(position, metaAction);
 		activeMetaActionsActor.put(position, actor);
 		activeMetaActionsTimeLeft.put(position, turnsOfActivity);
 		activeMetaActionsTimeStamp.put(position, actor.getAbsTime());
 	}
-	
+
 	public void metaActionTurnChanged(ExtendedTileModel position) {
-		System.out.println(activeMetaActionsTimeLeft.get(position)+"  "+ position);
 		if (activeMetaActionsTimeLeft.get(position) > 1) {
 			activeMetaActionsTimeLeft.put(position,
 					activeMetaActionsTimeLeft.get(position) - 1);
-			//save timestamp, to check next time if turn changed
-			activeMetaActionsTimeStamp.put(position, MetaClock.getAbsoluteTime());
-			System.out.println(activeMetaActionsTimeLeft.get(position));
+			// save timestamp, to check next time if turn changed
+			activeMetaActionsTimeStamp.put(position,
+					MetaClock.getAbsoluteTime());
 		} else {
 			System.out.println("test");
 			activeMetaActionsTimeLeft.remove(position);
@@ -103,7 +116,6 @@ public class ExtendedBoardModel {
 			activeMetaActions.remove(position);
 			activeMetaActionsTimeStamp.remove(position);
 		}
-		
 
 	}
 

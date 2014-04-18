@@ -1,5 +1,7 @@
 package logic;
 
+import java.awt.image.TileObserver;
+
 import meta.MetaMapping;
 import model.ExtendedPieceModel;
 import model.ExtendedPlayerModel;
@@ -13,14 +15,13 @@ public class MetaClock {
 	// minimum amount of ms a turn can take, if lower the game becomes real-time
 	private static int minWaitTime = 4 * 64;
 
-	// based on the fraction of the parent tile give absolute counter of turn
+	// based on the fraction of the parent tile give absolute counter of turn on 
 	public static int getTileTurn(int fraction) {
 		int highestFraction = maxWaitTime / minWaitTime;
 		// real-time
 		if (highestFraction < fraction)
 			fraction = highestFraction;
-		return (int) (((float) (System.currentTimeMillis() % maxWaitTime) / maxWaitTime)
-				* fraction * 2);
+		return getTileTurn(fraction,getAbsoluteTime());
 	}
 
 	// return tile turn based on absolute time
@@ -29,9 +30,15 @@ public class MetaClock {
 		// real-time
 		if (highestFraction < fraction)
 			fraction = highestFraction;
-		return (int) (((float) (time) / maxWaitTime) * fraction * 2);
+		return (int) (((float) (time) / maxWaitTime) * fraction *2);
 	}
-
+public static int getRelativeTileTurn(){
+	ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
+	ExtendedTileModel playerTile = MetaMapping.getBoardModel().getPiecePosition(player);
+	if(playerTile.getParent()!=null)
+		return (getTileTurn()/2)%(playerTile.getParent().getChildFraction())+1;
+	return 0;
+}
 	// return turn based on absolute time
 	public static boolean getTurn(int fraction, int side, int time) {
 		int absTurn = getTileTurn(fraction,time);
@@ -45,7 +52,7 @@ public class MetaClock {
 	public static int getAbsoluteTime() {
 		return (int) (System.currentTimeMillis() % maxWaitTime);
 	}
-	// absolute turn of player
+	// tile turn of piece
 		public static int getTileTurn(ExtendedPieceModel piece) {
 			ExtendedTileModel tile = MetaMapping.getBoardModel().getPiecePosition(piece);
 			if (tile == null)
