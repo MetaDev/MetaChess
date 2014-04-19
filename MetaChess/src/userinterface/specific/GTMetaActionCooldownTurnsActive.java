@@ -1,33 +1,33 @@
 package userinterface.specific;
 
+import decision.Decision;
 import meta.MetaMapping;
-import model.ExtendedBoardModel;
 import model.ExtendedPlayerModel;
 import userinterface.generic.GUI1Tile;
 import userinterface.generic.GUITile;
-import action.MetaAction;
 
 public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
-	// dynimacally change the grid of square based on the MetaActions activity,
-	// cooldown
-	// always display the icon
-	private MetaAction metaAction;
+	//display cooldown and active turns
+	//there are 5 rows for the cooldown (max 40)
+	//there are 2 rows for turns active (max 16)
+	private Decision metaAction;
 	private int oldCooldown;
-	private int oldBoardActiveTurns;
 	private int oldTurnsActive;
 
 	public GTMetaActionCooldownTurnsActive(int color, GUITile container, int i,
-			int j, MetaAction metaAction) {
+			int j, Decision metaAction) {
 		super(color, container, i, j);
 		this.metaAction = metaAction;
+		updateCooldownRows();
+		updateTurnsActiveRows();
 	}
 
 	@Override
-	public GUITile[][] getElements() {
+	public int[][] getGrid() {
 
 		ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
-		int cooldown = player.getCooldown(metaAction);
-		int turnsActive = player.getTurnsOfActivity(metaAction);
+		int cooldown = Math.min(player.getCooldown(metaAction),40);
+		int turnsActive = Math.min(player.getTurnsOfActivity(metaAction),16);
 
 		// if something change, adapt the grid
 
@@ -40,17 +40,25 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 			updateTurnsActiveRows();
 		}
 		
-		return elements;
+		return grid;
 
 	}
 
 	private void clearCooldownRows() {
-
 		for (int i = 0; i < 8; i++) {
-			setColorInGrid(elements, i, 6, color);
+			grid[3][i]=color;
 		}
 		for (int i = 0; i < 8; i++) {
-			setColorInGrid(elements, i, 7, color);
+			grid[4][i]=color;
+		}
+		for (int i = 0; i < 8; i++) {
+			grid[5][i]=color;
+		}
+		for (int i = 0; i < 8; i++) {
+			grid[6][i]=color;
+		}
+		for (int i = 0; i < 8; i++) {
+			grid[7][i]=color;
 		}
 	}
 
@@ -59,10 +67,10 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 
 	private void clearTurnsActiveRows() {
 		for (int i = 0; i < 8; i++) {
-			setColorInGrid(elements, i, 0, color);
+			grid[0][i]=color;
 		}
 		for (int i = 0; i < 8; i++) {
-			setColorInGrid(elements, i, 1, color);
+			grid[1][i]=color;
 		}
 
 	}
@@ -70,21 +78,34 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 	private void updateCooldownRows() {
 		int oppositeColor = (color + 1) % 2;
 		clearCooldownRows();
-
-		int row6 = oldCooldown - 8;
-		int row7 = oldCooldown;
-		// maximum shown cooldown is 16
-		if (row6 > 8) {
-			row6 = 8;
-		}
-		if (row7 > 0) {
-			for (int i = 0; i < row7; i++) {
-				setColorInGrid(elements, i, 7, oppositeColor);
+		int row4 = Math.min(oldCooldown - 32,8);
+		int row3 = Math.min(oldCooldown - 24,8);
+		int row2 = Math.min(oldCooldown - 16,8);
+		int row1 = Math.min(oldCooldown - 8,8);
+		int row0 = Math.min(oldCooldown,8);
+		if (row4 > 0) {
+			for (int i = 0; i < row4; i++) {
+				grid[i][3]=oppositeColor;
 			}
 		}
-		if (row6 > 0) {
-			for (int i = 0; i < row7; i++) {
-				setColorInGrid(elements, i, 6, oppositeColor);
+		if (row3 > 0) {
+			for (int i = 0; i < row3; i++) {
+				grid[i][4]=oppositeColor;
+			}
+		}
+		if (row2 > 0) {
+			for (int i = 0; i < row2; i++) {
+				grid[i][5]=oppositeColor;
+			}
+		}
+		if (row1 > 0) {
+			for (int i = 0; i < row1; i++) {
+				grid[i][6]=oppositeColor;
+			}
+		}
+		if (row0 > 0) {
+			for (int i = 0; i < row0; i++) {
+				grid[i][7]=oppositeColor;
 			}
 		}
 
@@ -94,21 +115,17 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 		int oppositeColor = (color + 1) % 2;
 		clearTurnsActiveRows();
 
-		int row1 = oldTurnsActive - 8;
-		int row0 = oldTurnsActive;
-		// maximum shown cooldown is 16
-		if (row1 > 8) {
-			row1 = 8;
-		}
-
+		int row1 = Math.min(oldTurnsActive - 8,8);
+		int row0 =  Math.min(oldTurnsActive,8);
+		
 		if (row1 > 0) {
 			for (int i = 0; i < row1; i++) {
-				setColorInGrid(elements, i, 1, oppositeColor);
+				grid[i][1]=oppositeColor;
 			}
 		}
 		if (row0 > 0) {
 			for (int i = 0; i < row0; i++) {
-				setColorInGrid(elements, i, 0, oppositeColor);
+				grid[i][0]=oppositeColor;
 			}
 		}
 	}

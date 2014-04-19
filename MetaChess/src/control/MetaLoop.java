@@ -7,12 +7,13 @@ package control;
 
 import java.util.Map;
 
+import decision.Decision;
 import logic.MetaClock;
 import meta.MetaMapping;
 import model.ExtendedBoardModel;
 import model.ExtendedPieceModel;
+import model.ExtendedPlayerModel;
 import model.ExtendedTileModel;
-import action.MetaAction;
 
 public class MetaLoop {
 
@@ -20,7 +21,7 @@ public class MetaLoop {
 		ExtendedBoardModel board = MetaMapping.getBoardModel();
 
 		// alert the board if the turn changed for it's active MetaAcations
-		for (Map.Entry<ExtendedTileModel, MetaAction> pair : MetaMapping
+		for (Map.Entry<ExtendedTileModel, Decision> pair : MetaMapping
 				.getBoardModel().getActiveMetaActions().entrySet()) {
 			ExtendedTileModel tile = pair.getKey();
 			ExtendedPieceModel model = board.getMetaActionActor(tile);
@@ -31,29 +32,37 @@ public class MetaLoop {
 				MetaMapping.getBoardModel().metaActionTurnChanged(tile);
 			}
 		}
-		// handle MetaActions acting on piece models
+		// handle input and pass to player model
+		ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
+		ExtendedTileModel tile = player.getTilePosition();
+		if (MetaClock.getTurn(tile.absoluteFraction(), player.getSide()) != MetaClock
+				.getTurn(tile.absoluteFraction(), player.getSide(),
+						player.getAbsTime())) {
+			player.turnChange();
+		}
+		MetaKeyboard.processInput();
+		player.regret();
+		player.makeDecisions();
+		// handle MetaActions acting on other piece models, here will come the
+		// multiplayer, I think
 		for (ExtendedPieceModel model : MetaMapping.getBoardModel()
 				.getEntityModels().keySet()) {
-			// alert the piece the turn changed for it
-			ExtendedTileModel tile = MetaMapping.getBoardModel()
-					.getPiecePosition(model);
-			if (MetaClock.getTurn(tile.absoluteFraction(), model.getSide()) != MetaClock
-					.getTurn(tile.absoluteFraction(), model.getSide(),
-							model.getAbsTime())) {
-				model.turnChange();
+			// if not player
+			if (model != player) {
+				// alert the piece the turn changed for it
+				if (MetaClock.getTurn(tile.absoluteFraction(), model.getSide()) != MetaClock
+						.getTurn(tile.absoluteFraction(), model.getSide(),
+								model.getAbsTime())) {
+					model.turnChange();
+				}
+
+				// TODO
+				// if highest fraction reached, the piece won't be locked
+				// anymore,
+				// but the cooldwon still counts with
+				// the min turn-time
+
 			}
-			// revert all active piece MetaAcions that turned inactive, included
-			// board MetaActions
-			model.regret();
-			// act all MetaActions: execute piece MetaActions and board
-			// MetaActions , set range of ranged piece metaActions
-			model.actMetaActions();
-
-			// TODO
-			// if highest fraction reached, the piece won't be locked anymore,
-			// but the cooldwon still counts with
-			// the min turn-time
-
 		}
 
 	}

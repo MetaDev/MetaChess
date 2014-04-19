@@ -7,6 +7,7 @@ import meta.MetaMapping;
 import meta.MetaMapping.PieceRendererType;
 import model.ExtendedBoardModel;
 import model.ExtendedTileModel;
+import userinterface.specific.IconLoader;
 import view.openglImpl.RectangleRenderer;
 
 public class BoardRenderer {
@@ -35,8 +36,8 @@ public class BoardRenderer {
 			}
 			// there's an active metaAction on the tile
 			if (board.getActiveMetaAction(tile) != null) {
-				RectangleRenderer.drawRectangle(tile.getRelSize()/4, tile.getRelSize()/4,
-						tile.getRelSize()/4, tile.getRelSize()/4, (tile.getColor()+1)%2);
+				TileRenderer.render(MetaMapping.getIcon("DECISIONONBOARD"), tile.getRelSize()/8,(tile.getColor()+1)%2);
+				
 			}
 			glPopMatrix();
 			

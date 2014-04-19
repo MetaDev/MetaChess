@@ -11,6 +11,7 @@ public class ActionLogic implements Logic {
 	
 
 	public static void RANGEPLUS2(ExtendedPieceModel model) {
+		System.out.println("test");
 		model.setRange(model.getMovementRange() + 2);
 	}
 

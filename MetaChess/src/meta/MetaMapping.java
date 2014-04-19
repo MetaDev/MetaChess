@@ -12,6 +12,7 @@ import model.ExtendedTileModel;
 import org.lwjgl.input.Controller;
 import org.lwjgl.util.Color;
 
+import decision.Decision;
 import userinterface.specific.IconLoader;
 import view.extended.BischopRenderer;
 import view.extended.BoardRenderer;
@@ -22,7 +23,6 @@ import view.extended.PawnRenderer;
 import view.extended.PieceRenderer;
 import view.extended.QueenRenderer;
 import view.extended.RookRenderer;
-import action.MetaAction;
 import editor.MetaAcionKeyAndPieceMappingEditor;
 
 //contains and initialises all unique instances
@@ -65,7 +65,7 @@ public class MetaMapping {
 	}
 
 	// map metaAction name to metaAction, save all existing MetaActions
-	private static Map<String, MetaAction> metaActions = new HashMap<>();
+	private static Map<String, Decision> metaActions = new HashMap<>();
 
 	// map String "MetaAction name, number , char" to icons for GUI and board representation
 	private static Map<String, int[][]> metaActionsIcons = new HashMap<>();
@@ -88,7 +88,17 @@ public class MetaMapping {
 	private static ExtendedBoardModel boardModel;
 
 	//map piece control types to directions
-	private static Map<ControllerType,int[]> pieceDirections;
+	private static Map<ControllerType,int[]> pieceDirections=new HashMap<>();
+	
+	//map metaActions to string input
+	private static Map<Integer, Decision> keyBinding=new HashMap<>();
+	
+	public static void setKeyBinding(int key, Decision decision){
+		keyBinding.put(key, decision);
+	}
+	public static Decision getKeyBinding(int key){
+		return keyBinding.get(key);
+	}
 	public static int[][] getIcon(String name) {
 		return metaActionsIcons.get(name);
 	}
@@ -183,19 +193,19 @@ public class MetaMapping {
 		return allControllers.get(controller);
 	}
 
-	public static void addMetaAction(String name, MetaAction action) {
+	public static void addDecision(String name, Decision action) {
 		metaActions.put(name, action);
 	}
 
-	public static void removeMetaAction(String name) {
+	public static void removeDecision(String name) {
 		metaActions.remove(name);
 	}
 
-	public static MetaAction getMetaAction(String name) {
+	public static Decision getDecision(String name) {
 		return metaActions.get(name);
 	}
 
-	public static Map<String, MetaAction> getAllMetaActions() {
+	public static Map<String, Decision> getAllDecisions() {
 		return metaActions;
 	}
 

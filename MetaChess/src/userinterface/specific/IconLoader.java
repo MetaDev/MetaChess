@@ -52,9 +52,29 @@ public class IconLoader {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		}
-		
-
+		try {
+			icon = stringToDrawing(readFile("res/bitgrid/yourturn.txt"));
+			MetaMapping.setIcon("YOURTURN", icon);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			icon = stringToDrawing(readFile("res/bitgrid/notyourturn.txt"));
+			MetaMapping.setIcon("NOTYOURTURN", icon);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			icon = stringToDrawing(readFile("res/bitgrid/decisiononboard.txt"));
+			MetaMapping.setIcon("DECISIONONBOARD", icon);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	

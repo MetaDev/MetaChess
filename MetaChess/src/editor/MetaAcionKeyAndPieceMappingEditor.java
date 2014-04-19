@@ -11,11 +11,8 @@ import model.ExtendedPieceModel;
 
 import org.lwjgl.input.Keyboard;
 
-import action.MAAKeyDown;
-import action.MARStraightDirectionX;
-import action.MetaAction;
-import action.MetaActionActivity;
-import action.MetaActionRange;
+import decision.Decision;
+import decision.Decision.WillType;
 
 //initial mapping of the controls, this can of course be edited with an editor
 public class MetaAcionKeyAndPieceMappingEditor extends Editor {
@@ -24,42 +21,31 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// init range
 		// range 1
 
-		MetaActionActivity keyInput1 = new MAAKeyDown(Keyboard.KEY_NUMPAD1);
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS1 },
 				new ActionType[] { ActionType.RANGEMIN1 },
 
-				keyInput1, null, 0, false, "RANGE1",0,0,0);
+				 0, false, "RANGE1", 0, 0, 0,Keyboard.KEY_NUMPAD1,WillType.KEYHOLD,false);
 
 		// // range 2
-		MetaActionActivity keyInput2 = new MAAKeyDown(Keyboard.KEY_NUMPAD2);
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS2 },
 				new ActionType[] { ActionType.RANGEMIN2 },
 
-				keyInput2, null, 0, false, "RANGE2",0,0,0);
+				 0, false, "RANGE2", 0, 0, 0,Keyboard.KEY_NUMPAD2,WillType.KEYHOLD,false);
 
 		// // range 4
-		MetaActionActivity keyInput4 = new MAAKeyDown(Keyboard.KEY_NUMPAD4);
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS4 },
 				new ActionType[] { ActionType.RANGEMIN4 },
 
-				keyInput4, null, 0, false, "RANGE4",0,0,0);
+				 0, false, "RANGE4", 0, 0, 0,Keyboard.KEY_NUMPAD4,WillType.KEYHOLD,false);
 
 		// init orthog movement
-		MetaActionActivity keyInputZ = new MAAKeyDown(Keyboard.KEY_Z);
-		initMetaAction(new ActionType[] { ActionType.UP }, null, keyInputZ,
-				null, 0, true, "UP",0,0,0);
+		initMetaAction(new ActionType[] { ActionType.UP }, null,  0, true, "UP", 0, 0, 0,Keyboard.KEY_Z,WillType.KEYHOLD,false);
 
-		MetaActionActivity keyInputS = new MAAKeyDown(Keyboard.KEY_S);
-		initMetaAction(new ActionType[] { ActionType.DOWN }, null, keyInputS,
-				null, 0, true, "DOWN",0,0,0);
+		initMetaAction(new ActionType[] { ActionType.DOWN }, null, 0, true, "DOWN", 0, 0, 0,Keyboard.KEY_S,WillType.KEYHOLD,false);
 
-		MetaActionActivity keyInputQ = new MAAKeyDown(Keyboard.KEY_Q);
-		initMetaAction(new ActionType[] { ActionType.LEFT }, null, keyInputQ,
-				null, 0, true, "LEFT",0,0,0);
+		initMetaAction(new ActionType[] { ActionType.LEFT }, null, 0, true, "LEFT", 0, 0, 0,Keyboard.KEY_Q,WillType.KEYHOLD,false);
 
-		MetaActionActivity keyInputD = new MAAKeyDown(Keyboard.KEY_D);
-		initMetaAction(new ActionType[] { ActionType.RIGHT }, null, keyInputD,
-				null, 0, true, "RIGHT",0,0,0);
+		initMetaAction(new ActionType[] { ActionType.RIGHT }, null, 0, true, "RIGHT", 0, 0, 0,Keyboard.KEY_D,WillType.KEYHOLD,false);
 
 		//
 		// // init orthog movement
@@ -91,10 +77,11 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// MetaMapping.bindMetaActionToInput(Keyboard.KEY_C + "hold", action);
 
 		// decision tile view up, active for half the cooldown, not locking
-		MetaActionRange mainRange = new MARStraightDirectionX();
 		initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
-				new ActionType[] { ActionType.TILEVIEWDOWN }, new MAAKeyDown(
-						Keyboard.KEY_P), mainRange, 8, true, "TILEVIEW",2,1,0);
+				new ActionType[] { ActionType.TILEVIEWDOWN }, 8, true,
+				"TILEVIEW", 2, 1, 0, Keyboard.KEY_P, WillType.KEYHOLD,true);
+		//turn , for pawn
+		
 		// // decision to be able to pentrate lower tile fraction, active while
 		// // pressed
 		// MetaMapping.bindMetaActionToInput(
@@ -128,9 +115,9 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 	}
 
 	// extended initialiser
-	private static MetaAction initMetaAction(ActionType[] acttypes,
-			ActionType[] reverttypes, MetaActionActivity activity,
-			MetaActionRange range, int cooldown, boolean locking, String name, int turnsActive, int weight, int balance) {
+	private static Decision initMetaAction(ActionType[] acttypes,
+			ActionType[] reverttypes, int cooldown, boolean locking,
+			String name, int turnsActive, int weight, int balance, int key, WillType willType,boolean reaching) {
 
 		List<Method> acts = new ArrayList<>();
 		List<Method> revertActs = new ArrayList<>();
@@ -154,9 +141,8 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 			e.printStackTrace();
 		}
 
-		MetaAction temp = new MetaAction(name, weight, balance, turnsActive,
-				acts, revertActs,
-				activity, range, locking);
+		Decision temp = new Decision(name, weight, balance, turnsActive, acts,
+				revertActs, locking, key,willType,reaching);
 
 		return temp;
 	}

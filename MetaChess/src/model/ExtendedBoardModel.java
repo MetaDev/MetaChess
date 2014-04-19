@@ -1,12 +1,11 @@
 package model;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import decision.Decision;
 import logic.MetaClock;
 import meta.MetaUtil;
-import action.MetaAction;
 
 public class ExtendedBoardModel {
 	private ExtendedTileModel rootTile;
@@ -15,7 +14,7 @@ public class ExtendedBoardModel {
 	// the tile and name of board MetaAction
 	// made this a concurrent hashmap because the activity is constantly update
 	// while in the logic loop this map is read all the time
-	private Map<ExtendedTileModel, MetaAction> activeMetaActions = new ConcurrentHashMap<>();
+	private Map<ExtendedTileModel, Decision> activeMetaActions = new ConcurrentHashMap<>();
 	// the piece which executed the board MetaAction
 	private Map<ExtendedTileModel, ExtendedPieceModel> activeMetaActionsActor = new ConcurrentHashMap<>();
 	// the time that past since execution
@@ -30,7 +29,7 @@ public class ExtendedBoardModel {
 		return piecesOnBoard;
 	}
 
-	public Map<ExtendedTileModel, MetaAction> getActiveMetaActions() {
+	public Map<ExtendedTileModel, Decision> getActiveMetaActions() {
 		return activeMetaActions;
 	}
 
@@ -95,7 +94,7 @@ public class ExtendedBoardModel {
 		return MetaUtil.getKeyByValue(piecesOnBoard, pos);
 	}
 
-	public void setActiveMetaAction(MetaAction metaAction,
+	public void setActiveMetaAction(Decision metaAction,
 			ExtendedTileModel position, ExtendedPieceModel actor) {
 		activeMetaActions.put(position, metaAction);
 		activeMetaActionsActor.put(position, actor);
@@ -111,7 +110,6 @@ public class ExtendedBoardModel {
 			activeMetaActionsTimeStamp.put(position,
 					MetaClock.getAbsoluteTime());
 		} else {
-			System.out.println("test");
 			activeMetaActionsTimeLeft.remove(position);
 			activeMetaActionsActor.remove(position);
 			activeMetaActions.remove(position);
@@ -120,7 +118,7 @@ public class ExtendedBoardModel {
 
 	}
 
-	public MetaAction getActiveMetaAction(ExtendedTileModel position) {
+	public Decision getActiveMetaAction(ExtendedTileModel position) {
 		if (activeMetaActions.containsKey(position))
 			return activeMetaActions.get(position);
 		return null;

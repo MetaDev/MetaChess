@@ -10,7 +10,7 @@ public class GUIPanelMetaAction extends GUITile{
 			GUITile container, int i, int j) {
 		super(container.getColumns(),container.getRows(),container.getColumns(), container.getRows(), color, container, i, j);
 		//tileview on lowest row
-		addElement(new GTMetaActionCooldownTurnsActive((color+1)%2,this,1,0,MetaMapping.getMetaAction("TILEVIEW")));
+		addElement(new GTMetaActionCooldownTurnsActive((color+1)%2,this,1,0,MetaMapping.getDecision("TILEVIEW")));
 		addElement(new GTIcon((color+1)%2,this,0,0,"TILEVIEW"));
 		addElement(new GTNumber((color+1)%2,this,2,0,ParamObjectsAcces.getPOView()));
 		//range on new row
