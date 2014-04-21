@@ -4,25 +4,37 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import decision.Decision;
 import logic.MetaClock;
 import meta.MetaMapping;
+import meta.MetaMapping.ActionType;
 import meta.MetaMapping.ControllerType;
 import meta.MetaMapping.PieceRendererType;
+import decision.Decision;
 
 public class ExtendedPieceModel {
 	protected int color;
 	protected int side;
 	protected int absTime = 0;
 
-	protected int maxMovementRange=8;
-	protected int maxDecisionRange=8;
+	protected int maxMovementRange = 8;
+	protected int maxDecisionRange = 8;
 	protected int range = 1;
-	protected int[] direction;
+	protected String direction;
 	protected boolean ignoreOccupationOfTile = false;
 	protected boolean penetrateLowerFraction = false;
 	protected PieceRendererType renderType;
 	protected ControllerType controllerType;
+	// the model is thinking about a decision
+	private Decision pendingDecision;
+
+	public Decision getPendingDecision() {
+		return pendingDecision;
+	}
+
+	public void setPendingDecision(Decision pendingDecision) {
+		this.pendingDecision = pendingDecision;
+	}
+
 	// this MetaAction is special because the cooldown and turns of activity
 	// don't have to lowered with every turn change
 	// and it's revert if the piece changes position to a tile without the
@@ -97,13 +109,12 @@ public class ExtendedPieceModel {
 		}
 		// if no longer active, do a revert
 		// for all active decisions
-		for (Map.Entry<Decision, Boolean> entry : metaActionIsActive
-				.entrySet()) {
+		for (Map.Entry<Decision, Boolean> entry : metaActionIsActive.entrySet()) {
 			// revert if MetaAction is active on model
 			// and no longer active in the game
 			Decision decision = entry.getKey();
 			if (entry.getValue() && !decision.veto(this)) {
-				
+
 				// And if it has still turns active on this model
 				if (turnsActiveOfmetaActions.get(decision) == 0) {
 					// maybe optimasation is removing the decision from the map
@@ -119,8 +130,40 @@ public class ExtendedPieceModel {
 		}
 	}
 
-	public void makeDecisions() {
+	// special method to invoke reaching decisions when a directional button is
+	// pressed
+	public void makeDecision(Decision decision) {
+		// act if the activity conditions of the MetaAction are met, already checked if input is OK
+		if (decision.conditionsMet(this)) {
+			// lock if needed
+			if (decision.isLocking()) {
+				locked = true;
+			}
+			ExtendedTileModel position = MetaMapping.getBoardModel()
+					.getPiecePosition(this);
+			Set<ExtendedTileModel> reach = decision.getReach(this);
+			// is the decision is reaching and it's range is not empty
+			if (decision.isReaching() && !reach.isEmpty()) {
+				// apply range to board
+				// while applying range calculated absolute affected tile
+				// weight
+				int tileWeight = 0;
+				for (ExtendedTileModel tile : reach) {
+					tileWeight += ((float) position.getAbsFraction())
+							/ ((float) tile.getAbsFraction());
+					// apply for each tile if not already applied to board
+					MetaMapping.getBoardModel().setActiveMetaAction(decision,
+							tile, this);
+				}
+				// set cooldown
+				cooldownOfMetaActions.put(decision,
+						decision.getCooldown(tileWeight));
 
+			}
+		}
+	}
+
+	public void makeDecisions() {
 		// act if on a tile with a MetaAction, a board MetaAction never locks
 		// the piece
 		// it also doesn't affect the MetaActions cooldown of this piece
@@ -144,24 +187,28 @@ public class ExtendedPieceModel {
 		for (Map.Entry<Decision, Integer> entry : cooldownOfMetaActions
 				.entrySet()) {
 			Decision decision = entry.getKey();
-
-			// act if the activity conditions of the MetaAction are met
+			// act if the decision has veto
+			
 			if (decision.veto(this)) {
+				
 				// lock if needed
 				if (decision.isLocking()) {
 					locked = true;
 				}
 				Set<ExtendedTileModel> reach = decision.getReach(this);
-				//is the decision is reaching and it's range is not empty
-				if (decision.isReaching()&& !reach.isEmpty()) {
+				// is the decision is reaching and it's range is not empty
+				if (decision.isReaching() && !reach.isEmpty()) {
+					
 					// apply range to board
-					// while applying range calculated absolute affected tile
+					// while applying range calculated absolute affected
+					// tile
 					// weight
 					int tileWeight = 0;
 					for (ExtendedTileModel tile : reach) {
 						tileWeight += ((float) position.getAbsFraction())
 								/ ((float) tile.getAbsFraction());
-						// apply for each tile if not already applied to board
+						// apply for each tile if not already applied to
+						// board
 						MetaMapping.getBoardModel().setActiveMetaAction(
 								decision, tile, this);
 					}
@@ -169,7 +216,6 @@ public class ExtendedPieceModel {
 					entry.setValue(decision.getCooldown(tileWeight));
 
 				}
-
 				// if it's not a ranged MetaAction, you can execute it
 				// directly if MetaAction is not active on this model
 
@@ -226,9 +272,11 @@ public class ExtendedPieceModel {
 	public void setIgnoreOccupationOfTile(boolean ignoreOccupationOfTile) {
 		this.ignoreOccupationOfTile = ignoreOccupationOfTile;
 	}
-	public int getRange(){
+
+	public int getRange() {
 		return range;
 	}
+
 	public ExtendedPieceModel(PieceRendererType renderType, int side,
 			ControllerType controllerType, int maxRange) {
 		this.side = side;
@@ -240,14 +288,12 @@ public class ExtendedPieceModel {
 		cooldownOfMetaActions = new HashMap<>();
 		metaActionIsActive = new HashMap<>();
 		turnsActiveOfmetaActions = new HashMap<>();
-		for (Map.Entry<String, Decision> pair : MetaMapping
-				.getAllDecisions().entrySet()) {
+		for (Map.Entry<String, Decision> pair : MetaMapping.getAllDecisions()
+				.entrySet()) {
 			cooldownOfMetaActions.put(pair.getValue(), 0);
 			turnsActiveOfmetaActions.put(pair.getValue(), 0);
 			metaActionIsActive.put(pair.getValue(), false);
 		}
-
-		direction = new int[2];
 	}
 
 	public int getColor() {
@@ -273,13 +319,14 @@ public class ExtendedPieceModel {
 	public void setControllerType(ControllerType controllerType) {
 		this.controllerType = controllerType;
 	}
-	//the range is always at least 1
+
+	// the range is always at least 1
 	public int getMovementRange() {
-		return Math.max(Math.min(range, maxMovementRange),1);
+		return Math.max(Math.min(range, maxMovementRange), 1);
 	}
 
 	public int getDecisionRange() {
-		return Math.max(Math.min(range, maxDecisionRange),1);
+		return Math.max(Math.min(range, maxDecisionRange) - 1, 0);
 	}
 
 	// if range is set negative the directions are inverted
@@ -300,12 +347,11 @@ public class ExtendedPieceModel {
 		cooldownOfMetaActions.put(metaAction, cooldown);
 	}
 
-	public void setDirection(int i, int j) {
-		direction[0] = i;
-		direction[1] = j;
+	public void setDirection(String direction) {
+		this.direction = direction;
 	}
 
-	public int[] getDirection() {
+	public String getDirection() {
 		return direction;
 	}
 

@@ -1,6 +1,7 @@
 package logic;
 
 import meta.MetaMapping;
+import meta.MetaMapping.ActionType;
 import model.ExtendedPieceModel;
 import model.ExtendedPlayerModel;
 import model.ExtendedTileModel;
@@ -8,10 +9,11 @@ import model.ExtendedTileModel;
 //geef builder mee omdat controller het hele object moet kunnen vernietigen
 public class ActionLogic implements Logic {
 
-	
+	public static void NODIRECTION(ExtendedPieceModel model){
+		model.setDirection(null);
+	}
 
 	public static void RANGEPLUS2(ExtendedPieceModel model) {
-		System.out.println("test");
 		model.setRange(model.getMovementRange() + 2);
 	}
 
@@ -48,23 +50,45 @@ public class ActionLogic implements Logic {
 	}
 
 	public static void UPRIGHT(ExtendedPieceModel model) {
-		movement(model.getMovementRange(), model.getMovementRange(), model, false);
+		movement(model.getMovementRange(), model.getMovementRange(), model,
+				false);
 	}
 
 	public static void UPLEFT(ExtendedPieceModel model) {
-		movement(-model.getMovementRange(), model.getMovementRange(), model, false);
+		movement(-model.getMovementRange(), model.getMovementRange(), model,
+				false);
 	}
 
 	public static void DOWNLEFT(ExtendedPieceModel model) {
-		movement(-model.getMovementRange(), -model.getMovementRange(), model, false);
+		movement(-model.getMovementRange(), -model.getMovementRange(), model,
+				false);
 	}
 
 	public static void DOWNRIGHT(ExtendedPieceModel model) {
-		movement(model.getMovementRange(), -model.getMovementRange(), model, false);
+		movement(model.getMovementRange(), -model.getMovementRange(), model,
+				false);
+	}
+
+	public static void DECISIONDIRECTIONUP(ExtendedPieceModel model) {
+
+	}
+
+	public static void DECISIONDIRECTIONNONE(ExtendedPieceModel model) {
+		// when directional button released
+		model.setDirection(null);
 	}
 
 	public static void UP(ExtendedPieceModel model) {
-		movement(0, model.getMovementRange(), model, false);
+		 //if there's a pending decision
+		model.setDirection("UP");
+		if (model.getPendingDecision() != null) {
+			// execute pending decision
+			model.makeDecision(model.getPendingDecision());
+			//model.setPendingDecision(null);
+		}else{
+			movement(0, model.getMovementRange(), model, false);
+		}
+		
 	}
 
 	public static void DOWN(ExtendedPieceModel model) {
@@ -135,11 +159,14 @@ public class ActionLogic implements Logic {
 						.getNrOfViewTiles() - 1);
 	}
 
-	
-
 	public static boolean movement(int i, int j, ExtendedPieceModel model,
 			boolean isSideStep) {
-		model.setDirection(i, j);
+		// if there's a pending decision, you won't make a movement but
+		// a decision in the direction
+		if (model.getPendingDecision() != null) {
+			return false;
+		}
+
 		ExtendedTileModel previousTile = MetaMapping.getBoardModel()
 				.getPiecePosition(model);
 		ExtendedTileModel newTile = BoardLogic.getTileNeighbour(previousTile,

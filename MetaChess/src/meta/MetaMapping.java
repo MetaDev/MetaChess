@@ -61,7 +61,8 @@ public class MetaMapping {
 	}
 
 	public enum ActionType {
-		LEFT, RIGHT, UP, DOWN, RANGE1, RANGEPLUS1, RANGEPLUS2, RANGEPLUS4, RANGEPLUS8, RANGEMIN1, RANGEMIN2, RANGEMIN4, RANGEMIN8, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, DOWNRIGHT12, DOWNRIGHT21, DOWNLEFT21, DOWNLEFT12, UPRIGHT12, UPRIGHT21, UPLEFT12, UPLEFT21, TILEVIEWUP, TILEVIEWDOWN, PENETRATELFTILE, NPENETRATELFTILE
+		LEFT, RIGHT, UP, DOWN, RANGE1, RANGEPLUS1, RANGEPLUS2, RANGEPLUS4, RANGEPLUS8, RANGEMIN1, RANGEMIN2, RANGEMIN4, RANGEMIN8, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, DOWNRIGHT12, DOWNRIGHT21, DOWNLEFT21, DOWNLEFT12,
+		UPRIGHT12, UPRIGHT21, UPLEFT12, UPLEFT21, TILEVIEWUP, TILEVIEWDOWN, PENETRATELFTILE, NPENETRATELFTILE, DECISIONDIRECTIONUP,DECISIONDIRECTIONNONE,NODIRECTION
 	}
 
 	// map metaAction name to metaAction, save all existing MetaActions
@@ -87,8 +88,10 @@ public class MetaMapping {
 
 	private static ExtendedBoardModel boardModel;
 
-	//map piece control types to directions
-	private static Map<ControllerType,int[]> pieceDirections=new HashMap<>();
+	
+	
+	//map ActionTypes corresponding with directions to an int[]
+	private static Map<String, int[]> actionDirections= new HashMap<>();
 	
 	//map metaActions to string input
 	private static Map<Integer, Decision> keyBinding=new HashMap<>();
@@ -154,9 +157,16 @@ public class MetaMapping {
 		MetaMapping.setBoardModel(new ExtendedBoardModel(floor));
 		//draw MetaAction icons
 		IconLoader.loadIcons();
+		//fill the directions of movement 
+		actionDirections.put("UP", new int[]{0,1});
+		actionDirections.put("DOWN", new int[]{0,-1});
+		actionDirections.put("RIGHT", new int[]{1,0});
+		actionDirections.put("LEFT", new int[]{-1,0});
 
 	}
-	
+	public static int[] getActionDirection(String action){
+		return actionDirections.get(action);
+	}
 	public static void addPieceAction(ControllerType controller, String action) {
 		pieceActions.get(controller).add(action);
 	}

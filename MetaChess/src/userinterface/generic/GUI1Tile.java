@@ -7,15 +7,35 @@ public class GUI1Tile extends GUITile {
 		super(1, 1, 8, 8, color, container, i, j);
 		grid = new int[8][8];
 	}
+	protected void reset() {
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j <8; j ++) {
+				setColorInGrid(i, j, color);
+			}
+		}
 
-	
+	}
+	protected void resetRows(int[] rowindices){
+		for (int j: rowindices){
+			for (int i = 0; i < 8; i++) {
+				setColorInGrid(i, j, color);
+			}
+		}
+	}
+	protected void resetColumns(int[] columnindices){
+		for (int i: columnindices){
+			for (int j = 0; j < 8; j++) {
+				setColorInGrid(i, j, color);
+			}
+		}
+	}
 
-	public void setColorInGrid(int[][] elements, int j, int i, int color) {
+	public void setColorInGrid(int[][] elements, int i, int j, int color) {
 		//column and row are switched
 		elements[i][j]=(color+elements[i][j])%2;
 	}
-	public void setColorInGrid( int j, int i, int color) {
-		grid[i][j]=(color+grid[i][j])%2;
+	public void setColorInGrid( int i, int j, int color) {
+		grid[i][j]=color;
 	}
 
 	public int[][] getGrid(){

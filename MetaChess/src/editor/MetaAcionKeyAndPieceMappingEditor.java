@@ -39,15 +39,15 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 				 0, false, "RANGE4", 0, 0, 0,Keyboard.KEY_NUMPAD4,WillType.KEYHOLD,false);
 
 		// init orthog movement
-		initMetaAction(new ActionType[] { ActionType.UP }, null,  0, true, "UP", 0, 0, 0,Keyboard.KEY_Z,WillType.KEYHOLD,false);
+		initMetaAction(new ActionType[] { ActionType.UP }, new ActionType[] { ActionType.NODIRECTION },  0, true, "UP", 0, 0, 0,Keyboard.KEY_E,WillType.KEYHOLD,false);
 
-		initMetaAction(new ActionType[] { ActionType.DOWN }, null, 0, true, "DOWN", 0, 0, 0,Keyboard.KEY_S,WillType.KEYHOLD,false);
+		initMetaAction(new ActionType[] { ActionType.DOWN }, null, 0, true, "DOWN", 0, 0, 0,Keyboard.KEY_D,WillType.KEYHOLD,false);
 
-		initMetaAction(new ActionType[] { ActionType.LEFT }, null, 0, true, "LEFT", 0, 0, 0,Keyboard.KEY_Q,WillType.KEYHOLD,false);
+		initMetaAction(new ActionType[] { ActionType.LEFT }, null, 0, true, "LEFT", 0, 0, 0,Keyboard.KEY_S,WillType.KEYHOLD,false);
 
-		initMetaAction(new ActionType[] { ActionType.RIGHT }, null, 0, true, "RIGHT", 0, 0, 0,Keyboard.KEY_D,WillType.KEYHOLD,false);
-
-		//
+		initMetaAction(new ActionType[] { ActionType.RIGHT }, null, 0, true, "RIGHT", 0, 0, 0,Keyboard.KEY_F,WillType.KEYHOLD,false);
+		//init orthog decision
+		
 		// // init orthog movement
 		// action = initMetaAction(new ActionType[] { ActionType.DOWNLEFT },
 		// null,
@@ -79,7 +79,7 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// decision tile view up, active for half the cooldown, not locking
 		initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
 				new ActionType[] { ActionType.TILEVIEWDOWN }, 8, true,
-				"TILEVIEW", 2, 1, 0, Keyboard.KEY_P, WillType.KEYHOLD,true);
+				"TILEVIEW", 2, 1, 0, Keyboard.KEY_NUMPAD5, WillType.KEYHOLD,true);
 		//turn , for pawn
 		
 		// // decision to be able to pentrate lower tile fraction, active while

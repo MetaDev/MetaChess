@@ -2,7 +2,6 @@ package decision;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,11 +41,13 @@ public class Decision {
 	private WillType willType;
 	// boolean for will
 	private boolean willing = false;
-	// 
+	//
 	private boolean reaching;
-	public boolean isReaching(){
+
+	public boolean isReaching() {
 		return reaching;
 	}
+
 	public boolean isLocking() {
 		return locking;
 	}
@@ -103,28 +104,58 @@ public class Decision {
 	// works because, the decision is executed in smaller periods then input is
 	// checked
 	public void handleInput(int in) {
+		ExtendedPieceModel player = MetaMapping.getBoardModel().getPlayer();
+		// if there is a range
+		if (player.getDecisionRange() > 0 && reaching) {
+			// handle the key combination for direction of a reaching
+			// decision
+			// the willtype is always the same for reaching decisions
+
+			// if no direction
+			if (player.getDirection() == null) {
+				// when the key is released, the decision is made
+				if (in == 1) {
+					willing = true;
+					// remove this decision from pending position
+					MetaMapping.getBoardModel().getPlayer()
+							.setPendingDecision(null);
+				}
+				// but the decision can also be made by the direction keys
+				// set pending decision if the player
+				if (in == -1) {
+					MetaMapping.getBoardModel().getPlayer()
+							.setPendingDecision(this);
+				}
+				return;
+			} else {
+				//when there is a direction and the directional button is held down
+				//the decision is made upon releasing the key
+				if (in == 1) {
+					willing = true;
+				}
+				return;
+			}
+		}
 		if (willType == WillType.KEYHOLD) {
 			if (in == 0 || in == -1) {
 				willing = true;
-			} else {
-				willing = false;
+				return;
 			}
 		}
 		if (willType == WillType.KEYPRESS) {
 			if (in == -1) {
 				willing = true;
-			} else {
-				willing = false;
+				return;
 			}
 
 		}
 		if (willType == WillType.KEYRELEASE) {
 			if (in == 1) {
 				willing = true;
-			} else {
-				willing = false;
+				return;
 			}
 		}
+		willing = false;
 	}
 
 	public Decision(String name, int weight, int balance, int turnsActive,
@@ -136,7 +167,7 @@ public class Decision {
 		this.turnsActive = turnsActive;
 		this.consequences = acts;
 		this.revert = revertActs;
-		this.reaching=reaching;
+		this.reaching = reaching;
 		this.locking = locking;
 		this.willType = willType;
 		MetaMapping.addDecision(name, this);
@@ -165,10 +196,13 @@ public class Decision {
 	// cooldown
 
 	public boolean conditionsMet(ExtendedPieceModel model) {
-		// check if your turn
-		// check if not action locking and model locked
-		// check if cooldwon is 0
-		if ((MetaClock.getTurn(model) && !model.isLocked()) || !locking) {
+		// check if your turn and model is locked
+		// check if not action locking
+		// if there's a pending decision, the next decision even locking should
+		// execute
+		// check if cooldown is 0
+		if ((MetaClock.getTurn(model) && !model.isLocked()) || !locking
+				|| model.getPendingDecision() != null) {
 			if (model.getCooldown(this) == 0) {
 				return true;
 			}
@@ -177,57 +211,42 @@ public class Decision {
 
 	}
 
+	public boolean isWilling() {
+		return willing;
+	}
+
 	public boolean veto(ExtendedPieceModel model) {
-		return conditionsMet(model) && willing;
+
+		if (!conditionsMet(model)) {
+			willing = false;
+		}
+		return willing;
 	}
 
 	// this will become the main range implementation
 	public Set<ExtendedTileModel> getReach(ExtendedPieceModel model) {
 		Set<ExtendedTileModel> list = new HashSet<ExtendedTileModel>();
-		List<int[]> directions = new ArrayList<>();
-		int[] dir = model.getDirection();
+		Set<int[]> directions = new HashSet<>();
+
+		int[] dir = MetaMapping.getActionDirection(model.getDirection());
 
 		int range = model.getDecisionRange();
 		// no direction
-		if (dir[0] == 0 && dir[1] == 0) {
+		if (dir == null || dir[0] == 0 && dir[1] == 0) {
 			// no range, local decision
-			if (range == 1) {
+			if (range == 0) {
 				return list;
 			}
 			// ranged, undirected decision, unidirected
 			else {
 				// depends upon controllertype
 				ControllerType type = model.getControllerType();
-
-				if (type == ControllerType.INPUTROOK
-						|| type == ControllerType.INPUTQUEEN
-						|| type == ControllerType.INPUTKING) {
-					// directions should be saved as constants for each
-					// controllertype
-					directions.add(new int[] { 1, 0 });
-					directions.add(new int[] { 0, 1 });
-					directions.add(new int[] { -1, 0 });
-					directions.add(new int[] { 0, -1 });
+				List<String> decisions = MetaMapping.getPieceMetaActions(type);
+				for (String decision : decisions) {
+					dir = MetaMapping.getActionDirection(decision);
+					if (dir != null)
+						directions.add(dir);
 				}
-				if (type == ControllerType.INPUTBISCHOP
-						|| type == ControllerType.INPUTQUEEN
-						|| type == ControllerType.INPUTKING) {
-					directions.add(new int[] { 1, 1 });
-					directions.add(new int[] { -1, 1 });
-					directions.add(new int[] { -1, -1 });
-					directions.add(new int[] { 1, -1 });
-				}
-				if (type == ControllerType.INPUTPAWN) {
-					// implement turn first as decision
-				}
-				if (type == ControllerType.INPUTKNIGHT) {
-					directions.add(new int[] { 1, 2 });
-					directions.add(new int[] { -1, 2 });
-					directions.add(new int[] { -1, -2 });
-					directions.add(new int[] { 1, -2 });
-					// ...
-				}
-
 			}
 		}
 		// directed decision
@@ -243,10 +262,10 @@ public class Decision {
 			ExtendedTileModel iterateTile = currentTile;
 			int i = range;
 			while (iterateTile != null && i > 0) {
-				iterateTile = BoardLogic.getTileNeighbour(iterateTile, direction[0],
-						direction[1], false, true, false);
-				//reach has ended
-				if(iterateTile==null)
+				iterateTile = BoardLogic.getTileNeighbour(iterateTile,
+						direction[0], direction[1], false, true, false);
+				// reach has ended
+				if (iterateTile == null)
 					break;
 				list.add(iterateTile);
 				i--;
