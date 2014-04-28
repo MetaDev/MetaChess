@@ -24,30 +24,39 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS1 },
 				new ActionType[] { ActionType.RANGEMIN1 },
 
-				 0, false, "RANGE1", 0, 0, 0,Keyboard.KEY_NUMPAD1,WillType.KEYHOLD,false);
+				0, false, "RANGE1", 0, 0, 0, Keyboard.KEY_NUMPAD1,
+				WillType.KEYHOLD, false);
 
 		// // range 2
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS2 },
 				new ActionType[] { ActionType.RANGEMIN2 },
-
-				 0, false, "RANGE2", 0, 0, 0,Keyboard.KEY_NUMPAD2,WillType.KEYHOLD,false);
+				0, false, "RANGE2", 0, 0, 0, Keyboard.KEY_NUMPAD2,
+				WillType.KEYHOLD, false);
 
 		// // range 4
 		initMetaAction(new ActionType[] { ActionType.RANGEPLUS4 },
 				new ActionType[] { ActionType.RANGEMIN4 },
-
-				 0, false, "RANGE4", 0, 0, 0,Keyboard.KEY_NUMPAD4,WillType.KEYHOLD,false);
+				0, false, "RANGE4", 0, 0, 0, Keyboard.KEY_NUMPAD4,
+				WillType.KEYHOLD, false);
 
 		// init orthog movement
-		initMetaAction(new ActionType[] { ActionType.UP }, new ActionType[] { ActionType.NODIRECTION },  0, true, "UP", 0, 0, 0,Keyboard.KEY_E,WillType.KEYHOLD,false);
+		initMetaAction(new ActionType[] { ActionType.UP },
+				new ActionType[] { ActionType.NODIRECTION }, 0, true, "UP", 0,
+				0, 0, Keyboard.KEY_E, WillType.KEYHOLD, false);
 
-		initMetaAction(new ActionType[] { ActionType.DOWN }, null, 0, true, "DOWN", 0, 0, 0,Keyboard.KEY_D,WillType.KEYHOLD,false);
+		initMetaAction(new ActionType[] { ActionType.DOWN },
+				new ActionType[] { ActionType.NODIRECTION }, 0, true, "DOWN",
+				0, 0, 0, Keyboard.KEY_D, WillType.KEYHOLD, false);
 
-		initMetaAction(new ActionType[] { ActionType.LEFT }, null, 0, true, "LEFT", 0, 0, 0,Keyboard.KEY_S,WillType.KEYHOLD,false);
+		initMetaAction(new ActionType[] { ActionType.LEFT },
+				new ActionType[] { ActionType.NODIRECTION }, 0, true, "LEFT",
+				0, 0, 0, Keyboard.KEY_S, WillType.KEYHOLD, false);
 
-		initMetaAction(new ActionType[] { ActionType.RIGHT }, null, 0, true, "RIGHT", 0, 0, 0,Keyboard.KEY_F,WillType.KEYHOLD,false);
-		//init orthog decision
-		
+		initMetaAction(new ActionType[] { ActionType.RIGHT },
+				new ActionType[] { ActionType.NODIRECTION }, 0, true, "RIGHT",
+				0, 0, 0, Keyboard.KEY_F, WillType.KEYHOLD, false);
+		// init orthog decision
+
 		// // init orthog movement
 		// action = initMetaAction(new ActionType[] { ActionType.DOWNLEFT },
 		// null,
@@ -79,9 +88,13 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		// decision tile view up, active for half the cooldown, not locking
 		initMetaAction(new ActionType[] { ActionType.TILEVIEWUP },
 				new ActionType[] { ActionType.TILEVIEWDOWN }, 8, true,
-				"TILEVIEW", 2, 1, 0, Keyboard.KEY_NUMPAD5, WillType.KEYHOLD,true);
-		//turn , for pawn
+				"TILEVIEW", 2, 1, 0, Keyboard.KEY_NUMPAD5, WillType.KEYHOLD,
+				true);
+		initMetaAction(new ActionType[] { ActionType.TURN }, null, 0, false,
+				"TURN", 0, 0, 0, Keyboard.KEY_NUMPAD6, WillType.KEYPRESS, false);
 		
+		// turn , for pawn
+
 		// // decision to be able to pentrate lower tile fraction, active while
 		// // pressed
 		// MetaMapping.bindMetaActionToInput(
@@ -117,7 +130,8 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 	// extended initialiser
 	private static Decision initMetaAction(ActionType[] acttypes,
 			ActionType[] reverttypes, int cooldown, boolean locking,
-			String name, int turnsActive, int weight, int balance, int key, WillType willType,boolean reaching) {
+			String name, int turnsActive, int weight, int balance, int key,
+			WillType willType, boolean reaching) {
 
 		List<Method> acts = new ArrayList<>();
 		List<Method> revertActs = new ArrayList<>();
@@ -142,7 +156,7 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		}
 
 		Decision temp = new Decision(name, weight, balance, turnsActive, acts,
-				revertActs, locking, key,willType,reaching);
+				revertActs, locking, key, willType, reaching);
 
 		return temp;
 	}
@@ -184,7 +198,7 @@ public class MetaAcionKeyAndPieceMappingEditor extends Editor {
 		MetaMapping.getPieceMetaActions(ControllerType.INPUTROOK).add(
 				"TILEVIEW");
 		MetaMapping.getPieceMetaActions(ControllerType.INPUTROOK).add(
-				"UPRANGERANGED");
+				"TURN");
 
 	}
 }

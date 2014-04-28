@@ -77,7 +77,9 @@ public class ActionLogic implements Logic {
 		// when directional button released
 		model.setDirection(null);
 	}
-
+	public static void TURN(ExtendedPieceModel model){
+		model.addTurn();
+	}
 	public static void UP(ExtendedPieceModel model) {
 		 //if there's a pending decision
 		model.setDirection("UP");
@@ -86,21 +88,50 @@ public class ActionLogic implements Logic {
 			model.makeDecision(model.getPendingDecision());
 			//model.setPendingDecision(null);
 		}else{
-			movement(0, model.getMovementRange(), model, false);
+			//the index of up in the turn array is 0
+			String dir = MetaMapping.getDirectionWithTurn(0, model.getTurn());
+			int[] direction = MetaMapping.getActionDirection(dir);
+			movement(direction[0]*model.getMovementRange(), direction[1]*model.getMovementRange(), model, false);
 		}
 		
 	}
 
 	public static void DOWN(ExtendedPieceModel model) {
-		movement(0, -model.getMovementRange(), model, false);
+		 //if there's a pending decision
+		model.setDirection("DOWN");
+		if (model.getPendingDecision() != null) {
+			// execute pending decision
+			model.makeDecision(model.getPendingDecision());
+			//model.setPendingDecision(null);
+		}else{
+			movement(0, -model.getMovementRange(), model, false);
+		}
+		
 	}
 
 	public static void LEFT(ExtendedPieceModel model) {
-		movement(-model.getMovementRange(), 0, model, false);
+		 //if there's a pending decision
+		model.setDirection("LEFT");
+		if (model.getPendingDecision() != null) {
+			// execute pending decision
+			model.makeDecision(model.getPendingDecision());
+			//model.setPendingDecision(null);
+		}else{
+			movement(-model.getMovementRange(), 0, model, false);
+		}
 	}
 
 	public static void RIGHT(ExtendedPieceModel model) {
-		movement(model.getMovementRange(), 0, model, false);
+		 //if there's a pending decision
+		model.setDirection("RIGHT");
+		if (model.getPendingDecision() != null) {
+			// execute pending decision
+			model.makeDecision(model.getPendingDecision());
+			//model.setPendingDecision(null);
+		}else{
+			movement(model.getMovementRange(), 0, model, false);
+		}
+		
 	}
 
 	// mode is the horizontal movement

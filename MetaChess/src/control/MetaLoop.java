@@ -43,6 +43,7 @@ public class MetaLoop {
 		MetaKeyboard.processInput();
 		player.regret();
 		player.makeDecisions();
+
 		// handle MetaActions acting on other piece models, here will come the
 		// multiplayer, I think
 		for (ExtendedPieceModel model : MetaMapping.getBoardModel()

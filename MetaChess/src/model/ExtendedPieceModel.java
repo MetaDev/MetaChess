@@ -20,6 +20,15 @@ public class ExtendedPieceModel {
 	protected int maxDecisionRange = 8;
 	protected int range = 1;
 	protected String direction;
+	//0-3
+	protected int turn;
+	public void addTurn(){
+		turn=(turn+1)%4;
+	}
+	public int getTurn() {
+		return turn;
+	}
+
 	protected boolean ignoreOccupationOfTile = false;
 	protected boolean penetrateLowerFraction = false;
 	protected PieceRendererType renderType;
@@ -188,7 +197,7 @@ public class ExtendedPieceModel {
 				.entrySet()) {
 			Decision decision = entry.getKey();
 			// act if the decision has veto
-			
+				
 			if (decision.veto(this)) {
 				
 				// lock if needed
@@ -288,6 +297,7 @@ public class ExtendedPieceModel {
 		cooldownOfMetaActions = new HashMap<>();
 		metaActionIsActive = new HashMap<>();
 		turnsActiveOfmetaActions = new HashMap<>();
+		//not necessary, use the controltype to get all makeable decisions others will be added to map while playing 
 		for (Map.Entry<String, Decision> pair : MetaMapping.getAllDecisions()
 				.entrySet()) {
 			cooldownOfMetaActions.put(pair.getValue(), 0);

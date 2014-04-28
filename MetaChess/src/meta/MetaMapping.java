@@ -62,7 +62,7 @@ public class MetaMapping {
 
 	public enum ActionType {
 		LEFT, RIGHT, UP, DOWN, RANGE1, RANGEPLUS1, RANGEPLUS2, RANGEPLUS4, RANGEPLUS8, RANGEMIN1, RANGEMIN2, RANGEMIN4, RANGEMIN8, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, DOWNRIGHT12, DOWNRIGHT21, DOWNLEFT21, DOWNLEFT12,
-		UPRIGHT12, UPRIGHT21, UPLEFT12, UPLEFT21, TILEVIEWUP, TILEVIEWDOWN, PENETRATELFTILE, NPENETRATELFTILE, DECISIONDIRECTIONUP,DECISIONDIRECTIONNONE,NODIRECTION
+		UPRIGHT12, UPRIGHT21, UPLEFT12, UPLEFT21, TILEVIEWUP, TILEVIEWDOWN, PENETRATELFTILE, NPENETRATELFTILE, DECISIONDIRECTIONUP,DECISIONDIRECTIONNONE,NODIRECTION,TURN
 	}
 
 	// map metaAction name to metaAction, save all existing MetaActions
@@ -88,6 +88,14 @@ public class MetaMapping {
 
 	private static ExtendedBoardModel boardModel;
 
+	//turn cycle of 3 types of movement
+	private static String[] orthogonalTurn = new String[]{"UP","RIGHT","DOWN","LEFT"};
+	private static String[] diagonalTurn = new String[]{"UPRIGHT","DOWNRIGHT","DOWNLEFT","UPLEFT"};
+	//..2 knight movement cycles
+	
+	public static String getDirectionWithTurn(int direction, int turn){
+		return orthogonalTurn[(direction+turn)%4];
+	}
 	
 	
 	//map ActionTypes corresponding with directions to an int[]
