@@ -32,7 +32,7 @@ public class MetaMapping {
 	}
 
 	// hierarchical enum for control types
-	// AI is handled in the metaloop differently
+	//no AI so this becomes pawn, king, rook,...
 	public enum ControllerType {
 		INPUTPAWN(ControllerGroup.INPUT), INPUTROOK(ControllerGroup.INPUT), INPUTKNIGHT(
 				ControllerGroup.INPUT), INPUTBISCHOP(ControllerGroup.INPUT), INPUTKING(

@@ -1,5 +1,12 @@
-import logic.MetaClock;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 import meta.MetaMapping;
+import network.MetaClient;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -11,7 +18,6 @@ import control.MetaLoop;
 import display.WindowUtil;
 import editor.BoardEditor;
 import editor.GUIEditor;
-import editor.MetaAcionKeyAndPieceMappingEditor;
 import editor.PlayerEditor;
 
 /**
@@ -25,9 +31,9 @@ public class MetaWindow {
 	public static void main(String[] args) {
 		create();
 		init();
-		
+
 		while (!Display.isCloseRequested()) {
-		
+
 			// While no attempt to close the display is made..
 			// Put render code here.
 			// Put input handling code here.
@@ -36,6 +42,9 @@ public class MetaWindow {
 			if (Display.wasResized()) {
 				resize();
 			}
+			// handle network comm
+			MetaClient.handleClientComm();
+			
 		}
 		dispose();
 
@@ -50,7 +59,7 @@ public class MetaWindow {
 			Display.setFullscreen(true);
 
 			Display.create();
-			//enable repeat keys
+			// enable repeat keys
 			Keyboard.enableRepeatEvents(true);
 		} catch (LWJGLException e) {
 			System.err.println("Display wasn't initialized correctly.");
@@ -63,15 +72,14 @@ public class MetaWindow {
 
 		// create and save all initial constants
 		MetaMapping.initConstants();
-		
-		
-		//initialize editors
+
+		// initialize editors
 		BoardEditor.init();
-		
+
 		PlayerEditor.init();
-		//the GUI is initialized the last
+		// the GUI is initialized the last
 		GUIEditor.init();
-		
+
 		// EnemyBuilder enemyBuilder = new EnemyBuilder();
 		// enemyBuilder.assemble(worldBuilder);
 	}
@@ -100,4 +108,5 @@ public class MetaWindow {
 		Display.destroy();
 		System.exit(0);
 	}
+	
 }

@@ -1,6 +1,6 @@
 package logic;
 
-import java.awt.image.TileObserver;
+
 
 import meta.MetaMapping;
 import model.ExtendedPieceModel;
