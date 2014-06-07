@@ -1,10 +1,3 @@
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import meta.MetaMapping;
 import network.MetaClient;
 
@@ -31,7 +24,7 @@ public class MetaWindow {
 	public static void main(String[] args) {
 		create();
 		init();
-
+		
 		while (!Display.isCloseRequested()) {
 
 			// While no attempt to close the display is made..
@@ -42,8 +35,7 @@ public class MetaWindow {
 			if (Display.wasResized()) {
 				resize();
 			}
-			// handle network comm
-			MetaClient.handleClientComm();
+			
 			
 		}
 		dispose();
@@ -61,6 +53,8 @@ public class MetaWindow {
 			Display.create();
 			// enable repeat keys
 			Keyboard.enableRepeatEvents(true);
+			//init network client code
+			MetaClient.startClient();
 		} catch (LWJGLException e) {
 			System.err.println("Display wasn't initialized correctly.");
 			System.exit(1);
