@@ -4,71 +4,80 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientThread extends Thread {
 
-	private Socket connectionSocket = null;
-
+	private Socket clientSocket = null;
 	public ClientThread(Socket socket) {
 
 		super("MiniServer");
-		this.connectionSocket = socket;
+		this.clientSocket = socket;
 
 	}
 
 	public void run() {
 		try {
-			String clientSentence;
-			BufferedReader inFromClient = new BufferedReader(
-					new InputStreamReader(connectionSocket.getInputStream()));
-			DataOutputStream outToClient = new DataOutputStream(
-					connectionSocket.getOutputStream());
-			System.out.println(inFromClient);
-			clientSentence = inFromClient.readLine();
-			System.out.println(clientSentence);
-			if (clientSentence != null) {
-				//first introduction of client
-				if(clientSentence.equals("hello")){
-					int id = MetaServer.addClient();
-					//send id to client
-					outToClient.writeBytes("welcome::"+id + "\n");
+			System.out.println("thread for client started");
+			while (!Thread.interrupted()) {
+
+				// in
+				String clientSentence;
+				String response = null;
+				BufferedReader inFromClient = new BufferedReader(
+						new InputStreamReader(clientSocket.getInputStream()));
+				clientSentence = inFromClient.readLine();
+				int clientId = Integer
+						.parseInt(clientSentence.split("::")[0]);
+				String clientMessage = clientSentence.split("::")[1];
+				// handle client message
+				if (clientSentence != null) {
+					// first introduction of client
+					if (clientMessage.startsWith("hello")) {
+						int id = MetaServer.addClient();
+						response = "welcome::" + id;
+						System.out.println("client added" + MetaServer.nrOfClients());
+					}
+					else {
+						// it's a normal message, save it for all other
+						// registered clients
+						// message structure clientid::message
+						// parse client id from sentence
+						
+						// if the message is meaningfull add to queue
+						if (!clientMessage.equals("nomessage")) {
+							MetaServer.addMessage(clientMessage, clientId);
+							System.out.println(clientMessage);
+						}
+						response = MetaServer.getMessage(clientId);
+					} 
 				}
-				
-				else{
-					//it's a normal message, save it for all other registered clients
-					//message structure clientid::message
-					
-					//parse client id from sentence
-					int clientId = Integer.parseInt(clientSentence.split("::")[0]);
-					String message = clientSentence.split("::")[1];
-					
-					MetaServer.addMessage(message, clientId);
-					
-					//send one message from the queue to client
-					//message already containes newline
-					outToClient.writeBytes(MetaServer.getMessage(clientId));
+
+				// if no messages for client, respond with nodata
+				if (response == null) {
+					response = "nodata";
 				}
-				
-				
+				// out
+				PrintWriter outToClient = new PrintWriter(
+						clientSocket.getOutputStream(), true);
+				outToClient.println(response);
+
 			}
-			//close client socket after receiving and sending all data
-			connectionSocket.close();	
-		} catch (IOException e) {
-			
+
+		} catch (Exception e) {
+
 			e.printStackTrace();
-		}
-		finally{
-			//clean up in any case
-			if(connectionSocket!= null && !connectionSocket.isClosed()){
+		} finally {
+			// clean up in any case
+			if (clientSocket != null && !clientSocket.isClosed()) {
 				try {
-					connectionSocket.close();
+					clientSocket.close();
+
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		}
 	}
-	
-
 }

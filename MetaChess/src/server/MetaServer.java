@@ -21,14 +21,13 @@ import javax.swing.SwingUtilities;
  * 
  */
 public class MetaServer {
-	private static volatile boolean play = true;
 	// we use a map instead of a list because the client id does'nt define an
 	// order
-	private static Map<Integer, ArrayBlockingQueue<String>> clientsMessages = new HashMap<>();
+	private static volatile Map<Integer, ArrayBlockingQueue<String>> clientsMessages = new HashMap<>();
 	private static volatile ServerSocket serverSocket = null;
 	private static volatile Thread serverThread;
 	private static volatile Socket clientSocket;
-	private static volatile ClientThread clientThread;
+
 	public static void main(String argv[]) {
 		buildGui();
 	}
@@ -62,14 +61,17 @@ public class MetaServer {
 	}
 
 	private static void start() {
-		//the serverthread will always terminate by an exception, either voluntary or not
+		// the serverthread will always terminate by an exception, either
+		// voluntary or not
+		//start a thread for every incoming client
 		serverThread = new Thread(new Runnable() {
 			public void run() {
 				try {
 					serverSocket = new ServerSocket(6789);
 					System.out.println("running");
+					ClientThread clientThread;
 					while (!Thread.interrupted()) {
-
+						System.out.println("waiting for client");
 						clientSocket = serverSocket.accept();
 
 						clientThread = new ClientThread(clientSocket);
@@ -77,14 +79,14 @@ public class MetaServer {
 
 					}
 				} catch (Exception e) {
-					//prints errors
+					// prints errors
 					e.printStackTrace();
-				}
-				finally {
+				} finally {
 					System.out.println("clean up");
-					//if the server thread hasn't failed on purpose clean up
+					// if the server thread hasn't failed on purpose clean up
 					stop();
-					//else the server has been ended purpose and the clean has already been done
+					// else the server has been ended purpose and the clean has
+					// already been done
 					System.out.println("stopped");
 				}
 			}
@@ -96,6 +98,7 @@ public class MetaServer {
 	// adds new client and returns id
 	public static int addClient() {
 		int id = clientsMessages.size();
+		System.out.println(id+ "test");
 		clientsMessages.put(id, new ArrayBlockingQueue<String>(10));
 		return id;
 	}
@@ -111,23 +114,23 @@ public class MetaServer {
 			}
 		}
 	}
-//maybe should be done with try with resources, because every clean can in his turn throw exceptions
-	//this method is pure on own thinking, needs to be checked
+
+	// maybe should be done with try with resources, because every clean can in
+	// his turn throw exceptions
+	// this method is pure on own thinking, needs to be checked
 	public static void stop() {
-		//closing the server socket will terminate alle server activities by throwing a socket exception on next .accept() call
+		// closing the server socket will terminate alle server activities by
+		// throwing a socket exception on next .accept() call
 		if (serverSocket != null && !serverSocket.isClosed()) {
 			try {
 				serverSocket.close();
-				//terminate client socket if necessary
-				if(clientSocket!=null && !clientSocket.isClosed()){
+				// terminate client socket if necessary
+				if (clientSocket != null && !clientSocket.isClosed()) {
 					clientSocket.close();
 				}
-				//terminate client thread if necessary
-				if(clientThread!=null && !clientThread.isInterrupted()){
-					clientThread.interrupt();
-				}
-				//and finally terminate serverthread
-				if(serverThread!=null && !serverThread.isInterrupted()){
+				
+				// and finally terminate serverthread
+				if (serverThread != null && !serverThread.isInterrupted()) {
 					serverThread.interrupt();
 				}
 			} catch (IOException e) {
@@ -136,5 +139,8 @@ public class MetaServer {
 			}
 		}
 	}
-	
+	public static int nrOfClients(){
+		return clientsMessages.keySet().size();
+	}
+
 }

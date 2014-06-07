@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import network.MetaClient;
 import logic.BoardLogic;
 import logic.MetaClock;
 import meta.MetaMapping;
@@ -63,12 +64,16 @@ public class Decision {
 		}
 		return weight - balance;
 	}
-
+	//after all conditions are met
+	//the decision can be made
 	public void decide(ExtendedPieceModel model) {
 
 		try {
-
+			//add message to client queue
+			MetaClient.addMessage(this.name);
+			
 			// all methods have signature "static XXX(model)"
+			
 			for (Method method : consequences)
 				method.invoke(null, model);
 			//
@@ -128,8 +133,9 @@ public class Decision {
 				}
 				return;
 			} else {
-				//when there is a direction and the directional button is held down
-				//the decision is made upon releasing the key
+				// when there is a direction and the directional button is held
+				// down
+				// the decision is made upon releasing the key
 				if (in == 1) {
 					willing = true;
 				}
