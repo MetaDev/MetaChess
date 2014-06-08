@@ -22,7 +22,7 @@ public class GTTurn extends GUI1Tile {
 	@Override
 	public int[][] getGrid() {
 		boolean turn = MetaClock.getTurn(MetaMapping.getBoardModel()
-				.getPlayer());
+				.getPlayer().getControlledModel());
 		// get fraction and side form player singleton
 		if (turn) {
 			return grid;

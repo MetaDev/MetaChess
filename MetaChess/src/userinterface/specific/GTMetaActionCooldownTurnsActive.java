@@ -26,8 +26,8 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 	@Override
 	public int[][] getGrid() {
 		ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
-		int cooldown = Math.min(player.getCooldown(metaAction),40);
-		int turnsActive = Math.min(player.getTurnsOfActivity(metaAction),16);
+		int cooldown = Math.min(player.getControlledModel().getCooldown(metaAction),40);
+		int turnsActive = Math.min(player.getControlledModel().getTurnsOfActivity(metaAction),16);
 
 		// if something change, adapt the grid
 		if (cooldown != oldCooldown) {

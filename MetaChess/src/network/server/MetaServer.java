@@ -1,4 +1,4 @@
-package server;
+package network.server;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;

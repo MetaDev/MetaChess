@@ -1,4 +1,4 @@
-package server;
+package network.server;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -28,18 +28,18 @@ public class ClientThread extends Thread {
 				BufferedReader inFromClient = new BufferedReader(
 						new InputStreamReader(clientSocket.getInputStream()));
 				clientSentence = inFromClient.readLine();
-				int clientId = Integer
-						.parseInt(clientSentence.split("::")[0]);
-				String clientMessage = clientSentence.split("::")[1];
 				// handle client message
 				if (clientSentence != null) {
 					// first introduction of client
-					if (clientMessage.startsWith("hello")) {
+					if (clientSentence.startsWith("hello")) {
 						int id = MetaServer.addClient();
 						response = "welcome::" + id;
-						System.out.println("client added" + MetaServer.nrOfClients());
+						System.out.println("client added: " + MetaServer.nrOfClients());
 					}
 					else {
+						int clientId = Integer
+								.parseInt(clientSentence.split("::")[0]);
+						String clientMessage = clientSentence.split("::")[1];
 						// it's a normal message, save it for all other
 						// registered clients
 						// message structure clientid::message

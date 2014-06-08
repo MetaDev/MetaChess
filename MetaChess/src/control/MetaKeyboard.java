@@ -6,7 +6,12 @@ import org.lwjgl.input.Keyboard;
 
 import decision.Decision;
 
+
+/*
+ * This class handles all and every input
+ */
 public class MetaKeyboard {
+	
 	public static void processInput() {
 		int key=-1;
 		while (Keyboard.next()) {
@@ -38,8 +43,8 @@ public class MetaKeyboard {
 				decision.handleInput(keyPos);
 			}
 		}
-		// now iterate to check for more pushed down keys
-		// don't handle ipnut of an already processed key
+		// now iterate to check for more, multiple, pushed down keys
+		// don't handle input of an already processed key
 		Keyboard.poll();
 		for (int i = 0; i < 256; i++) {
 			if (i != key) {

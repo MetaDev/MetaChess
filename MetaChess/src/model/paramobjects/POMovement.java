@@ -6,12 +6,12 @@ public class POMovement implements ParamObject{
 
 	@Override
 	public int getParam() {
-		return MetaMapping.getBoardModel().getPlayer().getMovementRange();
+		return MetaMapping.getBoardModel().getPlayer().getControlledModel().getMovementRange();
 	}
 
 	@Override
 	public void setParam(int param) {
-		 MetaMapping.getBoardModel().getPlayer().setRange(param);;
+		 MetaMapping.getBoardModel().getPlayer().getControlledModel().setRange(param);;
 	}
 
 }

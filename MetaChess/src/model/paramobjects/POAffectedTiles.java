@@ -7,7 +7,7 @@ public class POAffectedTiles implements ParamObject{
 
 	@Override
 	public int getParam() {
-		return MetaUtil.getKeyCountByValue(MetaMapping.getBoardModel().getActiveMetaActionsActor(),MetaMapping.getBoardModel().getPlayer());
+		return MetaUtil.getKeyCountByValue(MetaMapping.getBoardModel().getActiveMetaActionsActor(),MetaMapping.getBoardModel().getPlayer().getControlledModel());
 	}
 
 	@Override

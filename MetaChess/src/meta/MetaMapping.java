@@ -88,10 +88,8 @@ public class MetaMapping {
 
 	private static ExtendedBoardModel boardModel;
 
-	//turn cycle of 3 types of movement
+	//turn cycle of 3 types of movement, only needed for pawn
 	private static String[] orthogonalTurn = new String[]{"UP","RIGHT","DOWN","LEFT"};
-	private static String[] diagonalTurn = new String[]{"UPRIGHT","DOWNRIGHT","DOWNLEFT","UPLEFT"};
-	//..2 knight movement cycles
 	
 	public static String getDirectionWithTurn(int direction, int turn){
 		return orthogonalTurn[(direction+turn)%4];

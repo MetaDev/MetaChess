@@ -1,8 +1,10 @@
 package logic;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.List;
 import java.util.Random;
 
 import meta.MetaMapping;
@@ -48,13 +50,30 @@ public class BoardLogic implements Logic {
 
 	// Use the recursive coordinates I and J to find a tile;
 	public static ExtendedTileModel getTile(int[] I, int[] J) {
-		ExtendedTileModel currTile =(ExtendedTileModel) MetaMapping.getBoardModel().getRootTile();
+		ExtendedTileModel currTile = (ExtendedTileModel) MetaMapping
+				.getBoardModel().getRootTile();
 		int i = 0;
 		while (currTile.getChildren() != null && i < I.length && i < J.length) {
 			currTile = currTile.getChildren()[I[i]][J[i]];
 			i++;
 		}
 		return currTile;
+	}
+
+	// reverse method from above, give position array from tile
+	public static MetaPosition getTileIPost(ExtendedTileModel tile) {
+		if (tile.getLevel() > 0) {
+			int[] I = new int[tile.getLevel()];
+			int[] J = new int[tile.getLevel()];
+			while (tile.getParent() != null) {
+				// add position at the tail
+				I[tile.getLevel() - 1] = tile.getI();
+				J[tile.getLevel() - 1] = tile.getJ();
+				tile = tile.getParent();
+			}
+			return new MetaPosition(I, J);
+		}
+		return null;
 	}
 
 	public static void changeTileMapping(int mode) {
@@ -122,11 +141,13 @@ public class BoardLogic implements Logic {
 
 	// implementation; go to neighbour tile do remainingmovement -1
 	// if remainingmovement>0 do recursion
-	//parameters: floating, never go to lower fraction, float on it
+	// parameters: floating, never go to lower fraction, float on it
 	// ignoreoccupation, allowed to jump over pieces
-	// penetraLowerFraction, continue movement when entering a lower fractioned tile
-	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile, int horDir,
-			int vertDir, boolean floating, boolean ignoreOccupation, boolean penetrateLowerFraction) {
+	// penetraLowerFraction, continue movement when entering a lower fractioned
+	// tile
+	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile,
+			int horDir, int vertDir, boolean floating,
+			boolean ignoreOccupation, boolean penetrateLowerFraction) {
 		ExtendedTileModel it = tile;
 		int startFraction = it.absoluteFraction();
 		// root tile
@@ -183,7 +204,8 @@ public class BoardLogic implements Logic {
 						&& Math.abs(remainingHorMov)
 								+ Math.abs(remainingVerMov) != 0)
 					break;
-				ExtendedTileModel temp = enterLowerFractionOfTile(it, horMov, verMov);
+				ExtendedTileModel temp = enterLowerFractionOfTile(it, horMov,
+						verMov);
 				// avoid loop
 				if (temp == it) {
 					break;
@@ -202,7 +224,7 @@ public class BoardLogic implements Logic {
 			// recursion if needed-> movement is not finished
 			if (Math.abs(remainingHorMov) + Math.abs(remainingVerMov) != 0) {
 				return getTileNeighbour(it, remainingHorMov, remainingVerMov,
-						floating, ignoreOccupation,penetrateLowerFraction);
+						floating, ignoreOccupation, penetrateLowerFraction);
 			}
 		}
 		return it;
@@ -212,8 +234,8 @@ public class BoardLogic implements Logic {
 	// one of many implementations to come
 	// return a child with the highest fraction and the opposit colour as the
 	// parent that is positioned on the border accesed by the movement.
-	public static ExtendedTileModel enterLowerFractionOfTile(ExtendedTileModel tile,
-			int horMov, int verMov) {
+	public static ExtendedTileModel enterLowerFractionOfTile(
+			ExtendedTileModel tile, int horMov, int verMov) {
 		ExtendedTileModel it = tile;
 		// c==1 -> tile your on is white, if you want to use colour in your
 		// function
@@ -235,7 +257,5 @@ public class BoardLogic implements Logic {
 
 		return it;
 	}
-
-	
 
 }

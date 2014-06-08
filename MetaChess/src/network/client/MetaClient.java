@@ -1,4 +1,4 @@
-package network;
+package network.client;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -10,7 +10,9 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class MetaClient {
-	private static volatile ArrayBlockingQueue<String> messages = new ArrayBlockingQueue<String>(
+	private static volatile ArrayBlockingQueue<String> messagesOut = new ArrayBlockingQueue<String>(
+			10);
+	private static volatile ArrayBlockingQueue<String> messagesIn = new ArrayBlockingQueue<String>(
 			10);
 	private static int clientId;
 	private static Thread clientThread;
@@ -32,7 +34,7 @@ public class MetaClient {
 		}
 		// add initial message to queue
 		// manditory to register client
-		addMessage("hello\n");
+		addOutMessage("hello");
 
 		// start an connection thread
 		clientThread = new Thread(new Runnable() {
@@ -56,15 +58,15 @@ public class MetaClient {
 	}
 
 	// add message to queue
-	public static void addMessage(String message) {
-		messages.add(message);
+	public static void addOutMessage(String message) {
+		messagesOut.add(message);
 	}
 
 	// return and remove message form queue
 	// this method blocks the thread if the queue is empty and waits until a new
 	// message is added
-	public static String getMessage() {
-		return messages.poll();
+	public static String getOutMessage() {
+		return messagesOut.poll();
 	}
 
 	// handel uitgoing client communication
@@ -73,12 +75,12 @@ public class MetaClient {
 
 			// out
 			outToServer = new PrintWriter(clientSocket.getOutputStream(), true);
-			String sentence = getMessage();
+			String sentence = getOutMessage();
 			// a message to send
 			if (sentence != null) {
 				System.out.print(sentence);
 				// send message
-				outToServer.println(clientId + "::" + sentence);
+				outToServer.println(sentence);
 			}
 			// nothing to send
 			else {
@@ -99,8 +101,11 @@ public class MetaClient {
 				} else if (!serverMessage.equals("nodata")) {
 					// received normal message
 					// handle it
-					//serverMessage is null ???
-					//System.out.println(serverMessage);
+					// serverMessage is null ???
+					System.out.println(serverMessage);
+
+					messagesIn.add(serverMessage);
+
 				}
 			}
 
@@ -125,6 +130,10 @@ public class MetaClient {
 
 		}
 
+	}
+
+	public static int getClientId() {
+		return clientId;
 	}
 
 }

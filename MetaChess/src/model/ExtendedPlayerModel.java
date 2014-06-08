@@ -4,15 +4,21 @@ import meta.MetaMapping.ControllerType;
 import meta.MetaMapping.PieceRendererType;
 
 //contains all info about player
-public class ExtendedPlayerModel extends ExtendedPieceModel {
-	private int nrOfViewTiles = 4;
-	private String name = "Gray";
+public class ExtendedPlayerModel {
+	public ExtendedPieceModel getControlledModel() {
+		return controlledModel;
+	}
 
+	public void setControlledModel(ExtendedPieceModel controlledModel) {
+		this.controlledModel = controlledModel;
+	}
+
+	private int side;
+	private String name = "Gray";
+	//the model the player is in
+	private ExtendedPieceModel controlledModel;
 	
 
-	public void setNrOfViewTiles(int nrOfViewTiles) {
-		this.nrOfViewTiles = nrOfViewTiles;
-	}
 
 	public String getName() {
 		return name;
@@ -22,15 +28,20 @@ public class ExtendedPlayerModel extends ExtendedPieceModel {
 		this.name = name;
 	}
 
-	public ExtendedPlayerModel(PieceRendererType renderType, int side,
-			ControllerType controllerType, int lives, int maxLives, int range,
-			int nrOfViewTiles, String name) {
-		super(renderType, side, controllerType, range);
-		this.nrOfViewTiles = nrOfViewTiles;
+	public ExtendedPlayerModel(int side,ExtendedPieceModel controlledModel,
+			 String name) {
+		this.controlledModel = controlledModel;
 		this.name = name;
+		this.side=side;
 	}
 
-	public int getNrOfViewTiles() {
-		return nrOfViewTiles;
+	public int getSide() {
+		return side;
 	}
+
+	public void setSide(int side) {
+		this.side = side;
+	}
+
+	
 }

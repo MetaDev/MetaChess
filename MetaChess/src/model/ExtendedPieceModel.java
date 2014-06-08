@@ -6,7 +6,6 @@ import java.util.Set;
 
 import logic.MetaClock;
 import meta.MetaMapping;
-import meta.MetaMapping.ActionType;
 import meta.MetaMapping.ControllerType;
 import meta.MetaMapping.PieceRendererType;
 import decision.Decision;
@@ -15,16 +14,26 @@ public class ExtendedPieceModel {
 	protected int color;
 	protected int side;
 	protected int absTime = 0;
+	protected int nrOfViewTiles=4;
+	public int getNrOfViewTiles() {
+		return nrOfViewTiles;
+	}
+
+	public void setNrOfViewTiles(int nrOfViewTiles) {
+		this.nrOfViewTiles = nrOfViewTiles;
+	}
 
 	protected int maxMovementRange = 8;
 	protected int maxDecisionRange = 8;
 	protected int range = 1;
 	protected String direction;
-	//0-3
+	// 0-3
 	protected int turn;
-	public void addTurn(){
-		turn=(turn+1)%4;
+
+	public void addTurn() {
+		turn = (turn + 1) % 4;
 	}
+
 	public int getTurn() {
 		return turn;
 	}
@@ -142,7 +151,8 @@ public class ExtendedPieceModel {
 	// special method to invoke reaching decisions when a directional button is
 	// pressed
 	public void makeDecision(Decision decision) {
-		// act if the activity conditions of the MetaAction are met, already checked if input is OK
+		// act if the activity conditions of the MetaAction are met, already
+		// checked if input is OK
 		if (decision.conditionsMet(this)) {
 			// lock if needed
 			if (decision.isLocking()) {
@@ -184,7 +194,7 @@ public class ExtendedPieceModel {
 		ExtendedTileModel position = MetaMapping.getBoardModel()
 				.getPiecePosition(this);
 		if (boardMetaAction == null) {
-			// get current position
+			// get current board decision
 			boardMetaAction = MetaMapping.getBoardModel().getActiveMetaAction(
 					position);
 			// decide board decision
@@ -197,9 +207,9 @@ public class ExtendedPieceModel {
 				.entrySet()) {
 			Decision decision = entry.getKey();
 			// act if the decision has veto
-				
+
 			if (decision.veto(this)) {
-				
+
 				// lock if needed
 				if (decision.isLocking()) {
 					locked = true;
@@ -207,7 +217,7 @@ public class ExtendedPieceModel {
 				Set<ExtendedTileModel> reach = decision.getReach(this);
 				// is the decision is reaching and it's range is not empty
 				if (decision.isReaching() && !reach.isEmpty()) {
-					
+
 					// apply range to board
 					// while applying range calculated absolute affected
 					// tile
@@ -253,6 +263,14 @@ public class ExtendedPieceModel {
 		}
 
 	}
+	//executes incoming decision from server
+	//input shouldn't be checked
+	//turn, activity and cooldown shouldn't be checked either, but maybe later as check to be sure no mistakes are made
+	//the cooldown and activity of this model should be set, because it could be that the player switches of piece
+	public void makeServerDecision(Decision decision) {
+		// decide decision
+		decision.decide(this);
+	}
 
 	public boolean isMetaActionActive(Decision metaAction) {
 		return metaActionIsActive.get(metaAction);
@@ -297,7 +315,8 @@ public class ExtendedPieceModel {
 		cooldownOfMetaActions = new HashMap<>();
 		metaActionIsActive = new HashMap<>();
 		turnsActiveOfmetaActions = new HashMap<>();
-		//not necessary, use the controltype to get all makeable decisions others will be added to map while playing 
+		// not necessary, use the controltype to get all makeable decisions
+		// others will be added to map while playing
 		for (Map.Entry<String, Decision> pair : MetaMapping.getAllDecisions()
 				.entrySet()) {
 			cooldownOfMetaActions.put(pair.getValue(), 0);

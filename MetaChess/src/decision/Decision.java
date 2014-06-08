@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import network.MetaClient;
+import network.NetworkMessages;
+import network.client.MetaClient;
 import logic.BoardLogic;
 import logic.MetaClock;
 import meta.MetaMapping;
@@ -41,8 +42,8 @@ public class Decision {
 	// defines how the decision handles the will of the actor
 	private WillType willType;
 	// boolean for will
+	//the will is the boolean that handles keyboard input
 	private boolean willing = false;
-	//
 	private boolean reaching;
 
 	public boolean isReaching() {
@@ -69,8 +70,6 @@ public class Decision {
 	public void decide(ExtendedPieceModel model) {
 
 		try {
-			//add message to client queue
-			MetaClient.addMessage(this.name);
 			
 			// all methods have signature "static XXX(model)"
 			
@@ -109,7 +108,7 @@ public class Decision {
 	// works because, the decision is executed in smaller periods then input is
 	// checked
 	public void handleInput(int in) {
-		ExtendedPieceModel player = MetaMapping.getBoardModel().getPlayer();
+		ExtendedPieceModel player = MetaMapping.getBoardModel().getPlayer().getControlledModel();
 		// if there is a range
 		if (player.getDecisionRange() > 0 && reaching) {
 			// handle the key combination for direction of a reaching
@@ -122,13 +121,13 @@ public class Decision {
 				if (in == 1) {
 					willing = true;
 					// remove this decision from pending position
-					MetaMapping.getBoardModel().getPlayer()
+					MetaMapping.getBoardModel().getPlayer().getControlledModel()
 							.setPendingDecision(null);
 				}
 				// but the decision can also be made by the direction keys
 				// set pending decision if the player
 				if (in == -1) {
-					MetaMapping.getBoardModel().getPlayer()
+					MetaMapping.getBoardModel().getPlayer().getControlledModel()
 							.setPendingDecision(this);
 				}
 				return;
@@ -222,7 +221,6 @@ public class Decision {
 	}
 
 	public boolean veto(ExtendedPieceModel model) {
-
 		if (!conditionsMet(model)) {
 			willing = false;
 		}

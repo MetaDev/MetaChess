@@ -34,7 +34,7 @@ public class MetaClock {
 	}
 public static int getRelativeTileTurn(){
 	ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
-	ExtendedTileModel playerTile = MetaMapping.getBoardModel().getPiecePosition(player);
+	ExtendedTileModel playerTile = MetaMapping.getBoardModel().getPiecePosition(player.getControlledModel());
 	if(playerTile.getParent()!=null)
 		return (getTileTurn()/2)%(playerTile.getParent().getChildFraction())+1;
 	return 0;
@@ -62,7 +62,7 @@ public static int getRelativeTileTurn(){
 		}
 	// absolute turn of player
 	public static int getTileTurn() {
-		return getTileTurn(MetaMapping.getBoardModel().getPlayer());
+		return getTileTurn(MetaMapping.getBoardModel().getPlayer().getControlledModel());
 	}
 
 	public static boolean getTurn(int fraction, int side) {
@@ -73,7 +73,7 @@ public static int getRelativeTileTurn(){
 	// return if the player is in turn
 	public static boolean getTurn() {
 		ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
-		ExtendedTileModel playerTile = MetaMapping.getBoardModel().getPiecePosition(player);
+		ExtendedTileModel playerTile = MetaMapping.getBoardModel().getPiecePosition(player.getControlledModel());
 		if (playerTile == null)
 			return false;
 		int fraction = (playerTile).absoluteFraction();

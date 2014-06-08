@@ -1,5 +1,5 @@
 import meta.MetaMapping;
-import network.MetaClient;
+import network.client.MetaClient;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -53,6 +53,7 @@ public class MetaWindow {
 			Display.create();
 			// enable repeat keys
 			Keyboard.enableRepeatEvents(true);
+			//NETWORKING
 			//init network client code
 			MetaClient.startClient();
 		} catch (LWJGLException e) {

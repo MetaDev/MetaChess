@@ -22,7 +22,7 @@ public class ExtendedBoardModel {
 	// the absolute time at the moment of execution, needed to check if passed
 	// time has to be increased.
 	private Map<ExtendedTileModel, Integer> activeMetaActionsTimeStamp = new ConcurrentHashMap<>();
-	// map of team-lives
+	// map of team-lives, first integer is team 0/1
 	private Map<Integer, Integer> teamLives = new ConcurrentHashMap<>();
 
 	public Map<ExtendedPieceModel, ExtendedTileModel> getPiecesOnBoard() {
@@ -140,7 +140,7 @@ public class ExtendedBoardModel {
 			ExtendedTileModel position) {
 		this.player = player;
 		if (!piecesOnBoard.containsKey(player))
-			piecesOnBoard.put(player, position);
+			piecesOnBoard.put(player.getControlledModel(), position);
 	}
 
 	public void deleteModel(ExtendedTileModel pos) {

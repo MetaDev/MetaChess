@@ -54,7 +54,7 @@ public class MetaView {
 
 		ExtendedBoardModel board = MetaMapping.getBoardModel();
 		ExtendedPlayerModel player = board.getPlayer();
-		ExtendedTileModel PlayerTile = board.getPiecePosition(player);
+		ExtendedTileModel PlayerTile = board.getPiecePosition(player.getControlledModel());
 		// set the drawing as absolute
 		glClear(GL_COLOR_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
@@ -82,7 +82,7 @@ public class MetaView {
 		// zoom out depending on nr of tiles allowed to see
 		int tiles = 1;
 		if (player != null) {
-			tiles = player.getNrOfViewTiles();
+			tiles = player.getControlledModel().getNrOfViewTiles();
 		}
 		glScalef((float) 1 / (2 * tiles + 1), (float) 1 / (2 * tiles + 1), 1);
 		// move player to center
