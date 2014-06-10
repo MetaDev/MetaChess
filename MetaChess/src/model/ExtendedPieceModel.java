@@ -2,81 +2,64 @@ package model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import logic.MetaClock;
-import meta.MetaMapping;
-import meta.MetaMapping.ControllerType;
-import meta.MetaMapping.PieceRendererType;
-import decision.Decision;
+import meta.MetaConfig;
+import meta.MetaConfig.PieceType;
+import meta.MetaUtil;
+import decision.DecisionLogic;
 
 public class ExtendedPieceModel {
 	protected int color;
 	protected int side;
 	protected int absTime = 0;
-	protected int nrOfViewTiles=4;
+	private int previousFraction = 8;
+	// board variables
+	private int boardTileView = 0;
+	private int boardMaxRange = 0;
+
+	// regular number of viewn tiles is 4 and 8 on main board
 	public int getNrOfViewTiles() {
-		return nrOfViewTiles;
+		if (getTilePosition().getParent() == null) {
+			return 8;
+		}
+		return 4;
 	}
 
-	public void setNrOfViewTiles(int nrOfViewTiles) {
-		this.nrOfViewTiles = nrOfViewTiles;
-	}
-
-	protected int maxMovementRange = 8;
-	protected int maxDecisionRange = 8;
 	protected int range = 1;
-	protected String direction;
-	// 0-3
-	protected int turn;
-
-	public void addTurn() {
-		turn = (turn + 1) % 4;
-	}
-
-	public int getTurn() {
-		return turn;
-	}
 
 	protected boolean ignoreOccupationOfTile = false;
 	protected boolean penetrateLowerFraction = false;
-	protected PieceRendererType renderType;
-	protected ControllerType controllerType;
-	// the model is thinking about a decision
-	private Decision pendingDecision;
-
-	public Decision getPendingDecision() {
-		return pendingDecision;
-	}
-
-	public void setPendingDecision(Decision pendingDecision) {
-		this.pendingDecision = pendingDecision;
-	}
+	protected PieceType type;
 
 	// this MetaAction is special because the cooldown and turns of activity
 	// don't have to lowered with every turn change
 	// and it's revert if the piece changes position to a tile without the
 	// MetaAction
-	protected Decision boardMetaAction;
+	protected String boardDecision;
 
-	public PieceRendererType getRenderType() {
-		return renderType;
-	}
-
-	public void setRenderType(PieceRendererType renderType) {
-		this.renderType = renderType;
+	public PieceType getType() {
+		return type;
 	}
 
 	// save remaining cooldown of all metaActions applied on this model
-	protected Map<Decision, Integer> cooldownOfMetaActions;
+	protected Map<String, Integer> cooldownOfDecisions = new HashMap<>();;
 	// save metaActions turnsOfActivity if it has a fixed amount of active turns
 	// only decreased of the MetaAction has a cooldown on current model
 	// this means that MetaActions without a cooldown don't change
-	protected Map<Decision, Integer> turnsActiveOfmetaActions;
+	protected Map<String, Integer> turnsActiveOfDecisions = new HashMap<>();;
 	// saves all MetaActions executed on this activated on model, needed to
 	// verify if MetaAction has
 	// to be reversed
-	protected Map<Decision, Boolean> metaActionIsActive;
+	protected Map<String, Boolean> activeDecisions = new HashMap<>();;
+	// decisions that have to be reverted at the end of the turn
+	protected Map<String, Boolean> regrettedDecisions = new HashMap<>();;
+	// kept decision that will receive an increase of cooldwon when the turn
+	// changes
+	// the saved cooldown is the max cooldown of that turn based on range
+	// so if the user change range in the turn it pays the cooldown for the
+	// highest range
+	protected Map<String, Integer> keptDecisionCooldown = new HashMap<>();;
 
 	// if the piece already made a move this turn it's locked and can't be moved
 	// again
@@ -90,190 +73,246 @@ public class ExtendedPieceModel {
 		this.penetrateLowerFraction = penetrateLowerFraction;
 	}
 
+	// on the turn change, you should add cooldown to the currently active
+	// decisions
+	// cooldown is paid after every turn, with the highest range in that turn
+	// cooldown is payed after making decision, and while it stays active after
+	// every turn change
 	public void turnChange() {
-		// with every change of turn check wether a MetaAction is still active
-		for (Map.Entry<Decision, Integer> entry : cooldownOfMetaActions
-				.entrySet()) {
-			// metaactions that have a cooldown and are active
-			if (entry.getValue() != null) {
-				if (entry.getValue() > 0) {
-					// decrease cooldown
-					entry.setValue(entry.getValue() - 1);
-					// if it has a cooldown
-					if (turnsActiveOfmetaActions.get(entry.getKey()) > 0) {
-						// decrease turns of activity
-						turnsActiveOfmetaActions
-								.put(entry.getKey(), turnsActiveOfmetaActions
-										.get(entry.getKey()) - 1);
+		// turn regretted decision non-active, and active turn=0 and regret them
+		for (Map.Entry<String, Boolean> entry : regrettedDecisions.entrySet()) {
+			if (entry.getValue()) {
+				activeDecisions.put(entry.getKey(), false);
+				turnsActiveOfDecisions.put(entry.getKey(), 0);
+				DecisionLogic.regret(entry.getKey(), this);
+				// remove from regretted list
+				entry.setValue(false);
+			}
+		}
+		ExtendedTileModel position = MetaConfig.getBoardModel()
+				.getPiecePosition(this);
+		int newFraction = position.getAbsFraction();
+		if (previousFraction <= newFraction) {
+			// decrease cooldown of non-active decisions with cooldown, if on
+			// same fraction or higher as previous turn
+			for (Map.Entry<String, Integer> entry : cooldownOfDecisions
+					.entrySet()) {
+				if (!activeDecisions.get(entry.getKey())) {
+					if (entry.getValue() > 0) {
+						// decrease by number of minimum turns passed on this
+						// fraction
+						entry.setValue(Math.max(
+								entry.getValue() - MetaClock.getMaxFraction()
+										/ position.getAbsFraction(), 0));
+						turnsActiveOfDecisions.put(entry.getKey(),
+								turnsActiveOfDecisions.get(entry.getKey()) + 1);
 					}
 				}
-
 			}
+		}
+
+		// increase cooldown and turnsactive of kept decisions
+		for (Map.Entry<String, Integer> entry : keptDecisionCooldown.entrySet()) {
+			// increase
+			cooldownOfDecisions.put(entry.getKey(),
+					cooldownOfDecisions.get(entry.getKey()) + entry.getValue());
+			// reset
+			entry.setValue(0);
+
 		}
 		// unlock piece
 		locked = false;
 		absTime = MetaClock.getAbsoluteTime();
 	}
 
-	public void regret() {
-		// check if board MetaAction has to be reversed
-		if (boardMetaAction != null) {
-			ExtendedTileModel position = MetaMapping.getBoardModel()
-					.getPiecePosition(this);
-			if (MetaMapping.getBoardModel().getActiveMetaAction(position) != boardMetaAction) {
-				boardMetaAction.regret(this);
-				boardMetaAction = null;
-			}
+	/*
+	 * makes decisions or regrets them based on the input And the current tile
+	 * standing on
+	 */
+	public void decideAndRegret(String inputSequence) {
+		
+		// no input, no decisions or regretes
+		// TODO: here can be saved wether a team makes at least 1 decision every
+		// main turn
+		if (inputSequence.equals("")) {
+			return;
 		}
-		// if no longer active, do a revert
-		// for all active decisions
-		for (Map.Entry<Decision, Boolean> entry : metaActionIsActive.entrySet()) {
-			// revert if MetaAction is active on model
-			// and no longer active in the game
-			Decision decision = entry.getKey();
-			if (entry.getValue() && !decision.veto(this)) {
 
-				// And if it has still turns active on this model
-				if (turnsActiveOfmetaActions.get(decision) == 0) {
-					// maybe optimasation is removing the decision from the map
-					// all together
-
-					// set inactive in model
-					entry.setValue(false);
-					// regret decision
-					decision.regret(this);
+		String[] inputs = inputSequence.split(";");
+		int i = 0;
+		// regret or decide in pressed key
+		while (i < inputs.length
+				&& (inputs[i].startsWith("RELEASE") || inputs[i]
+						.startsWith("PRESS"))) {
+			
+			// a key has been released
+			// always a single key
+			// translate key to decision
+			String regretOrDecision = MetaConfig.getKeyMapping().get(type).get(
+					inputs[i].split(":")[1]);
+			
+			// first handle if range change
+			if (MetaUtil.isNumeric(regretOrDecision)) {
+				
+				int changeRange = MetaUtil.convertToInteger(regretOrDecision);
+				
+				if (inputs[i].startsWith("RELEASE")) {
+					range -= changeRange;
+				} else if (inputs[i].startsWith("PRESS")) {
+					range += changeRange;
 				}
-
-			}
-		}
-	}
-
-	// special method to invoke reaching decisions when a directional button is
-	// pressed
-	public void makeDecision(Decision decision) {
-		// act if the activity conditions of the MetaAction are met, already
-		// checked if input is OK
-		if (decision.conditionsMet(this)) {
-			// lock if needed
-			if (decision.isLocking()) {
-				locked = true;
-			}
-			ExtendedTileModel position = MetaMapping.getBoardModel()
-					.getPiecePosition(this);
-			Set<ExtendedTileModel> reach = decision.getReach(this);
-			// is the decision is reaching and it's range is not empty
-			if (decision.isReaching() && !reach.isEmpty()) {
-				// apply range to board
-				// while applying range calculated absolute affected tile
-				// weight
-				int tileWeight = 0;
-				for (ExtendedTileModel tile : reach) {
-					tileWeight += ((float) position.getAbsFraction())
-							/ ((float) tile.getAbsFraction());
-					// apply for each tile if not already applied to board
-					MetaMapping.getBoardModel().setActiveMetaAction(decision,
-							tile, this);
+				
+			}else
+			// does this type contains this decision
+			if (MetaConfig.getPieceDecisions().get(type)
+					.contains(regretOrDecision)) {
+				// regret
+				if (inputs[i].startsWith("RELEASE")) {
+					System.out.println(regretOrDecision);
+					regret(regretOrDecision);
 				}
-				// set cooldown
-				cooldownOfMetaActions.put(decision,
-						decision.getCooldown(tileWeight));
-
+				// decision
+				if (inputs[i].startsWith("PRESS")) {
+					// if the conditions: activity, cooldown and turn are okay
+					if (DecisionLogic.conditionsMet(regretOrDecision, this)) {
+						// lock if its a movement
+						if (!MetaConfig.getSpecialsSet().keySet()
+								.contains(regretOrDecision)
+								&& !regretOrDecision.equals("TURN")) {
+							locked = true;
+						}
+						decide(regretOrDecision);
+					}
+				}
 			}
-		}
-	}
 
-	public void makeDecisions() {
-		// act if on a tile with a MetaAction, a board MetaAction never locks
+			// skip seen input
+			i++;
+		}
+
+		// now make board decision
+		// a board decision never locks
 		// the piece
-		// it also doesn't affect the MetaActions cooldown of this piece
+		// it also doesn't affect the decisions cooldown of this piece
 
-		// check if this MetaAction is already registered
-		// if so, check if not already active
-		// if the board Decision is null, this means that the previous decision
-		// has been reverted
-		ExtendedTileModel position = MetaMapping.getBoardModel()
+		// check if there isn't already the same board decision active
+		ExtendedTileModel position = MetaConfig.getBoardModel()
 				.getPiecePosition(this);
-		if (boardMetaAction == null) {
-			// get current board decision
-			boardMetaAction = MetaMapping.getBoardModel().getActiveMetaAction(
+		if (boardDecision != MetaConfig.getBoardModel().getActiveMetaAction(
+				position)) {
+			String oldBoardDecision = boardDecision;
+			boardDecision = MetaConfig.getBoardModel().getActiveMetaAction(
 					position);
-			// decide board decision
-			if (boardMetaAction != null)
-				boardMetaAction.decide(this);
+			if (oldBoardDecision != null) {
+				// regret previous board decision
+				regretBoard(oldBoardDecision);
+			}
+			// decide new board decision if there is one
+			if (boardDecision != null) {
+				decideBoard(boardDecision);
+			}
+
 		}
 
-		// iterate over all MetaAction that the piece can execute
-		for (Map.Entry<Decision, Integer> entry : cooldownOfMetaActions
-				.entrySet()) {
-			Decision decision = entry.getKey();
-			// act if the decision has veto
+		// TODO: implement multikey understanding
+		// all permutations of held down keys should be tried
+		// handling reaching decisions is done in actionlogic
+		String keptDecision = "";
+		// all next inputs are DOWN and are thus kept decision
+		for (; i < inputs.length; i++) {
+			keptDecision = MetaConfig.getKeyMapping().get(type).get(
+					inputs[i].split(":")[1]);
+			if (MetaConfig.getPieceDecisions().get(type).contains(keptDecision)) {
+				// TODO: MINFRACT here if the max fraction is achieved even
+				// movement isn't redecided
 
-			if (decision.veto(this)) {
-
-				// lock if needed
-				if (decision.isLocking()) {
-					locked = true;
-				}
-				Set<ExtendedTileModel> reach = decision.getReach(this);
-				// is the decision is reaching and it's range is not empty
-				if (decision.isReaching() && !reach.isEmpty()) {
-
-					// apply range to board
-					// while applying range calculated absolute affected
-					// tile
-					// weight
-					int tileWeight = 0;
-					for (ExtendedTileModel tile : reach) {
-						tileWeight += ((float) position.getAbsFraction())
-								/ ((float) tile.getAbsFraction());
-						// apply for each tile if not already applied to
-						// board
-						MetaMapping.getBoardModel().setActiveMetaAction(
-								decision, tile, this);
+				// if this decision is a special one, don't redecide but
+				// increase cooldown and turnsactive
+				// the corresponding decision should already be active
+				if (MetaConfig.getSpecialsSet().keySet().contains(keptDecision)) {
+					raiseCooldownAndTurnsActiveAfterTurn(keptDecision);
+				} else if (!keptDecision.equals("TURN")) {
+					// a movement
+					if (DecisionLogic.conditionsMet(keptDecision, this)) {
+						decide(keptDecision);
+						locked = true;
 					}
-					// set cooldown
-					entry.setValue(decision.getCooldown(tileWeight));
-
-				}
-				// if it's not a ranged MetaAction, you can execute it
-				// directly if MetaAction is not active on this model
-
-				else if (!metaActionIsActive.get(decision)) {
-					// set active on model if the metaAction has a lasting, not
-					// a switch
-					// effect->has to revert
-					// no MetaAction is permanent
-					if (decision.reverts()) {
-						metaActionIsActive.put(decision, true);
-					}
-					// set cooldown, only 1 tile affected, your own
-					int cooldown = decision.getCooldown(1);
-					// set turns of activity if it has a cooldown
-					if (cooldown > 0) {
-						entry.setValue(cooldown);
-						turnsActiveOfmetaActions.put(decision,
-								decision.getTurnsActive());
-					}
-					// decide decision
-					decision.decide(this);
 
 				}
 
 			}
+
 		}
 
 	}
-	//executes incoming decision from server
-	//input shouldn't be checked
-	//turn, activity and cooldown shouldn't be checked either, but maybe later as check to be sure no mistakes are made
-	//the cooldown and activity of this model should be set, because it could be that the player switches of piece
-	public void makeServerDecision(Decision decision) {
-		// decide decision
-		decision.decide(this);
+
+	private void raiseCooldownAndTurnsActiveNow(String decision) {
+		ExtendedTileModel position = MetaConfig.getBoardModel()
+				.getPiecePosition(this);
+		cooldownOfDecisions
+				.put(decision,
+						cooldownOfDecisions.get(decision)
+								+ DecisionLogic.getCooldown(range,
+										position.absoluteFraction()));
+		turnsActiveOfDecisions.put(decision,
+				turnsActiveOfDecisions.get(decision) + 1);
 	}
 
-	public boolean isMetaActionActive(Decision metaAction) {
-		return metaActionIsActive.get(metaAction);
+	// save max cooldown of this turn
+	private void raiseCooldownAndTurnsActiveAfterTurn(String decision) {
+		ExtendedTileModel position = MetaConfig.getBoardModel()
+				.getPiecePosition(this);
+		keptDecisionCooldown.put(decision, Math.max(
+				DecisionLogic.getCooldown(range, position.absoluteFraction()),
+				keptDecisionCooldown.get(decision)));
+	}
+
+	// handles all that has to be done to regret decision
+	// turns active 0, active false, start countdown cooldown-> by turning on
+	// non-active
+	// regret only initialises the regretting process, a method can only be
+	// undone after a turn is over
+	public void regret(String regret) {
+		regrettedDecisions.put(regret, true);
+
+	}
+
+	// make a board decision
+	public void decideBoard(String boardDecision) {
+		DecisionLogic.decide(boardDecision, this);
+	}
+
+	// regret board decision
+	public void regretBoard(String boardRegret) {
+		DecisionLogic.regret(boardRegret, this);
+	}
+
+	// handle the decision
+	// set initial cooldown, set active, set turnsactive to 1
+	public void decide(String decision) {
+		DecisionLogic.decide(decision, this);
+		// if it's a movent decision no cooldown is added or made active on the
+		// model
+		if (MetaConfig.getSpecialsSet().keySet().contains(decision)) {
+			activeDecisions.put(decision, true);
+			// initial cooldown is payed directly
+			raiseCooldownAndTurnsActiveNow(decision);
+		}
+	}
+
+	// executes incoming decision from server
+	// input shouldn't be checked
+	// turn, activity and cooldown shouldn't be checked either, but maybe later
+	// as check to be sure no mistakes are made
+	// the cooldown and activity of this model should be set, because it could
+	// be that the player switches of piece
+	// public void makeServerDecision(DecisionLogic decisionLogic) {
+	// // decide decision
+	// dDecisionLogic.decide(decision,this);
+	// }
+
+	public boolean isMetaActionActive(DecisionLogic metaAction) {
+		return activeDecisions.get(metaAction);
 	}
 
 	public int getAbsTime() {
@@ -300,28 +339,18 @@ public class ExtendedPieceModel {
 		this.ignoreOccupationOfTile = ignoreOccupationOfTile;
 	}
 
-	public int getRange() {
-		return range;
-	}
-
-	public ExtendedPieceModel(PieceRendererType renderType, int side,
-			ControllerType controllerType, int maxRange) {
+	public ExtendedPieceModel(PieceType type, int side, int maxRange) {
 		this.side = side;
 		this.color = side;
-		this.maxMovementRange = maxRange;
-		this.controllerType = controllerType;
-		this.renderType = renderType;
-		// fill with all available MetaActions
-		cooldownOfMetaActions = new HashMap<>();
-		metaActionIsActive = new HashMap<>();
-		turnsActiveOfmetaActions = new HashMap<>();
-		// not necessary, use the controltype to get all makeable decisions
-		// others will be added to map while playing
-		for (Map.Entry<String, Decision> pair : MetaMapping.getAllDecisions()
-				.entrySet()) {
-			cooldownOfMetaActions.put(pair.getValue(), 0);
-			turnsActiveOfmetaActions.put(pair.getValue(), 0);
-			metaActionIsActive.put(pair.getValue(), false);
+		this.type = type;
+
+		// fill all mappings
+		for (String decision : MetaConfig.getPieceDecisions().get(type)) {
+			cooldownOfDecisions.put(decision, 0);
+			turnsActiveOfDecisions.put(decision, 0);
+			activeDecisions.put(decision, false);
+			regrettedDecisions.put(decision, false);
+			keptDecisionCooldown.put(decision,0);
 		}
 	}
 
@@ -341,21 +370,9 @@ public class ExtendedPieceModel {
 		this.side = side;
 	}
 
-	public ControllerType getControllerType() {
-		return controllerType;
-	}
-
-	public void setControllerType(ControllerType controllerType) {
-		this.controllerType = controllerType;
-	}
-
 	// the range is always at least 1
-	public int getMovementRange() {
-		return Math.max(Math.min(range, maxMovementRange), 1);
-	}
-
-	public int getDecisionRange() {
-		return Math.max(Math.min(range, maxDecisionRange) - 1, 0);
+	public int getRange() {
+		return Math.max(Math.min(range, 8), 1);
 	}
 
 	// if range is set negative the directions are inverted
@@ -364,31 +381,64 @@ public class ExtendedPieceModel {
 
 	}
 
-	public Integer getCooldown(Decision metaAction) {
-		return cooldownOfMetaActions.get(metaAction);
+	public Integer getCooldown(String decision) {
+		return cooldownOfDecisions.get(decision);
 	}
 
-	public Integer getTurnsOfActivity(Decision metaAction) {
-		return turnsActiveOfmetaActions.get(metaAction);
+	public Integer getTurnsOfActivity(String decision) {
+		return turnsActiveOfDecisions.get(decision);
 	}
 
-	public void setMetaActionCooldown(Decision metaAction, int cooldown) {
-		cooldownOfMetaActions.put(metaAction, cooldown);
-	}
-
-	public void setDirection(String direction) {
-		this.direction = direction;
-	}
-
-	public String getDirection() {
-		return direction;
+	public void setMetaActionCooldown(String metaAction, int cooldown) {
+		cooldownOfDecisions.put(metaAction, cooldown);
 	}
 
 	public float getRelSize() {
-		return MetaMapping.getBoardModel().getPiecePosition(this).getRelSize();
+		return MetaConfig.getBoardModel().getPiecePosition(this).getRelSize();
 	}
 
 	public ExtendedTileModel getTilePosition() {
-		return MetaMapping.getBoardModel().getPiecePosition(this);
+		return MetaConfig.getBoardModel().getPiecePosition(this);
 	}
+
+	public String getPendingDecision() {
+		return null;
+	}
+
+	public int isDragon() {
+		return 0;
+	}
+
+	public void setDragon(int dragon) {
+		// do nothing
+	}
+
+	public void setViewing(int viewing) {
+		// do nothing
+	}
+
+	public void setMaxRange(int maxRange) {
+		// do nothing
+	}
+
+	public int getMaxRange() {
+		return 8;
+	}
+
+	public void setTurn(int turn) {
+		// do nothing
+	}
+
+	public int getTurn() {
+		return 0;
+	}
+
+	public void setDirection(String direction) {
+		// do nothing
+	}
+
+	public String getDirection() {
+		return null;
+	}
+
 }

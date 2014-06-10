@@ -1,6 +1,6 @@
 package editor;
 
-import meta.MetaMapping;
+import meta.MetaConfig;
 import model.ExtendedTileModel;
 
 
@@ -11,7 +11,7 @@ public class BoardEditor extends Editor {
 		//make this equal to initial windowsize or else->problem
 		
 		// draw floor tiles
-		ExtendedTileModel floor = (ExtendedTileModel)MetaMapping.getBoardModel().getRootTile();
+		ExtendedTileModel floor = (ExtendedTileModel)MetaConfig.getBoardModel().getRootTile();
 		floor.divide(8);
 		floor.getChildren()[0][1].divide(2);
 		floor.getChildren()[2][4].divide(8);

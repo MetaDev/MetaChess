@@ -3,7 +3,7 @@ package model;
 import java.util.HashMap;
 import java.util.Map;
 
-import meta.MetaMapping.GUIPosition;
+import meta.MetaConfig.GUIPosition;
 import userinterface.generic.GUITile;
 
 public class ExtendedGUI {

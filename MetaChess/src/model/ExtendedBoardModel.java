@@ -3,18 +3,22 @@ package model;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import decision.Decision;
+import decision.DecisionLogic;
 import logic.MetaClock;
 import meta.MetaUtil;
 
 public class ExtendedBoardModel {
+	//to save board decisions, save range, balance and side and parameter, tileview or maxrange
+	
+	//save a mapping of clientid and ExtendedPieceModel to know where all player are
+	
 	private ExtendedTileModel rootTile;
 	// the pieces and there position on the board
 	private Map<ExtendedPieceModel, ExtendedTileModel> piecesOnBoard = new ConcurrentHashMap<>();
 	// the tile and name of board MetaAction
 	// made this a concurrent hashmap because the activity is constantly update
 	// while in the logic loop this map is read all the time
-	private Map<ExtendedTileModel, Decision> activeMetaActions = new ConcurrentHashMap<>();
+	private Map<ExtendedTileModel, String> activeMetaActions = new ConcurrentHashMap<>();
 	// the piece which executed the board MetaAction
 	private Map<ExtendedTileModel, ExtendedPieceModel> activeMetaActionsActor = new ConcurrentHashMap<>();
 	// the time that past since execution
@@ -29,7 +33,7 @@ public class ExtendedBoardModel {
 		return piecesOnBoard;
 	}
 
-	public Map<ExtendedTileModel, Decision> getActiveMetaActions() {
+	public Map<ExtendedTileModel, String> getActiveMetaActions() {
 		return activeMetaActions;
 	}
 
@@ -94,11 +98,13 @@ public class ExtendedBoardModel {
 		return MetaUtil.getKeyByValue(piecesOnBoard, pos);
 	}
 
-	public void setActiveMetaAction(Decision metaAction,
+	public void setActiveDecision(String decision,
 			ExtendedTileModel position, ExtendedPieceModel actor) {
-		activeMetaActions.put(position, metaAction);
+		activeMetaActions.put(position, decision);
 		activeMetaActionsActor.put(position, actor);
-		activeMetaActionsTimeLeft.put(position, metaAction.getTurnsActive());
+		//stays active while king stays on same place and keeps corresponding key down
+		activeMetaActionsTimeLeft.put(position, 1);
+		//won't be necessary once we work with absolute cooldown
 		activeMetaActionsTimeStamp.put(position, actor.getAbsTime());
 	}
 
@@ -118,7 +124,7 @@ public class ExtendedBoardModel {
 
 	}
 
-	public Decision getActiveMetaAction(ExtendedTileModel position) {
+	public String getActiveMetaAction(ExtendedTileModel position) {
 		if (activeMetaActions.containsKey(position))
 			return activeMetaActions.get(position);
 		return null;

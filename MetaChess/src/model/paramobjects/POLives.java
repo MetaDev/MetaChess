@@ -1,17 +1,17 @@
 package model.paramobjects;
 
-import meta.MetaMapping;
+import meta.MetaConfig;
 
 public class POLives implements ParamObject{
 
 	@Override
 	public int getParam() {
-		return MetaMapping.getBoardModel().getTeamLives(MetaMapping.getBoardModel().getPlayer().getSide());
+		return MetaConfig.getBoardModel().getTeamLives(MetaConfig.getBoardModel().getPlayer().getSide());
 	}
 
 	@Override
 	public void setParam(int param) {
-		MetaMapping.getBoardModel().setTeamLives(MetaMapping.getBoardModel().getPlayer().getSide(),param);
+		MetaConfig.getBoardModel().setTeamLives(MetaConfig.getBoardModel().getPlayer().getSide(),param);
 	}
 
 }

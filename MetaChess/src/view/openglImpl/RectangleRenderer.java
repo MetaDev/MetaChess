@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
-import meta.MetaMapping;
+import meta.MetaConfig;
 
 import org.lwjgl.util.Color;
 
@@ -33,7 +33,7 @@ public class RectangleRenderer {
 		
 		glBegin(GL_QUADS);
 		// Set the color to white.
-		Color col = MetaMapping.getColor(c);
+		Color col = MetaConfig.getColor(c);
 		glColor3f(col.getRed(), col.getGreen(), col.getBlue());
 		// glVertex2f function
 		glVertex2f(0,  height); // Top left corner

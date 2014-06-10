@@ -1,13 +1,13 @@
 package model.paramobjects;
 
-import meta.MetaMapping;
+import meta.MetaConfig;
 import meta.MetaUtil;
 
 public class POAffectedTiles implements ParamObject{
 
 	@Override
 	public int getParam() {
-		return MetaUtil.getKeyCountByValue(MetaMapping.getBoardModel().getActiveMetaActionsActor(),MetaMapping.getBoardModel().getPlayer().getControlledModel());
+		return MetaUtil.getKeyCountByValue(MetaConfig.getBoardModel().getActiveMetaActionsActor(),MetaConfig.getBoardModel().getPlayer().getControlledModel());
 	}
 
 	@Override

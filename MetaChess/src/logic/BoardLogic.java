@@ -1,13 +1,11 @@
 package logic;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.List;
 import java.util.Random;
 
-import meta.MetaMapping;
+import meta.MetaConfig;
 import model.ExtendedTileModel;
 
 public class BoardLogic implements Logic {
@@ -50,7 +48,7 @@ public class BoardLogic implements Logic {
 
 	// Use the recursive coordinates I and J to find a tile;
 	public static ExtendedTileModel getTile(int[] I, int[] J) {
-		ExtendedTileModel currTile = (ExtendedTileModel) MetaMapping
+		ExtendedTileModel currTile = (ExtendedTileModel) MetaConfig
 				.getBoardModel().getRootTile();
 		int i = 0;
 		while (currTile.getChildren() != null && i < I.length && i < J.length) {
@@ -61,7 +59,7 @@ public class BoardLogic implements Logic {
 	}
 
 	// reverse method from above, give position array from tile
-	public static MetaPosition getTileIPost(ExtendedTileModel tile) {
+	public static MetaPosition getTilePost(ExtendedTileModel tile) {
 		if (tile.getLevel() > 0) {
 			int[] I = new int[tile.getLevel()];
 			int[] J = new int[tile.getLevel()];
@@ -257,5 +255,11 @@ public class BoardLogic implements Logic {
 
 		return it;
 	}
-
+	//Euclidian distance of tiles
+	public static double calculateDistance(ExtendedTileModel tile1,
+			ExtendedTileModel tile2) {
+		return Math.sqrt(Math.pow(
+				(double) tile1.getAbsX() - tile2.getAbsX(), 2)
+				+ Math.pow((double) tile1.getAbsY() - tile2.getAbsY(), 2));
+	}
 }

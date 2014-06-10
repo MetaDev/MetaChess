@@ -2,7 +2,7 @@ package logic;
 
 
 
-import meta.MetaMapping;
+import meta.MetaConfig;
 import model.ExtendedPieceModel;
 import model.ExtendedPlayerModel;
 import model.ExtendedTileModel;
@@ -14,27 +14,25 @@ public class MetaClock {
 	private static int maxWaitTime = 16 * 64 * 64;
 	// minimum amount of ms a turn can take, if lower the game becomes real-time
 	private static int minWaitTime = 4 * 64;
-
+	private static int maxTileFraction = 4 * 64;
 	// based on the fraction of the parent tile give absolute counter of turn on 
 	public static int getTileTurn(int fraction) {
-		int highestFraction = maxWaitTime / minWaitTime;
 		// real-time
-		if (highestFraction < fraction)
-			fraction = highestFraction;
+		if (maxTileFraction < fraction)
+			fraction = maxTileFraction;
 		return getTileTurn(fraction,getAbsoluteTime());
 	}
 
 	// return tile turn based on absolute time
 	public static int getTileTurn(int fraction, int time) {
-		int highestFraction = maxWaitTime / minWaitTime;
 		// real-time
-		if (highestFraction < fraction)
-			fraction = highestFraction;
+		if (maxTileFraction < fraction)
+			fraction = maxTileFraction;
 		return (int) (((float) (time) / maxWaitTime) * fraction *2);
 	}
 public static int getRelativeTileTurn(){
-	ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
-	ExtendedTileModel playerTile = MetaMapping.getBoardModel().getPiecePosition(player.getControlledModel());
+	ExtendedPlayerModel player = MetaConfig.getBoardModel().getPlayer();
+	ExtendedTileModel playerTile = MetaConfig.getBoardModel().getPiecePosition(player.getControlledModel());
 	if(playerTile.getParent()!=null)
 		return (getTileTurn()/2)%(playerTile.getParent().getChildFraction())+1;
 	return 0;
@@ -46,7 +44,7 @@ public static int getRelativeTileTurn(){
 	}
 	//return turn based on Piece
 	public static boolean getTurn(ExtendedPieceModel piece){
-		ExtendedTileModel tile = MetaMapping.getBoardModel().getPiecePosition(piece);
+		ExtendedTileModel tile = MetaConfig.getBoardModel().getPiecePosition(piece);
 		return getTurn(tile.absoluteFraction(),piece.getSide());
 	}
 	public static int getAbsoluteTime() {
@@ -54,7 +52,7 @@ public static int getRelativeTileTurn(){
 	}
 	// tile turn of piece
 		public static int getTileTurn(ExtendedPieceModel piece) {
-			ExtendedTileModel tile = MetaMapping.getBoardModel().getPiecePosition(piece);
+			ExtendedTileModel tile = MetaConfig.getBoardModel().getPiecePosition(piece);
 			if (tile == null)
 				return -1;
 			int fraction =tile.absoluteFraction();
@@ -62,7 +60,7 @@ public static int getRelativeTileTurn(){
 		}
 	// absolute turn of player
 	public static int getTileTurn() {
-		return getTileTurn(MetaMapping.getBoardModel().getPlayer().getControlledModel());
+		return getTileTurn(MetaConfig.getBoardModel().getPlayer().getControlledModel());
 	}
 
 	public static boolean getTurn(int fraction, int side) {
@@ -72,8 +70,8 @@ public static int getRelativeTileTurn(){
 
 	// return if the player is in turn
 	public static boolean getTurn() {
-		ExtendedPlayerModel player = MetaMapping.getBoardModel().getPlayer();
-		ExtendedTileModel playerTile = MetaMapping.getBoardModel().getPiecePosition(player.getControlledModel());
+		ExtendedPlayerModel player = MetaConfig.getBoardModel().getPlayer();
+		ExtendedTileModel playerTile = MetaConfig.getBoardModel().getPiecePosition(player.getControlledModel());
 		if (playerTile == null)
 			return false;
 		int fraction = (playerTile).absoluteFraction();
@@ -82,6 +80,6 @@ public static int getRelativeTileTurn(){
 	}
 
 	public static int getMaxFraction() {
-		return maxWaitTime / minWaitTime;
+		return maxTileFraction;
 	}
 }

@@ -24,8 +24,8 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.util.Map;
 
-import meta.MetaMapping;
-import meta.MetaMapping.GUIPosition;
+import meta.MetaConfig;
+import meta.MetaConfig.GUIPosition;
 import model.ExtendedBoardModel;
 import model.ExtendedGUI;
 import model.ExtendedPlayerModel;
@@ -52,7 +52,7 @@ public class MetaView {
 		float startSize = Display.getDisplayMode().getWidth();
 		float resizeToDisplay = min / startSize;
 
-		ExtendedBoardModel board = MetaMapping.getBoardModel();
+		ExtendedBoardModel board = MetaConfig.getBoardModel();
 		ExtendedPlayerModel player = board.getPlayer();
 		ExtendedTileModel PlayerTile = board.getPiecePosition(player.getControlledModel());
 		// set the drawing as absolute
@@ -91,7 +91,7 @@ public class MetaView {
 		glTranslatef(-PlayerTile.getAbsX() + centerPlayer, -PlayerTile.getAbsY()
 				+ centerPlayer, 0);
 		// render board
-		MetaMapping.getBoardRenderer().render(board);
+		MetaConfig.getBoardRenderer().render(board);
 
 		glPopMatrix();
 		glPushMatrix();
@@ -123,7 +123,7 @@ public class MetaView {
 				guiBlock.setHeight(centerBoardY);
 				guiBlock.setY((Display.getHeight() - centerBoardY));
 			}
-			MetaMapping.getGuiRenderer().render(guiBlock);
+			MetaConfig.getGuiRenderer().render(guiBlock);
 
 		}
 		glPopMatrix();

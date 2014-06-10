@@ -1,7 +1,7 @@
 package userinterface.specific;
 
 import logic.MetaClock;
-import meta.MetaMapping;
+import meta.MetaConfig;
 import userinterface.generic.GUI1Tile;
 import userinterface.generic.GUITile;
 
@@ -14,14 +14,14 @@ public class GTTurn extends GUI1Tile {
 		super(color, container, i, j);
 		// construct both grids
 		int squareColor = (color + 1) % 2;
-		grid = MetaMapping.getIcon("YOURTURN");
-		grid1 =  MetaMapping.getIcon("NOTYOURTURN");
+		grid = MetaConfig.getIcon("YOURTURN");
+		grid1 =  MetaConfig.getIcon("NOTYOURTURN");
 		
 	}
 
 	@Override
 	public int[][] getGrid() {
-		boolean turn = MetaClock.getTurn(MetaMapping.getBoardModel()
+		boolean turn = MetaClock.getTurn(MetaConfig.getBoardModel()
 				.getPlayer().getControlledModel());
 		// get fraction and side form player singleton
 		if (turn) {

@@ -3,8 +3,8 @@ package view.extended;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
-import meta.MetaMapping;
-import meta.MetaMapping.PieceRendererType;
+import meta.MetaConfig;
+import meta.MetaConfig.PieceType;
 import model.ExtendedBoardModel;
 import model.ExtendedTileModel;
 import userinterface.specific.IconLoader;
@@ -18,7 +18,7 @@ public class BoardRenderer {
 
 	// render a FloorGrpahic recursively
 	private void recursiveRender(ExtendedTileModel tile) {
-		ExtendedBoardModel board = MetaMapping.getBoardModel();
+		ExtendedBoardModel board = MetaConfig.getBoardModel();
 		// if no children anymore draw square
 		glPushMatrix();
 		if (tile.getChildren() == null) {
@@ -28,15 +28,15 @@ public class BoardRenderer {
 					tile.getRelSize(), tile.getRelSize(), tile.getColor());
 			// there's a piece located on the tile
 			if (board.getModelOnPosition(tile) != null) {
-				PieceRendererType piece = (board.getModelOnPosition(tile))
-						.getRenderType();
+				PieceType piece = (board.getModelOnPosition(tile))
+						.getType();
 				if (piece != null)
-					MetaMapping.getPieceRenderer(piece).render(
+					MetaConfig.getPieceRenderer(piece).render(
 							board.getModelOnPosition(tile));
 			}
 			// there's an active metaAction on the tile
 			if (board.getActiveMetaAction(tile) != null) {
-				TileRenderer.render(MetaMapping.getIcon("DECISIONONBOARD"), tile.getRelSize()/8,(tile.getColor()+1)%2);
+				TileRenderer.render(MetaConfig.getIcon("DECISIONONBOARD"), tile.getRelSize()/8,(tile.getColor()+1)%2);
 				
 			}
 			glPopMatrix();

@@ -9,13 +9,13 @@ public class ParamObjectsAcces {
 
 	public static ParamObject getPOView() {
 		if (poView == null)
-			poView = new POView();
+			poView = new POTileView();
 		return poView;
 	}
 
 	public static ParamObject getPOMovement() {
 		if (poMovement == null)
-			poMovement = new POMovement();
+			poMovement = new PORange();
 		return poMovement;
 	}
 

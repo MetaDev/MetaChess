@@ -1,6 +1,6 @@
 package model;
 
-import meta.MetaMapping;
+import meta.MetaConfig;
 
 public class ExtendedTileModel {
 
@@ -16,7 +16,7 @@ public class ExtendedTileModel {
 	private int j;
 
 	public boolean isOccupied() {
-		if (MetaMapping.getBoardModel().getModelOnPosition(this) != null)
+		if (MetaConfig.getBoardModel().getModelOnPosition(this) != null)
 			return true;
 		if (children == null)
 			return false;

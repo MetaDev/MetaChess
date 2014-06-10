@@ -1,61 +1,61 @@
 package control;
 
-import meta.MetaMapping;
+import meta.MetaConfig;
 
 import org.lwjgl.input.Keyboard;
 
-import decision.Decision;
-
+import decision.DecisionLogic;
 
 /*
  * This class handles all and every input
  */
 public class MetaKeyboard {
-	
-	public static void processInput() {
-		int key=-1;
+	// return input sequence
+	public static String processInput() {
+		String inputSequence = "";
+		int key = -1;
+		String keyPos;
 		while (Keyboard.next()) {
-
+			
 			// in each iteration, each key is either pressed, released or held
 			// the loop is so fast only 1 key max is found when iterating
 			// keyboard state
 			key = Keyboard.getEventKey();
-			int keyPos;
+
 			if (Keyboard.getEventKeyState()) {
 				// Key held down
 				if (Keyboard.isRepeatEvent()) {
-					keyPos = 0;
+					keyPos = "DOWN:";
 				}
 				// Key pressed
 				else {
-					keyPos = -1;
+					keyPos = "PRESS:";
 				}
 
 			}
 			// Key released
 			else {
-				keyPos = 1;
+				keyPos = "RELEASE:";
 			}
-			// use the input to get the decision
-			// let the decision handle the input
-			Decision decision = MetaMapping.getKeyBinding(key);
-			if (decision != null) {
-				decision.handleInput(keyPos);
-			}
+			// save for this iteration the key sequence
+			inputSequence +=keyPos + key +";";
+
 		}
 		// now iterate to check for more, multiple, pushed down keys
 		// don't handle input of an already processed key
 		Keyboard.poll();
 		for (int i = 0; i < 256; i++) {
+			//don't register double input
 			if (i != key) {
 				if (Keyboard.isKeyDown(i)) {
-					Decision decision = MetaMapping.getKeyBinding(i);
-					if (decision != null) {
-						decision.handleInput(0);
-					}
+					inputSequence += "DOWN:" + i + ";";
 				}
 			}
 		}
+		//remove last semicolon
+		if(inputSequence.length()>0){
+			inputSequence = inputSequence.substring(0, inputSequence.length()-1);
+		}
+		return inputSequence;
 	}
-
 }

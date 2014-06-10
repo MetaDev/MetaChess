@@ -46,4 +46,49 @@ public class MetaUtil {
 		}
 		return sb.toString();
 	}
+
+	public static boolean isNumeric(String string) {
+		if(string!=null){
+			return string.equals("1") || string.equals("2") || string.equals("3")
+					|| string.equals("4") || string.equals("5")
+					|| string.equals("6") || string.equals("7")
+					|| string.equals("8") || string.equals("9");
+		}
+		return false;
+	}
+
+	public static int convertToInteger(String s) {
+		try {
+			return Integer.parseInt(s);
+		} catch (NumberFormatException e) {
+			return -1;
+		}
+
+	}
+
+	public static String convertIntArrayToString(int[] array) {
+		String result = "[";
+		for (int i = 0; i < array.length; i++) {
+			if (i < array.length - 1) {
+				result += array[i] + ",";
+			} else {
+				result += array[i];
+			}
+		}
+		return result + "]";
+	}
+
+	public static int[] parseIntArray(String array) {
+		String[] items = array.replaceAll("\\[", "").replaceAll("\\]", "")
+				.split(",");
+		int[] results = new int[items.length];
+		for (int i = 0; i < items.length; i++) {
+			try {
+				results[i] = Integer.parseInt(items[i]);
+			} catch (NumberFormatException nfe) {
+				System.out.println("conversion problem");
+			}
+		}
+		return results;
+	}
 }

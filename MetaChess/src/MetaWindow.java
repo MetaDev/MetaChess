@@ -1,4 +1,4 @@
-import meta.MetaMapping;
+import meta.MetaConfig;
 import network.client.MetaClient;
 
 import org.lwjgl.LWJGLException;
@@ -20,7 +20,6 @@ import editor.PlayerEditor;
  * @author Oskar Veerhoek
  */
 public class MetaWindow {
-
 	public static void main(String[] args) {
 		create();
 		init();
@@ -55,7 +54,8 @@ public class MetaWindow {
 			Keyboard.enableRepeatEvents(true);
 			//NETWORKING
 			//init network client code
-			MetaClient.startClient();
+			if(MetaConfig.multiPlayer)
+				MetaClient.startClient();
 		} catch (LWJGLException e) {
 			System.err.println("Display wasn't initialized correctly.");
 			System.exit(1);
@@ -66,7 +66,7 @@ public class MetaWindow {
 	private static void create() {
 
 		// create and save all initial constants
-		MetaMapping.initConstants();
+		MetaConfig.initConstants();
 
 		// initialize editors
 		BoardEditor.init();
