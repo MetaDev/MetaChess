@@ -1,11 +1,11 @@
-package view.extended;
+package view.renderer;
 
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import userinterface.generic.GUI1Tile;
 import userinterface.generic.GUITile;
-import view.openglImpl.RectangleRenderer;
+import view.zgpu.RectangleRenderer;
 
 public class GUIRenderer {
 
@@ -20,7 +20,7 @@ public class GUIRenderer {
 		glTranslatef(tile.getX(), tile.getY(), 0);
 		// if tile is not a container draw it's grid
 		if (tile.getElements() == null) {
-			TileRenderer.render(((GUI1Tile) tile).getGrid(),
+			GridRenderer.render(((GUI1Tile) tile).getGrid(),
 					tile.getHeight() / 8);
 			glPopMatrix();
 			return;

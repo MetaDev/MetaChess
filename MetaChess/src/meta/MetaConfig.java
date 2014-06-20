@@ -20,21 +20,15 @@ import model.paramobjects.ParamObject;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.Color;
 
-import userinterface.specific.IconLoader;
-import view.extended.BischopRenderer;
-import view.extended.BoardRenderer;
-import view.extended.GUIRenderer;
-import view.extended.KingRenderer;
-import view.extended.KnightRenderer;
-import view.extended.PawnRenderer;
-import view.extended.PieceRenderer;
-import view.extended.QueenRenderer;
-import view.extended.RookRenderer;
+import userinterface.generic.IconLoader;
+import view.renderer.BoardRenderer;
+import view.renderer.GUIRenderer;
+import view.renderer.PieceRenderer;
 
 //contains and initialises all unique instances
 public class MetaConfig {
 	public enum PieceType {
-		PAWN, ROOK, KNIGHT, BISCHOP, KING, QUEEN
+		PAWN, ROOK, KNIGHT, BISHOP, KING, QUEEN
 	}
 
 	// free means that the gui's position is based on absolute coordinates
@@ -59,10 +53,8 @@ public class MetaConfig {
 	// the first 2 colors are for the opposing tile and piece colors
 	private static Map<Integer, Color> colors = new HashMap<>();
 
-	// all PieceRenderers
-	private static Map<PieceType, PieceRenderer> pieceRenderers = new HashMap<>();
 	// all Controls, a mapping of a key number sequence onto decision
-	private static Map<PieceType,HashMap<String,String>> keyMapping = new HashMap<>();
+	private static Map<PieceType, HashMap<String, String>> keyMapping = new HashMap<>();
 
 	// board renderer
 	private static BoardRenderer boardRenderer;
@@ -82,12 +74,12 @@ public class MetaConfig {
 			Map<PieceType, Set<String>> pieceDecisions) {
 		MetaConfig.pieceDecisions = pieceDecisions;
 	}
-	//map decision name to int key
-	public static Map<PieceType,HashMap<String,String>> getKeyMapping() {
+
+	// map decision name to int key
+	public static Map<PieceType, HashMap<String, String>> getKeyMapping() {
 		return keyMapping;
 	}
 
-	
 	public static Map<String, int[]> getOrthogonalSet() {
 		return orthogonalSet;
 	}
@@ -141,7 +133,8 @@ public class MetaConfig {
 	}
 
 	// method that converts direction array to key-string
-	//we save string and array, because conversion everytime is less cost-effective
+	// we save string and array, because conversion everytime is less
+	// cost-effective
 	private static Map<String, int[]> mapDirections(List<int[]> directions) {
 		Map<String, int[]> map = new HashMap<String, int[]>();
 		for (int[] dir : directions) {
@@ -193,19 +186,23 @@ public class MetaConfig {
 	public static Set<String> getPieceMetaActions(PieceType type) {
 		return pieceDecisions.get(type);
 	}
-private static void setKeyMappingForAll(Map<String,String> mapping){
-	for(PieceType type: PieceType.values()){
-		setKeyMappingForPiece(type,mapping);
+
+	private static void setKeyMappingForAll(Map<String, String> mapping) {
+		for (PieceType type : PieceType.values()) {
+			setKeyMappingForPiece(type, mapping);
+		}
+
 	}
-	
-}
-private static void setKeyMappingForPiece(PieceType type,Map<String,String> mapping){
-	if(keyMapping.get(type)==null){
-		keyMapping.put(type, new HashMap<String,String>());
+
+	private static void setKeyMappingForPiece(PieceType type,
+			Map<String, String> mapping) {
+		if (keyMapping.get(type) == null) {
+			keyMapping.put(type, new HashMap<String, String>());
+		}
+		keyMapping.get(type).putAll(mapping);
+
 	}
-	keyMapping.get(type).putAll(mapping);
-	
-}
+
 	// init all necessary constants
 	public static void initConstants() {
 		// tile entering mapping
@@ -213,13 +210,6 @@ private static void setKeyMappingForPiece(PieceType type,Map<String,String> mapp
 		// map colors
 		setColor(0, new Color(Color.BLACK));
 		setColor(1, new Color(Color.WHITE));
-		// renderers
-		pieceRenderers.put(PieceType.PAWN, new PawnRenderer());
-		pieceRenderers.put(PieceType.ROOK, new RookRenderer());
-		pieceRenderers.put(PieceType.BISCHOP, new BischopRenderer());
-		pieceRenderers.put(PieceType.KING, new KingRenderer());
-		pieceRenderers.put(PieceType.KNIGHT, new KnightRenderer());
-		pieceRenderers.put(PieceType.QUEEN, new QueenRenderer());
 
 		// Map MetaActions
 		boardRenderer = new BoardRenderer();
@@ -253,57 +243,56 @@ private static void setKeyMappingForPiece(PieceType type,Map<String,String> mapp
 		orthogonalList.add(new int[] { -2, -1 });
 		orthogonalList.add(new int[] { -2, 1 });
 		horseSet = mapDirections(horseList);
-		//fill specialset with
+		// fill specialset with
 		specialsSet.put("TILEVIEW", new POTileView());
 		specialsSet.put("MAXRANGE", new POMaxRange());
 		specialsSet.put("DRAGON", new PODragon());
 		specialsSet.put("TURN", new POTurn());
 		specialsSet.put("SWITCH", new POSwitch());
 		// TODO
-		//  map to initial keymapping
-		
-		//special decisions
-		Map<String,String> map = new HashMap<>();
-		map.put(Keyboard.KEY_SPACE+"","TILEVIEW");
-		setKeyMappingForPiece(PieceType.ROOK,map);
+		// map to initial keymapping
+
+		// special decisions
+		Map<String, String> map = new HashMap<>();
+		map.put(Keyboard.KEY_SPACE + "", "TILEVIEW");
+		setKeyMappingForPiece(PieceType.ROOK, map);
 		map = new HashMap<>();
-		map.put(Keyboard.KEY_SPACE+"","MAXRANGE");
-		setKeyMappingForPiece(PieceType.BISCHOP,map);
+		map.put(Keyboard.KEY_SPACE + "", "MAXRANGE");
+		setKeyMappingForPiece(PieceType.BISHOP, map);
 		map = new HashMap<>();
-		map.put(Keyboard.KEY_SPACE+"","DRAGON");
-		setKeyMappingForPiece(PieceType.KNIGHT,map);
+		map.put(Keyboard.KEY_SPACE + "", "DRAGON");
+		setKeyMappingForPiece(PieceType.KNIGHT, map);
 		map = new HashMap<>();
-		map.put(Keyboard.KEY_SPACE+"","TURN");
-		setKeyMappingForPiece(PieceType.PAWN,map);
+		map.put(Keyboard.KEY_SPACE + "", "TURN");
+		setKeyMappingForPiece(PieceType.PAWN, map);
 		map = new HashMap<>();
-		map.put(Keyboard.KEY_SPACE+"","RANGEDTILEVIEW");
-		map.put(Keyboard.KEY_NUMPAD0+"","RANGEDMAXRANGE");
-		setKeyMappingForPiece(PieceType.KING,map);
-		//range
+		map.put(Keyboard.KEY_SPACE + "", "RANGED");
+		setKeyMappingForPiece(PieceType.KING, map);
+		// range
 		map = new HashMap<>();
-		map.put(Keyboard.KEY_NUMPAD1+"","1");
-		map.put(Keyboard.KEY_NUMPAD2+"","2");
-		map.put(Keyboard.KEY_NUMPAD3+"","3");
-		map.put(Keyboard.KEY_NUMPAD4+"","4");
-		map.put(Keyboard.KEY_NUMPAD5+"","5");
+		map.put(Keyboard.KEY_NUMPAD1 + "", "1");
+		map.put(Keyboard.KEY_NUMPAD2 + "", "2");
+		map.put(Keyboard.KEY_NUMPAD3 + "", "3");
+		map.put(Keyboard.KEY_NUMPAD4 + "", "4");
+		map.put(Keyboard.KEY_NUMPAD5 + "", "5");
+		map.put(Keyboard.KEY_0 + "", "SWITCH");
+		// set above decision for all piece types
 		setKeyMappingForAll(map);
-		//TODO, complete
-		//movement
+		// TODO, complete
+		// movement
 		map = new HashMap<>();
-		map.put(Keyboard.KEY_Z+"","[0,1]");
-		setKeyMappingForPiece(PieceType.PAWN,map);
+		map.put(Keyboard.KEY_Z + "", "[0,1]");
+		setKeyMappingForPiece(PieceType.PAWN, map);
 		map = new HashMap<>();
-		map.put(Keyboard.KEY_D+"","[1,0]");
-		map.put(Keyboard.KEY_Z+"","[0,1]");
-		map.put(Keyboard.KEY_Q+"","[-1,0]");
-		map.put(Keyboard.KEY_S+"","[0,-1]");
-		setKeyMappingForPiece(PieceType.KING,map);
-		setKeyMappingForPiece(PieceType.ROOK,map);
-		setKeyMappingForPiece(PieceType.QUEEN,map);
-		
-				
-		
-		//todo, this can be deleted, because redundant
+		map.put(Keyboard.KEY_D + "", "[1,0]");
+		map.put(Keyboard.KEY_Z + "", "[0,1]");
+		map.put(Keyboard.KEY_Q + "", "[-1,0]");
+		map.put(Keyboard.KEY_S + "", "[0,-1]");
+		setKeyMappingForPiece(PieceType.KING, map);
+		setKeyMappingForPiece(PieceType.ROOK, map);
+		setKeyMappingForPiece(PieceType.QUEEN, map);
+
+		// todo, this can be deleted, because redundant
 		// config pieces with available decisions
 
 		// pawn
@@ -319,7 +308,7 @@ private static void setKeyMappingForPiece(PieceType type,Map<String,String> mapp
 		bischopSet.addAll(diagonalSet.keySet());
 
 		bischopSet.add("MAXRANGE");
-		pieceDecisions.put(PieceType.BISCHOP, bischopSet);
+		pieceDecisions.put(PieceType.BISHOP, bischopSet);
 
 		// Rook
 		Set<String> rookSet = new HashSet<String>();
@@ -370,10 +359,6 @@ private static void setKeyMappingForPiece(PieceType type,Map<String,String> mapp
 
 	public static void setColor(int c, Color color) {
 		colors.put(c, color);
-	}
-
-	public static PieceRenderer getPieceRenderer(PieceType piece) {
-		return pieceRenderers.get(piece);
 	}
 
 	public static BoardRenderer getBoardRenderer() {

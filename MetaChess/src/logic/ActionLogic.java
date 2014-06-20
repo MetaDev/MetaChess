@@ -1,8 +1,9 @@
 package logic;
 
-import decision.DecisionLogic;
 import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
+import meta.MetaUtil;
+import model.ExtendedKingModel;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
 import model.paramobjects.ParamObject;
@@ -10,9 +11,10 @@ import network.NetworkMessages;
 import network.client.MetaClient;
 
 //geef builder mee omdat controller het hele object moet kunnen vernietigen
-public class ActionLogic implements Logic {
+public class ActionLogic  {
 
-	public static void decisionMediator(int decideOrRegret,String type, ExtendedPieceModel model) {
+	public static void decisionMediator(int decideOrRegret, String type,
+			ExtendedPieceModel model) {
 		// NETWORKING
 		// add message to client queue
 		// todo: not all decisions have to be communicated
@@ -21,21 +23,21 @@ public class ActionLogic implements Logic {
 			MetaClient.addOutMessage(NetworkMessages.decisionOutMessage(type,
 					model));
 		}
-		//TODO
-		//ranged decision
-		if(type.startsWith("RANGED")){
-			//if decide, set boarddecision for tiles within reach
-			//if regret, unset boarddecision for tiles within reach
-			
+		// TODO
+		// ranged decision
+		if (type.startsWith("RANGED")) {
+			// if decide, set boarddecision for tiles within reach
+			// if regret, unset boarddecision for tiles within reach
+
 		}
-		//board decision
-		if(type.startsWith("RANGED")){
-			//when decideing increase bonus paramter of piece with effect
-			//if regret set bonus to 0
+		// board decision
+		if (type.startsWith("RANGED")) {
+			// when decideing increase bonus paramter of piece with effect
+			// if regret set bonus to 0
 		}
 		// special decision
 		if (MetaConfig.getSpecialsSet().keySet().contains(type)) {
-			changeParam(decideOrRegret,type, model);
+			changeParam(decideOrRegret, type, model);
 			return;
 		}
 		// diagonal or orthogonal step
@@ -68,6 +70,22 @@ public class ActionLogic implements Logic {
 		// movement did not succeed
 		if (newTile == null)
 			return false;
+		// reset influence of king
+		model.clearInfluence();
+		// check if a king is within range of view
+		for (ExtendedPieceModel piece : MetaConfig.getBoardModel()
+				.getEntityModels().keySet()) {
+			if (piece.getType() == PieceType.KING) {
+				if (BoardLogic.isInrange(model, piece)) {
+					int effect = DecisionLogic.getEffect(
+							((ExtendedKingModel) piece).getBalance(),
+							((ExtendedKingModel) piece).getInfluence(),
+							(piece.getSide() + model.getSide()) % 2);
+					// set influence of king
+					model.setInfluence(effect);
+				}
+			}
+		}
 		// tile is occupied and the movement isn't a sidestep->there doesn't
 		// immediately follow a next move
 		if (!isSideStep
@@ -75,9 +93,10 @@ public class ActionLogic implements Logic {
 			// here a piece loses a life or more or get's killed
 			// when killed the Metamodel should be alerted
 
-			// delete piece model
-			// should this be the player, then it's game over
-			MetaConfig.getBoardModel().deleteModel(newTile);
+			//decrease teamlifes
+			ExtendedPieceModel takenPiece = MetaUtil.getKeyByValue(MetaConfig.getBoardModel().getEntityModels(), newTile);
+			MetaConfig.getBoardModel().decreaseSideLives(takenPiece.getSide(), takenPiece.getLives());
+			//put the player in a free other piece, if there are left
 
 		}
 
@@ -104,8 +123,8 @@ public class ActionLogic implements Logic {
 				dir = MetaConfig.getDirectionWithTurn(dir, model.getTurn());
 			}
 			int[] direction = MetaConfig.getDirectionArray(dir);
-			movement(direction[0] * model.getRange(), direction[1]
-					* model.getRange(), model, false);
+			movement(direction[0] * model.getRange(),
+					direction[1] * model.getRange(), model, false);
 		}
 	}
 

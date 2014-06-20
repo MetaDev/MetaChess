@@ -11,7 +11,7 @@ import control.MetaLoop;
 import display.WindowUtil;
 import editor.BoardEditor;
 import editor.GUIEditor;
-import editor.PlayerEditor;
+import editor.PieceEditor;
 
 /**
  * If this application shows a blank and responsive window and doesn't throw any
@@ -71,7 +71,7 @@ public class MetaWindow {
 		// initialize editors
 		BoardEditor.init();
 
-		PlayerEditor.init();
+		PieceEditor.init();
 		// the GUI is initialized the last
 		GUIEditor.init();
 

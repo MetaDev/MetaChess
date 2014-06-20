@@ -1,10 +1,9 @@
 package control;
 
+import logic.DecisionLogic;
 import meta.MetaConfig;
 
 import org.lwjgl.input.Keyboard;
-
-import decision.DecisionLogic;
 
 /*
  * This class handles all and every input

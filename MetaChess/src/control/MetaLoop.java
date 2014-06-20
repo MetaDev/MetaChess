@@ -5,9 +5,6 @@
  */
 package control;
 
-import java.util.Map;
-
-import decision.DecisionLogic;
 import logic.MetaClock;
 import meta.MetaConfig;
 import model.ExtendedBoardModel;
@@ -26,19 +23,6 @@ public class MetaLoop {
 		// but the cooldwon still counts with
 		// the min turn-time
 
-		// alert the board if the turn changed for it's active MetaAcations
-		for (Map.Entry<ExtendedTileModel, String> pair : MetaConfig
-				.getBoardModel().getActiveMetaActions().entrySet()) {
-			ExtendedTileModel tile = pair.getKey();
-			ExtendedPieceModel model = board.getMetaActionActor(tile);
-
-			if (MetaClock.getTurn(tile.absoluteFraction(), model.getSide()) != MetaClock
-					.getTurn(tile.absoluteFraction(), model.getSide(),
-							board.getMetaActionTimeStamp(tile))) {
-				MetaConfig.getBoardModel().metaActionTurnChanged(tile);
-			}
-		}
-
 		ExtendedPlayerModel player = MetaConfig.getBoardModel().getPlayer();
 		ExtendedTileModel tile = player.getControlledModel().getTilePosition();
 		if (MetaClock.getTurn(tile.absoluteFraction(), player.getSide()) != MetaClock
@@ -49,9 +33,8 @@ public class MetaLoop {
 		// handle input
 		String inputSequence = MetaKeyboard.processInput();
 
-		//decide and regret
+		// decide and regret
 		player.getControlledModel().decideAndRegret(inputSequence);
-		
 
 		// handle MetaActions acting on other piece models, here will come the
 		// multiplayer, I think

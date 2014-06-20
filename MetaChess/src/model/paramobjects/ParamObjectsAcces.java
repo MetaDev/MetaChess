@@ -27,11 +27,6 @@ public class ParamObjectsAcces {
 		return poLives;
 	}
 
-	public static ParamObject getPoAffectedTiles() {
-		 if(poAffectedTiles==null)
-			 poAffectedTiles=new POAffectedTiles();
-		return poAffectedTiles;
-	}
 
 	public static ParamObject getPoNrOfTurn() {
 		 if(poNrOfTurn==null)

@@ -1,4 +1,4 @@
-package view.openglImpl;
+package view.zgpu;
 
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.glBegin;

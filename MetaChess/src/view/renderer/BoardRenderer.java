@@ -1,4 +1,4 @@
-package view.extended;
+package view.renderer;
 
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
@@ -6,9 +6,10 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
 import model.ExtendedBoardModel;
+import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
-import userinterface.specific.IconLoader;
-import view.openglImpl.RectangleRenderer;
+import userinterface.generic.IconLoader;
+import view.zgpu.RectangleRenderer;
 
 public class BoardRenderer {
 
@@ -28,17 +29,13 @@ public class BoardRenderer {
 					tile.getRelSize(), tile.getRelSize(), tile.getColor());
 			// there's a piece located on the tile
 			if (board.getModelOnPosition(tile) != null) {
-				PieceType piece = (board.getModelOnPosition(tile))
-						.getType();
-				if (piece != null)
-					MetaConfig.getPieceRenderer(piece).render(
-							board.getModelOnPosition(tile));
+				ExtendedPieceModel piece = board.getModelOnPosition(tile);
+				if (piece != null){
+					PieceRenderer.render(piece);
+				}
+					
 			}
-			// there's an active metaAction on the tile
-			if (board.getActiveMetaAction(tile) != null) {
-				TileRenderer.render(MetaConfig.getIcon("DECISIONONBOARD"), tile.getRelSize()/8,(tile.getColor()+1)%2);
-				
-			}
+			
 			glPopMatrix();
 			
 		}

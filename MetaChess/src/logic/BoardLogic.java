@@ -6,9 +6,10 @@ import java.util.Deque;
 import java.util.Random;
 
 import meta.MetaConfig;
+import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
 
-public class BoardLogic implements Logic {
+public class BoardLogic {
 
 	private static double[][][][] enterTileMapping;
 	private static int enterTileMode = 1;
@@ -261,5 +262,18 @@ public class BoardLogic implements Logic {
 		return Math.sqrt(Math.pow(
 				(double) tile1.getAbsX() - tile2.getAbsX(), 2)
 				+ Math.pow((double) tile1.getAbsY() - tile2.getAbsY(), 2));
+	}
+	public static boolean isInrange(ExtendedPieceModel viewer, ExtendedPieceModel subject){
+		//calculate viewsquare boundaries
+		float x = viewer.getTilePosition().getAbsX()-viewer.getTilePosition().getAbsSize()*viewer.getNrOfViewTiles();
+		float y =viewer.getTilePosition().getAbsY()-viewer.getTilePosition().getAbsSize()*viewer.getNrOfViewTiles();
+		float s = viewer.getTilePosition().getAbsSize()*(2*viewer.getNrOfViewTiles()+1);
+
+		if(subject.getTilePosition().getAbsX()>=x &&subject.getTilePosition().getAbsX()<=x+s ){
+			if(subject.getTilePosition().getAbsY()>=y &&subject.getTilePosition().getAbsY()<=y+s){
+				return true;
+			}
+		}
+		return false;
 	}
 }

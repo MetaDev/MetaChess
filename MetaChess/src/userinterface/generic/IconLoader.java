@@ -1,4 +1,4 @@
-package userinterface.specific;
+package userinterface.generic;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,73 +13,43 @@ public class IconLoader {
 		try {
 			icon = stringToDrawing(readFile("res/bitgrid/tileview.txt"));
 			MetaConfig.setIcon("TILEVIEW", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/lives.txt"));
+			MetaConfig.setIcon("LIVES", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/movement.txt"));
+			MetaConfig.setIcon("MOVRANGE", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/lives.txt"));
+			MetaConfig.setIcon("LIVES", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/maxmovement.txt"));
+			MetaConfig.setIcon("MAXMOVEMENT", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/maxmovement.txt"));
+			MetaConfig.setIcon("MAXMOVEMENT", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/yourturn.txt"));
+			MetaConfig.setIcon("YOURTURN", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/notyourturn.txt"));
+			MetaConfig.setIcon("NOTYOURTURN", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/decisiononboard.txt"));
+			MetaConfig.setIcon("DECISIONONBOARD", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/bishop.txt"));
+			MetaConfig.setIcon("BISHOP", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/king.txt"));
+			MetaConfig.setIcon("KING", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/queen.txt"));
+			MetaConfig.setIcon("QUEEN", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/pawn.txt"));
+			MetaConfig.setIcon("PAWN", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/knight.txt"));
+			MetaConfig.setIcon("KNIGHT", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/rook.txt"));
+			MetaConfig.setIcon("ROOK", icon);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		try {
-			icon = stringToDrawing(readFile("res/bitgrid/movement.txt"));
-			MetaConfig.setIcon("MOVRANGE", icon);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			icon = stringToDrawing(readFile("res/bitgrid/lives.txt"));
-			MetaConfig.setIcon("LIVES", icon);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			icon = stringToDrawing(readFile("res/bitgrid/lives.txt"));
-			MetaConfig.setIcon("LIVES", icon);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			icon = stringToDrawing(readFile("res/bitgrid/maxmovement.txt"));
-			MetaConfig.setIcon("MAXMOVEMENT", icon);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			icon = stringToDrawing(readFile("res/bitgrid/maxmovement.txt"));
-			MetaConfig.setIcon("MAXMOVEMENT", icon);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
-		}
-		try {
-			icon = stringToDrawing(readFile("res/bitgrid/yourturn.txt"));
-			MetaConfig.setIcon("YOURTURN", icon);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			icon = stringToDrawing(readFile("res/bitgrid/notyourturn.txt"));
-			MetaConfig.setIcon("NOTYOURTURN", icon);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			icon = stringToDrawing(readFile("res/bitgrid/decisiononboard.txt"));
-			MetaConfig.setIcon("DECISIONONBOARD", icon);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	
-
-
 	
 
 	private static String readFile(String pathname) throws IOException {
