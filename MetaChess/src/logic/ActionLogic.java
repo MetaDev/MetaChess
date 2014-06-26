@@ -11,7 +11,7 @@ import network.NetworkMessages;
 import network.client.MetaClient;
 
 //geef builder mee omdat controller het hele object moet kunnen vernietigen
-public class ActionLogic  {
+public class ActionLogic {
 
 	public static void decisionMediator(int decideOrRegret, String type,
 			ExtendedPieceModel model) {
@@ -23,18 +23,7 @@ public class ActionLogic  {
 			MetaClient.addOutMessage(NetworkMessages.decisionOutMessage(type,
 					model));
 		}
-		// TODO
-		// ranged decision
-		if (type.startsWith("RANGED")) {
-			// if decide, set boarddecision for tiles within reach
-			// if regret, unset boarddecision for tiles within reach
-
-		}
-		// board decision
-		if (type.startsWith("RANGED")) {
-			// when decideing increase bonus paramter of piece with effect
-			// if regret set bonus to 0
-		}
+		
 		// special decision
 		if (MetaConfig.getSpecialsSet().keySet().contains(type)) {
 			changeParam(decideOrRegret, type, model);
@@ -86,18 +75,18 @@ public class ActionLogic  {
 				}
 			}
 		}
-		// tile is occupied and the movement isn't a sidestep->there doesn't
-		// immediately follow a next move
-		if (!isSideStep
+		// the model is a dragon knight or it isn't a sidestep
+		// and the target tile is occupied
+		if ((model.isDragon()==1 || !isSideStep)
 				&& MetaConfig.getBoardModel().getModelOnPosition(newTile) != null) {
-			// here a piece loses a life or more or get's killed
-			// when killed the Metamodel should be alerted
-
-			//decrease teamlifes
-			ExtendedPieceModel takenPiece = MetaUtil.getKeyByValue(MetaConfig.getBoardModel().getEntityModels(), newTile);
-			MetaConfig.getBoardModel().decreaseSideLives(takenPiece.getSide(), takenPiece.getLives());
-			//put the player in a free other piece, if there are left
-
+			
+			// decrease teamlifes
+			ExtendedPieceModel takenPiece = MetaUtil.getKeyByValue(MetaConfig
+					.getBoardModel().getEntityModels(), newTile);
+			MetaConfig.getBoardModel().decreaseSideLives(takenPiece.getSide(),
+					takenPiece.getLives());
+			// put the player in a free other piece, if there are left
+			MetaConfig.getSpecialsSet().get("SWITCH").setParam(1);
 		}
 
 		// set new position for model
@@ -106,7 +95,6 @@ public class ActionLogic  {
 	}
 
 	public static void step(String type, ExtendedPieceModel model) {
-
 		// if there's a pending decision
 		// pending decision are for ranged decisions, which are for the king
 		model.setDirection(type);
@@ -130,10 +118,7 @@ public class ActionLogic  {
 
 	// horsteStep
 	public static void horseStep(String type, ExtendedPieceModel model) {
-		// NETWORKING
-		// add message to client queue
-		MetaClient.addOutMessage(NetworkMessages
-				.decisionOutMessage(type, model));
+
 		String dir = type;
 
 		int[] direction = MetaConfig.getDirectionArray(dir);
@@ -147,7 +132,7 @@ public class ActionLogic  {
 	public static void changeParam(int decideOrRegret, String type,
 			ExtendedPieceModel model) {
 		// check if type of decision is allowed by piecetype
-		if (MetaConfig.getPieceDecisions().get(model.getType()).contains(type)) {
+		if (MetaConfig.getKeyMapping().get(model.getType()).containsValue(type)) {
 			ParamObject param = MetaConfig.getSpecialsSet().get(type);
 			param.setParam(decideOrRegret);
 		}

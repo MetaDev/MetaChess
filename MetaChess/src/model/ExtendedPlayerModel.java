@@ -1,10 +1,13 @@
 package model;
 
+import java.util.Random;
+
 import logic.BoardLogic;
 import meta.MetaConfig;
 
 //contains all info about player
 public class ExtendedPlayerModel {
+	private int[][] core;
 	public ExtendedPieceModel getControlledModel() {
 		return controlledModel;
 	}
@@ -14,7 +17,7 @@ public class ExtendedPlayerModel {
 	}
 
 	private int side;
-	private String name = "Gray";
+	private String name ;
 	// the model the player is in
 	private ExtendedPieceModel controlledModel;
 
@@ -27,10 +30,11 @@ public class ExtendedPlayerModel {
 	}
 
 	public ExtendedPlayerModel(int side, ExtendedPieceModel controlledModel,
-			String name) {
+			String name, int[][] core) {
 		this.controlledModel = controlledModel;
 		this.name = name;
 		this.side = side;
+		this.core =core;
 	}
 
 	public int getSide() {
@@ -43,18 +47,36 @@ public class ExtendedPlayerModel {
 	//a mode can be defined, for switch, like switch to nearest, furthest or a priorityqueue with types can be made
 	//will be implemented later
 	//you can't switch to piece occupied by another player
-	public void switchPiece(int mode) {
+	//the switch algorythm is defined by the range given
+	//if mode=0 this means the switch key has been released, mode=1 is the switch key pressed
+	public void switchPiece(int in) {
 		double minDist=Double.MAX_VALUE;
 		double tempDist;
 		ExtendedPieceModel newPiece=null;
+		int mode = in*controlledModel.getRange();
+		//random
 		if(mode==1){
+			Random generator = new Random();
+			Object[] entries = MetaConfig.getBoardModel().getEntityModels().keySet().toArray();
+			controlledModel  = (ExtendedPieceModel)entries[generator.nextInt(entries.length)];
+		}
+		//nearest
+		else if(mode==2){
 			for(ExtendedPieceModel piece: MetaConfig.getBoardModel().getEntityModels().keySet()){
-				if((tempDist=BoardLogic.calculateDistance(controlledModel.getTilePosition(), piece.getTilePosition()))<minDist){
+				if(controlledModel!=piece && (tempDist=BoardLogic.calculateDistance(controlledModel.getTilePosition(), piece.getTilePosition()))<minDist){
 					newPiece=piece;
 					minDist=tempDist;
 				}
 			}
 			controlledModel=newPiece;
 		}
+	}
+
+	public int[][] getCore() {
+		return core;
+	}
+
+	public void setCore(int[][] core) {
+		this.core = core;
 	}
 }

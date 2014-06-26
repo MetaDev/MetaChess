@@ -1,11 +1,14 @@
 package logic;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.List;
 import java.util.Random;
 
 import meta.MetaConfig;
+import meta.MetaUtil;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
 
@@ -35,19 +38,6 @@ public class BoardLogic {
 		fillMapping(enterTileMode);
 	}
 
-	// public float tileToAxis(ArrayList<Integer> list) {
-	// float sum = 0;
-	// for (int i = 0; i < list.size(); i++) {
-	// sum += list.get(i) * Math.pow(2, -i) * floor.getWidth();
-	// }
-	// return sum;
-	// }
-
-	// public float axisToTile(float f) {
-	// return 0;
-	// }
-
-	// Use the recursive coordinates I and J to find a tile;
 	public static ExtendedTileModel getTile(int[] I, int[] J) {
 		ExtendedTileModel currTile = (ExtendedTileModel) MetaConfig
 				.getBoardModel().getRootTile();
@@ -256,24 +246,56 @@ public class BoardLogic {
 
 		return it;
 	}
-	//Euclidian distance of tiles
+
+	// Euclidian distance of tiles
 	public static double calculateDistance(ExtendedTileModel tile1,
 			ExtendedTileModel tile2) {
-		return Math.sqrt(Math.pow(
-				(double) tile1.getAbsX() - tile2.getAbsX(), 2)
-				+ Math.pow((double) tile1.getAbsY() - tile2.getAbsY(), 2));
+		return Math
+				.sqrt(Math.pow((double) tile1.getAbsX() - tile2.getAbsX(), 2)
+						+ Math.pow((double) tile1.getAbsY() - tile2.getAbsY(),
+								2));
 	}
-	public static boolean isInrange(ExtendedPieceModel viewer, ExtendedPieceModel subject){
-		//calculate viewsquare boundaries
-		float x = viewer.getTilePosition().getAbsX()-viewer.getTilePosition().getAbsSize()*viewer.getNrOfViewTiles();
-		float y =viewer.getTilePosition().getAbsY()-viewer.getTilePosition().getAbsSize()*viewer.getNrOfViewTiles();
-		float s = viewer.getTilePosition().getAbsSize()*(2*viewer.getNrOfViewTiles()+1);
 
-		if(subject.getTilePosition().getAbsX()>=x &&subject.getTilePosition().getAbsX()<=x+s ){
-			if(subject.getTilePosition().getAbsY()>=y &&subject.getTilePosition().getAbsY()<=y+s){
+	public static boolean isInrange(ExtendedPieceModel viewer,
+			ExtendedPieceModel subject) {
+		// calculate viewsquare boundaries
+		float x = viewer.getTilePosition().getAbsX()
+				- viewer.getTilePosition().getAbsSize()
+				* viewer.getNrOfViewTiles();
+		float y = viewer.getTilePosition().getAbsY()
+				- viewer.getTilePosition().getAbsSize()
+				* viewer.getNrOfViewTiles();
+		float s = viewer.getTilePosition().getAbsSize()
+				* (2 * viewer.getNrOfViewTiles() + 1);
+
+		if (subject.getTilePosition().getAbsX() >= x
+				&& subject.getTilePosition().getAbsX() <= x + s) {
+			if (subject.getTilePosition().getAbsY() >= y
+					&& subject.getTilePosition().getAbsY() <= y + s) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	// return a tile with an abs fraction smaller then the one given
+	public static ExtendedTileModel getRandomTile(int maxAbsFraction) {
+
+		// now choose random tile
+		int randCol;
+		int randRow;
+		// pick a random max level of depth, different from root (0)
+		int randAbsFraction = MetaUtil.randInt(1, maxAbsFraction);
+		ExtendedTileModel tileIt = MetaConfig.getBoardModel().getRootTile();
+		while (tileIt.getChildren() != null
+				&& tileIt.getAbsFraction() < randAbsFraction) {
+
+			// pick random child on current tile
+			randCol = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
+			randRow = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
+			tileIt = tileIt.getChildren()[randCol][randRow];
+		}
+		return tileIt;
+
 	}
 }

@@ -18,12 +18,17 @@ public class ExtendedPieceModel {
 	// board variables
 	protected int influencedTileView = 0;
 	protected int influencedMaxRange = 0;
-	//only the rook will adapt this
-	protected int viewing=0;
-	//only the bishop will adapt this
-	protected int maxRange=0;
+	// only the rook will adapt this
+	protected int viewing = 0;
+	// only the bishop will adapt this
+	protected int maxRange = 0;
+
 	public int getNrOfViewTiles() {
-		return Math.min(8 + influencedTileView+getRange()*viewing, getTilePosition().absoluteFraction()/2);
+		if (getTilePosition().getParent().getLevel() == 0) {
+			return 4;
+		}
+		return Math.min(8 + influencedTileView + getRange() * viewing,
+				getTilePosition().absoluteFraction() / 2);
 	}
 
 	protected int range = 1;
@@ -191,10 +196,9 @@ public class ExtendedPieceModel {
 						// if the conditions: activity, cooldown and turn are
 						// okay
 						if (DecisionLogic.conditionsMet(regretOrDecision, this)) {
-							// lock if its a movement
-							if (!MetaConfig.getSpecialsSet().keySet()
-									.contains(regretOrDecision)
-									&& !regretOrDecision.equals("TURN")) {
+							// lock if its a movement, unless under lowest
+							// fraction
+							if (MetaConfig.getDirectionArray(regretOrDecision) != null && getTilePosition().absoluteFraction()<=MetaClock.getMaxFraction()) {
 								locked = true;
 							}
 							decide(regretOrDecision);
@@ -207,29 +211,21 @@ public class ExtendedPieceModel {
 			i++;
 		}
 
-		// now make board decision
-		// a board decision never locks
-		// the piece
-		// it also doesn't affect the decisions cooldown of this piece
-
-		// TODO: implement multikey understanding
-		// all permutations of held down keys should be tried
-		// handling reaching decisions is done in actionlogic
 		String keptDecision = "";
 		// save the largest cooldown when a decision is kept
+		// or redecide if a movement is being held down
 		for (; i < inputs.length; i++) {
 			keptDecision = MetaConfig.getKeyMapping().get(type)
 					.get(inputs[i].split(":")[1]);
-			if (MetaConfig.getPieceDecisions().get(type).contains(keptDecision)) {
-				// TODO: MINFRACT here if the max fraction is achieved even
-				// movement isn't redecided
-
-				// if this decision is a special one, don't redecide but
+			if (MetaConfig.getKeyMapping().get(type)
+					.containsValue(keptDecision)) {
+				
+				// if this decision is a special one and belongs to this piece type, don't redecide but
 				// increase cooldown and turnsactive
 				// the corresponding decision should already be active
-				if (MetaConfig.getSpecialsSet().keySet().contains(keptDecision)) {
+				if (MetaConfig.getSpecialsSet().containsKey(keptDecision) && MetaConfig.getKeyMapping().get(type).containsValue(keptDecision)) {
 					raiseCooldownAndTurnsActiveAfterTurn(keptDecision);
-				} else if (!keptDecision.equals("TURN")) {
+				} else if(getTilePosition().absoluteFraction()<=MetaClock.getMaxFraction()){
 					// a movement
 					if (DecisionLogic.conditionsMet(keptDecision, this)) {
 						decide(keptDecision);
@@ -333,7 +329,7 @@ public class ExtendedPieceModel {
 		this.type = type;
 		this.lives = lives;
 		// fill all mappings
-		for (String decision : MetaConfig.getPieceDecisions().get(type)) {
+		for (String decision : MetaConfig.getKeyMapping().get(type).values()) {
 			cooldownOfDecisions.put(decision, 0);
 			turnsActiveOfDecisions.put(decision, 0);
 			activeDecisions.put(decision, false);
@@ -360,7 +356,8 @@ public class ExtendedPieceModel {
 
 	// the range is ranged between 1 and 8 + influencedRange
 	public int getRange() {
-		return Math.max(Math.min(range, 8+100*maxRange)+ influencedMaxRange, 1) ;
+		return Math.max(Math.min(range, 8 + 100 * maxRange)
+				+ influencedMaxRange, 1);
 	}
 
 	// if range is set negative the directions are inverted

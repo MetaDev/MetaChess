@@ -41,8 +41,6 @@ public class MetaConfig {
 	// representation
 	private static Map<String, int[][]> decisionsIcons = new HashMap<>();
 
-	// Mapping MetaAction names to pieces
-	private static Map<PieceType, Set<String>> pieceDecisions = new HashMap<>();
 	// mapping of range keys
 	private static Map<Integer, Integer> rangeKeys = new HashMap<>();
 
@@ -65,15 +63,6 @@ public class MetaConfig {
 	// turn cycle of 3 types of movement, only needed for pawn
 	private static String[] orthogonalTurn = new String[] { "[0,1]", "[1,0]",
 			"[0,-1]", "[-1,0]" };
-
-	public static Map<PieceType, Set<String>> getPieceDecisions() {
-		return pieceDecisions;
-	}
-
-	public static void setPieceDecisions(
-			Map<PieceType, Set<String>> pieceDecisions) {
-		MetaConfig.pieceDecisions = pieceDecisions;
-	}
 
 	// map decision name to int key
 	public static Map<PieceType, HashMap<String, String>> getKeyMapping() {
@@ -111,6 +100,7 @@ public class MetaConfig {
 				dir = i;
 			}
 		}
+		System.out.println(dir+" "+turn);
 		if (dir != -1)
 			return orthogonalTurn[(dir + turn) % 4];
 		return null;
@@ -121,7 +111,7 @@ public class MetaConfig {
 	private static Map<String, int[]> diagonalSet;
 	private static Map<String, int[]> horseSet;
 	private static Map<String, ParamObject> specialsSet = new HashMap<>();
-
+	
 	// for the range decision, check if mapping is
 	public static int isNumber(String s) {
 		try {
@@ -181,10 +171,6 @@ public class MetaConfig {
 
 	public static int getTileSize() {
 		return tileSize;
-	}
-
-	public static Set<String> getPieceMetaActions(PieceType type) {
-		return pieceDecisions.get(type);
 	}
 
 	private static void setKeyMappingForAll(Map<String, String> mapping) {
@@ -249,7 +235,9 @@ public class MetaConfig {
 		specialsSet.put("DRAGON", new PODragon());
 		specialsSet.put("TURN", new POTurn());
 		specialsSet.put("SWITCH", new POSwitch());
-		// TODO
+
+		
+		
 		// map to initial keymapping
 
 		// special decisions
@@ -275,10 +263,10 @@ public class MetaConfig {
 		map.put(Keyboard.KEY_NUMPAD3 + "", "3");
 		map.put(Keyboard.KEY_NUMPAD4 + "", "4");
 		map.put(Keyboard.KEY_NUMPAD5 + "", "5");
-		map.put(Keyboard.KEY_0 + "", "SWITCH");
+		map.put(Keyboard.KEY_NUMPAD0 + "", "SWITCH");
 		// set above decision for all piece types
 		setKeyMappingForAll(map);
-		// TODO, complete
+
 		// movement
 		map = new HashMap<>();
 		map.put(Keyboard.KEY_Z + "", "[0,1]");
@@ -291,58 +279,25 @@ public class MetaConfig {
 		setKeyMappingForPiece(PieceType.KING, map);
 		setKeyMappingForPiece(PieceType.ROOK, map);
 		setKeyMappingForPiece(PieceType.QUEEN, map);
-
-		// todo, this can be deleted, because redundant
-		// config pieces with available decisions
-
-		// pawn
-		Set<String> pawnSet = new HashSet<String>();
-		// pawn can only go up
-		pawnSet.add("[0,1]");
-		// pawn can change turn, but not active on main board
-		pawnSet.add("TURN");
-		pieceDecisions.put(PieceType.PAWN, pawnSet);
-
-		// Bischop
-		Set<String> bischopSet = new HashSet<String>();
-		bischopSet.addAll(diagonalSet.keySet());
-
-		bischopSet.add("MAXRANGE");
-		pieceDecisions.put(PieceType.BISHOP, bischopSet);
-
-		// Rook
-		Set<String> rookSet = new HashSet<String>();
-
-		rookSet.addAll(orthogonalSet.keySet());
-
-		rookSet.add("TILEVIEW");
-		pieceDecisions.put(PieceType.ROOK, rookSet);
-
-		// Knight
-		Set<String> knightSet = new HashSet<String>();
-
-		knightSet.addAll(horseSet.keySet());
-
-		knightSet.add("DRAGON");
-		pieceDecisions.put(PieceType.KNIGHT, knightSet);
-
-		// Queen
-		Set<String> queenSet = new HashSet<String>();
-
-		queenSet.addAll(diagonalSet.keySet());
-		queenSet.addAll(orthogonalSet.keySet());
-		pieceDecisions.put(PieceType.QUEEN, queenSet);
-
-		// King
-		Set<String> kingSet = new HashSet<String>();
-
-		kingSet.addAll(diagonalSet.keySet());
-		kingSet.addAll(orthogonalSet.keySet());
-		kingSet.add("RANGEDMAXRANGE");
-		kingSet.add("RANGEDTILEVIEW");
-
-		pieceDecisions.put(PieceType.KING, kingSet);
-
+		map = new HashMap<>();
+		map.put(Keyboard.KEY_E + "", "[1,1]");
+		map.put(Keyboard.KEY_A + "", "[-1,1]");
+		map.put(Keyboard.KEY_W + "", "[-1,-1]");
+		map.put(Keyboard.KEY_C + "", "[1,-1]");
+		setKeyMappingForPiece(PieceType.KING, map);
+		setKeyMappingForPiece(PieceType.BISHOP, map);
+		setKeyMappingForPiece(PieceType.QUEEN, map);
+		map = new HashMap<>();
+		map.put(Keyboard.KEY_Z + "", "[-1,2]");
+		map.put(Keyboard.KEY_Q + "", "[-2,1]");
+		map.put(Keyboard.KEY_R + "", "[1,2]");
+		map.put(Keyboard.KEY_G + "", "[2,1]");
+		map.put(Keyboard.KEY_F + "", "[2,-1]");
+		map.put(Keyboard.KEY_C + "", "[1,-2]");
+		map.put(Keyboard.KEY_S + "", "[-2,-1]");
+		map.put(Keyboard.KEY_X + "", "[-1,-2]");
+		setKeyMappingForPiece(PieceType.KNIGHT, map);
+		
 	}
 
 	public static Map<String, ParamObject> getSpecialsSet() {

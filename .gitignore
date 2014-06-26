@@ -9,6 +9,6 @@ MetaChess/bin
 .metadata
 
 # Package Files #
-*.jar
+#*.jar the build file should be accesible too#0
 *.war
 *.ear

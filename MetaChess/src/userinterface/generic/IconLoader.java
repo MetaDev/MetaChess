@@ -41,6 +41,8 @@ public class IconLoader {
 			MetaConfig.setIcon("KNIGHT", icon);
 			icon = stringToDrawing(readFile("res/bitgrid/rook.txt"));
 			MetaConfig.setIcon("ROOK", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/harald.txt"));
+			MetaConfig.setIcon("HARALD", icon);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -28,9 +28,6 @@ public class DecisionLogic {
 
 	// add this cooldown after every turn that the decision is active
 	public static int getCooldown(int tileFraction, int range) {
-		int test = MetaClock.getMaxFraction();
-		System.out.println(tileFraction);
-		System.out.println("test" + test);
 		return range * Math.max(MetaClock.getMaxFraction() / tileFraction, 1);
 	}
 

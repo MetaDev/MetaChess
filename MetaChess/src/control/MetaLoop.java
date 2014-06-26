@@ -17,12 +17,7 @@ public class MetaLoop {
 	public static void decisionTurn() {
 		ExtendedBoardModel board = MetaConfig.getBoardModel();
 
-		// TODO
-		// if highest fraction reached, the piece won't be locked
-		// anymore,
-		// but the cooldwon still counts with
-		// the min turn-time
-
+		//if the turn calculated from current is different from turn calculated from the abs time from the latest registered turnchange, alert piece
 		ExtendedPlayerModel player = MetaConfig.getBoardModel().getPlayer();
 		ExtendedTileModel tile = player.getControlledModel().getTilePosition();
 		if (MetaClock.getTurn(tile.absoluteFraction(), player.getSide()) != MetaClock
