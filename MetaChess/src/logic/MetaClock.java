@@ -14,7 +14,7 @@ public class MetaClock {
 
 	// based on the fraction of the parent tile give absolute counter of turn on
 	public static int getTileTurn(int fraction) {
-		return getTileTurn(Math.max(fraction, maxTileFraction),
+		return getTileTurn(Math.min(fraction, maxTileFraction),
 				getAbsoluteTime());
 	}
 
@@ -22,7 +22,7 @@ public class MetaClock {
 	public static int getTileTurn(int fraction, int time) {
 		// real-time
 		return (int) (((float) (time) / maxWaitTime)
-				* Math.max(fraction, maxTileFraction) * 2);
+				* Math.min(fraction, maxTileFraction) * 2);
 	}
 
 	public static int getRelativeTileTurn() {
@@ -36,7 +36,7 @@ public class MetaClock {
 	}
 
 	public static int getNrOfFractionsOfMinFraction(int absFraction) {
-		return Math.max(absFraction, maxTileFraction) / maxTileFraction;
+		return Math.min(absFraction, maxTileFraction) / maxTileFraction;
 	}
 
 	// return turn based on absolute time

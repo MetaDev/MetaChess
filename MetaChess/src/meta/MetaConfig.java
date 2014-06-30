@@ -2,13 +2,12 @@ package meta;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import logic.BoardLogic;
 import model.ExtendedBoardModel;
+import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
 import model.paramobjects.PODragon;
 import model.paramobjects.POMaxRange;
@@ -23,7 +22,6 @@ import org.lwjgl.util.Color;
 import userinterface.generic.IconLoader;
 import view.renderer.BoardRenderer;
 import view.renderer.GUIRenderer;
-import view.renderer.PieceRenderer;
 
 //contains and initialises all unique instances
 public class MetaConfig {
@@ -61,8 +59,8 @@ public class MetaConfig {
 	private static ExtendedBoardModel boardModel;
 
 	// turn cycle of 3 types of movement, only needed for pawn
-	private static String[] orthogonalTurn = new String[] { "[0,1]", "[1,0]",
-			"[0,-1]", "[-1,0]" };
+	private static String[] directionTurn = new String[] { "[-1,-1]", "[0,-1]",
+			"[1,-1]", "[1,0]", "[1,1]", "[0,1]", "[-1,1]", "[-1,0]" };
 
 	// map decision name to int key
 	public static Map<PieceType, HashMap<String, String>> getKeyMapping() {
@@ -95,15 +93,28 @@ public class MetaConfig {
 
 	public static String getDirectionWithTurn(String direction, int turn) {
 		int dir = -1;
-		for (int i = 0; i < 4; i++) {
-			if (direction.equals(orthogonalTurn[i])) {
+		for (int i = 0; i < directionTurn.length; i++) {
+			if (direction.equals(directionTurn[i])) {
 				dir = i;
 			}
 		}
-		System.out.println(dir+" "+turn);
 		if (dir != -1)
-			return orthogonalTurn[(dir + turn) % 4];
+			return directionTurn[(dir + turn) % directionTurn.length];
 		return null;
+	}
+
+	public static String getDirectionWithIndex(int index) {
+		return directionTurn[index];
+	}
+
+	public static int getIndexfromDirection(String direction) {
+		int dir = -1;
+		for (int i = 0; i < directionTurn.length; i++) {
+			if (direction.equals(directionTurn[i])) {
+				dir = i;
+			}
+		}
+		return dir;
 	}
 
 	// 3 maps for the directions
@@ -111,7 +122,7 @@ public class MetaConfig {
 	private static Map<String, int[]> diagonalSet;
 	private static Map<String, int[]> horseSet;
 	private static Map<String, ParamObject> specialsSet = new HashMap<>();
-	
+
 	// for the range decision, check if mapping is
 	public static int isNumber(String s) {
 		try {
@@ -134,7 +145,9 @@ public class MetaConfig {
 	}
 
 	// method thar return direction array for any movement
-	public static int[] getDirectionArray(String direction) {
+	public static int[] getDirectionArray(String direction,
+			ExtendedPieceModel piece) {
+		direction = MetaConfig.getDirectionWithTurn(direction, piece.getTurn());
 		if (orthogonalSet.containsKey(direction)) {
 			return orthogonalSet.get(direction);
 		} else if (diagonalSet.containsKey(direction)) {
@@ -236,8 +249,6 @@ public class MetaConfig {
 		specialsSet.put("TURN", new POTurn());
 		specialsSet.put("SWITCH", new POSwitch());
 
-		
-		
 		// map to initial keymapping
 
 		// special decisions
@@ -297,7 +308,7 @@ public class MetaConfig {
 		map.put(Keyboard.KEY_S + "", "[-2,-1]");
 		map.put(Keyboard.KEY_X + "", "[-1,-2]");
 		setKeyMappingForPiece(PieceType.KNIGHT, map);
-		
+
 	}
 
 	public static Map<String, ParamObject> getSpecialsSet() {

@@ -4,6 +4,7 @@ import java.util.Random;
 
 import logic.BoardLogic;
 import meta.MetaConfig;
+import meta.MetaConfig.PieceType;
 
 //contains all info about player
 public class ExtendedPlayerModel {
@@ -14,6 +15,11 @@ public class ExtendedPlayerModel {
 
 	public void setControlledModel(ExtendedPieceModel controlledModel) {
 		this.controlledModel = controlledModel;
+		//unbind if current piece is a pawn and it is bound
+		if(controlledModel.getType()==PieceType.PAWN){
+			((ExtendedKingModel)MetaConfig.getBoardModel().getPieceByTypeAndSide(PieceType.KING,side)).removePawnFromWall((ExtendedPawnModel)controlledModel);
+			
+		}
 	}
 
 	private int side;

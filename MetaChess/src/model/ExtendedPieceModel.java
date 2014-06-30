@@ -198,7 +198,7 @@ public class ExtendedPieceModel {
 						if (DecisionLogic.conditionsMet(regretOrDecision, this)) {
 							// lock if its a movement, unless under lowest
 							// fraction
-							if (MetaConfig.getDirectionArray(regretOrDecision) != null && getTilePosition().absoluteFraction()<=MetaClock.getMaxFraction()) {
+							if (MetaConfig.getDirectionArray(regretOrDecision,this) != null && getTilePosition().absoluteFraction()<=MetaClock.getMaxFraction()) {
 								locked = true;
 							}
 							decide(regretOrDecision);

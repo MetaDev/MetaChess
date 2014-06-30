@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import meta.MetaConfig.PieceType;
 import meta.MetaUtil;
 
 public class ExtendedBoardModel {
@@ -22,7 +23,14 @@ public class ExtendedBoardModel {
 	public Map<ExtendedPieceModel, ExtendedTileModel> getPiecesOnBoard() {
 		return piecesOnBoard;
 	}
-
+	public ExtendedPieceModel getPieceByTypeAndSide(PieceType type,int side){
+		for(ExtendedPieceModel piece:piecesOnBoard.keySet()){
+			if(piece.getType()==type&& piece.getSide()==side){
+				return piece;
+			}
+		}
+		return null;
+	}
 	private ExtendedPlayerModel player;
 
 	public ExtendedPlayerModel getPlayer() {

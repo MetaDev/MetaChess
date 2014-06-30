@@ -93,7 +93,7 @@ public class PieceEditor extends Editor {
 				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
 
 		// assign pawns randomly to player(s)
-		ExtendedPlayerModel player = new ExtendedPlayerModel(1, pawn1,
+		ExtendedPlayerModel player = new ExtendedPlayerModel(1, king,
 				"HARALD", MetaConfig.getIcon("HARALD"));
 		MetaConfig.getBoardModel().setPlayer(player);
 
