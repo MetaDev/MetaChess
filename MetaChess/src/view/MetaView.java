@@ -77,7 +77,7 @@ public class MetaView {
 		glScalef(resizeToDisplay, resizeToDisplay, 0);
 
 		// (zoom in) scale to 1 tile in playerview
-		int zoomIn = PlayerTile.absoluteFraction();
+		int zoomIn = PlayerTile.getAbsFraction();
 		glScalef(zoomIn, zoomIn, 1);
 		// zoom out depending on nr of tiles allowed to see
 		int tiles = 1;

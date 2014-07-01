@@ -19,6 +19,7 @@ public class PieceEditor extends Editor {
 	}
 
 	private static void initPieces() {
+		boolean debug=true;
 		// create all pieces
 		ExtendedPawnModel pawn0 = new ExtendedPawnModel(1);
 		ExtendedPawnModel pawn1 = new ExtendedPawnModel(1);
@@ -44,54 +45,82 @@ public class PieceEditor extends Editor {
 
 		// set positions
 
-		PieceLogic.setPosition(pawn0,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
+//		PieceLogic.setPosition(pawn0,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(pawn1,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(pawn2,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(pawn3,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(pawn4,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(pawn5,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(pawn6,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(pawn7,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(rook0,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(rook1,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(knight0,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(knight1,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(bischop0,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(bischop1,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(queen,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+//
+//		PieceLogic.setPosition(king,
+//				BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
 
-		PieceLogic.setPosition(pawn1,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
+		if(debug){
+			PieceLogic
+					.setPosition(king, BoardLogic.getRandomTile(
+							MetaClock.getMaxFraction(), false));
+			PieceLogic
+					.setPosition(pawn0, BoardLogic.getRandomTile(
+							MetaClock.getMaxFraction(), false));
 
-		PieceLogic.setPosition(pawn2,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
+			PieceLogic
+					.setPosition(pawn1, BoardLogic.getRandomTile(
+							MetaClock.getMaxFraction(), false));
 
-		PieceLogic.setPosition(pawn3,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
+			PieceLogic
+					.setPosition(pawn2, BoardLogic.getRandomTile(
+							MetaClock.getMaxFraction(), false));
 
-		PieceLogic.setPosition(pawn4,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
+			PieceLogic
+					.setPosition(pawn3, BoardLogic.getRandomTile(
+							MetaClock.getMaxFraction(), false));
 
-		PieceLogic.setPosition(pawn5,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
+			PieceLogic
+					.setPosition(pawn4, BoardLogic.getRandomTile(
+							MetaClock.getMaxFraction(), false));
 
-		PieceLogic.setPosition(pawn6,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(pawn7,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(rook0,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(rook1,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(knight0,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(knight1,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(bischop0,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(bischop1,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(queen,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
-		PieceLogic.setPosition(king,
-				BoardLogic.getRandomTile(MetaClock.getMaxFraction()));
-
+			PieceLogic
+					.setPosition(pawn5, BoardLogic.getRandomTile(MetaClock.getMaxFraction(),false));
+		}
+		
 		// assign pawns randomly to player(s)
 		ExtendedPlayerModel player = new ExtendedPlayerModel(1, king,
 				"HARALD", MetaConfig.getIcon("HARALD"));

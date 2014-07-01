@@ -66,15 +66,7 @@ public class ExtendedTileModel {
 		children = null;
 	}
 
-	public int absoluteFraction() {
-		if (parent != null) {
-			return parent.getChildFraction() * parent.absoluteFraction();
-
-		} else {
-			return 1;
-		}
-
-	}
+	
 
 	// don't allow empty (null) children
 	public void divide(int fraction) {
@@ -155,7 +147,7 @@ public class ExtendedTileModel {
 		if (parent != null) {
 			return parent.childFraction + parent.getAbsFraction();
 		} else {
-			return 0;
+			return 1;
 		}
 	}
 

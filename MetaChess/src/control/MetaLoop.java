@@ -20,8 +20,8 @@ public class MetaLoop {
 		//if the turn calculated from current is different from turn calculated from the abs time from the latest registered turnchange, alert piece
 		ExtendedPlayerModel player = MetaConfig.getBoardModel().getPlayer();
 		ExtendedTileModel tile = player.getControlledModel().getTilePosition();
-		if (MetaClock.getTurn(tile.absoluteFraction(), player.getSide()) != MetaClock
-				.getTurn(tile.absoluteFraction(), player.getSide(), player
+		if (MetaClock.getTurn(tile.getAbsFraction(), player.getSide()) != MetaClock
+				.getTurn(tile.getAbsFraction(), player.getSide(), player
 						.getControlledModel().getAbsTime())) {
 			player.getControlledModel().turnChange();
 		}
@@ -39,8 +39,8 @@ public class MetaLoop {
 			// if not player
 			if (model != player.getControlledModel()) {
 				// alert the piece the turn changed for it
-				if (MetaClock.getTurn(tile.absoluteFraction(), model.getSide()) != MetaClock
-						.getTurn(tile.absoluteFraction(), model.getSide(),
+				if (MetaClock.getTurn(tile.getAbsFraction(), model.getSide()) != MetaClock
+						.getTurn(tile.getAbsFraction(), model.getSide(),
 								model.getAbsTime())) {
 					model.turnChange();
 				}

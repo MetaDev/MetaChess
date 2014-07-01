@@ -75,34 +75,42 @@ public class ActionLogic {
 		// if there's a piece on the new tile and it's from the opposite team
 		ExtendedPieceModel pieceOnnewTile = MetaConfig.getBoardModel()
 				.getModelOnPosition(newTile);
-		if (pieceOnnewTile != null
-				&& pieceOnnewTile.getSide() != piece.getSide()) {
+		if (pieceOnnewTile != null) {
+			if (pieceOnnewTile.getSide() != piece.getSide()) {
 
-			// the model is a dragon knight or it isn't a sidestep
-			// and the target tile is occupied
-			if ((piece.isDragon() != 0 || !isSideStep)) {
+				// the model is a dragon knight or it isn't a sidestep
+				// and the target tile is occupied
+				if ((piece.isDragon() != 0 || !isSideStep)) {
 
-				// decrease teamlifes
-				ExtendedPieceModel takenPiece = MetaUtil.getKeyByValue(
-						MetaConfig.getBoardModel().getEntityModels(), newTile);
-				MetaConfig.getBoardModel().decreaseSideLives(
-						takenPiece.getSide(), takenPiece.getLives());
-				// put the player in a free other piece, if there are left
-				// get correct player from piece
-				// networking
-				MetaConfig.getSpecialsSet().get("SWITCH").setParam(1);
+					// decrease teamlifes
+					ExtendedPieceModel takenPiece = MetaUtil.getKeyByValue(
+							MetaConfig.getBoardModel().getEntityModels(),
+							newTile);
+					MetaConfig.getBoardModel().decreaseSideLives(
+							takenPiece.getSide(), takenPiece.getLives());
+					// put player in other piece and delete piece form play if
+					// on main board
+					if (takenPiece.getTilePosition().getAbsFraction() == 8) {
+						MetaConfig.getBoardModel().deleteModel(takenPiece);
+					} else {
+						MetaConfig.getBoardModel().setPiecePosition(
+								takenPiece,
+								BoardLogic.getRandomTile(
+										MetaClock.getMaxFraction(), false));
+					}
+
+					//
+					// TODO networking
+					// switch on correct player the switch under
+					// MetaConfig.getSpecialsSet().get("SWITCH").setParam(1);
+					System.out.println("killed piece");
+
+				}
 			}
-		}
-		// the piece on the new tile is from same side
-		else {
-			// check if pawn binding can be done
-			if (piece.getType() == PieceType.KING
-					&& pieceOnnewTile.getType() == PieceType.PAWN) {
-				((ExtendedKingModel) piece)
-						.addPawnToWall((ExtendedPawnModel) pieceOnnewTile);
+			// the piece on the new tile is from same side
+			else {
+				return false;
 			}
-			// end movement
-			return true;
 		}
 		// set new position for model
 		MetaConfig.getBoardModel().setPiecePosition(piece, newTile);
@@ -110,50 +118,96 @@ public class ActionLogic {
 	}
 
 	public static void step(String type, ExtendedPieceModel model) {
-		// if the stepping model is a king, check if the pawns don't have to be
-		// move with him
-		//TODO, adapt algo: reposition the pawns with every movement-> move king, then position pawns on king then move according to the wall if possible
+		// TODO apply influence to pawns, pawns in wall always are under
+		// influence, when moving king, check of first of
+		int[] direction = MetaConfig.getDirectionArray(type, model);
+		// if the stepping model is a king, check if it's pawns can be moved
+		// with him
+
 		if (model.getType() == PieceType.KING) {
 			ExtendedKingModel king = (ExtendedKingModel) model;
-			for (ExtendedPawnModel pawn : king.getPawnWall()) {
-				int pawnWallIndex = king.getIndexOfPawnInWall(pawn);
-				boolean sideStep = false;
-				// the pawn in which his step would lead to step on the king can
-				// ignore
-				// occupation, just like the king
-				// the pawn with the position opposite to the stepping direction
-				if ((MetaConfig.getDirectionWithIndex((pawnWallIndex + 4) % 8)
-						.equals(type))) {
-					sideStep = true;
+			ExtendedTileModel kingPos = king.getTilePosition();
+			ExtendedTileModel newKingPos = BoardLogic.getTileNeighbour(kingPos,
+					direction[0], direction[1], false);
+			// king makes a legal move, if king moves on a pawn not in wall
+			// add to wall
+			if (newKingPos != null) {
+				ExtendedPieceModel piecOnKingNewPos = MetaConfig
+						.getBoardModel().getModelOnPosition(newKingPos);
+				// check if any condition of the kings's new tile could end the
+				// movement
+				if (piecOnKingNewPos != null) {
+					// the piece on the king new position is a pawn
+					if (piecOnKingNewPos.getType() == PieceType.PAWN) {
+						// pawn is not in wall
+						if (king.getIndexOfPawnInWallOnBoard((ExtendedPawnModel) piecOnKingNewPos) != -1) {
+							// add to wall
+							// end movement
+							return;
+						}// movement is allowed if pawn already in wall
+					} else if (piecOnKingNewPos.getSide() == king.getSide()) {
+						// not a pawn and from same side
+						// end movement
+						return;
+					}
+
 				}
-				// if the move can't be made skip
-				if (BoardLogic.getTileNeighbour(pawn.getTilePosition(),
-						ExtendedKingModel.getIndexMapping()[pawnWallIndex][0],
-						ExtendedKingModel.getIndexMapping()[pawnWallIndex][1],
-						BoardLogic.isHoover(), sideStep,
-						pawn.isPenetrateLowerFraction()) == null) {
-					return;
+				if (king.getWallSize() > 0) {
+					// save the new legal positions of the pawns
+					ExtendedTileModel[] newPawnPositions = new ExtendedTileModel[8];
+
+					// check if every pawn around the king can be moved
+					for (int i = 0; i < 8; i++) {
+						ExtendedPawnModel pawn = king.getPawnWall()[i];
+						// there's a pawn
+						if (pawn != null) {
+							// position of pawn in wall
+							int[] pawnPosInWall = MetaConfig.getDirectionArray(
+									MetaConfig.getDirectionWithIndex(king
+											.getIndexOfPawnInWallOnBoard(i)),
+									pawn);
+							// get new pawn position, now we allow that a tile
+							// would be occupied
+							ExtendedTileModel newPawnPos = BoardLogic
+									.getTileNeighbour(newKingPos,
+											pawnPosInWall[0], pawnPosInWall[1],
+											true);
+							ExtendedPieceModel pieceOnnewTile = MetaConfig
+									.getBoardModel().getModelOnPosition(
+											newPawnPos);
+							// if occupied by king ,pawn in wall or nothing
+							if (pieceOnnewTile == null
+									|| pieceOnnewTile == king
+									|| (pieceOnnewTile.getType() == PieceType.PAWN && king
+											.getIndexOfPawnInWallOnBoard((ExtendedPawnModel) pieceOnnewTile) != -1)) {
+								// legal position
+								newPawnPositions[i] = newPawnPos;
+							} else {
+								// one of the tile moves if illegal, the move is
+								// illegal
+								return;
+							}
+
+						}
+					}
+
 				}
+				// handle king move
+				// if code is reached until here all pawn wall movement is legal
+				
+				// if there's a piece on the kings new position and it's not of his side, kill 
+				if (piecOnKingNewPos!= null && piecOnKingNewPos.getSide() != king.getSide()) {
+					// kill piece
+
+				}
+				// everything is checked, move king and it's wall of pawns
 
 			}
-			int[] direction;
-			// if all moves are allowed make them
-			for (ExtendedPawnModel pawn : king.getPawnWall()) {
-				int pawnWallIndex = king.getIndexOfPawnInWall(pawn);
-				direction = MetaConfig.getDirectionArray(MetaConfig.getDirectionWithIndex(pawnWallIndex), pawn);
-				movement(direction[0] * pawn.getRange(),
-						direction[1] * pawn.getRange(), pawn, true);
-			}
-			//also for the king
-			direction = MetaConfig.getDirectionArray(type, model);
+		} else {
+			// normal movement
 			movement(direction[0] * model.getRange(),
-					direction[1] * model.getRange(), model, true);
-			//and end
-			return;
+					direction[1] * model.getRange(), model, false);
 		}
-		int[] direction = MetaConfig.getDirectionArray(type, model);
-		movement(direction[0] * model.getRange(),
-				direction[1] * model.getRange(), model, false);
 
 	}
 

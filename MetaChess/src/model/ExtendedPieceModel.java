@@ -28,7 +28,7 @@ public class ExtendedPieceModel {
 			return 4;
 		}
 		return Math.min(8 + influencedTileView + getRange() * viewing,
-				getTilePosition().absoluteFraction() / 2);
+				getTilePosition().getAbsFraction() / 2);
 	}
 
 	protected int range = 1;
@@ -198,7 +198,7 @@ public class ExtendedPieceModel {
 						if (DecisionLogic.conditionsMet(regretOrDecision, this)) {
 							// lock if its a movement, unless under lowest
 							// fraction
-							if (MetaConfig.getDirectionArray(regretOrDecision,this) != null && getTilePosition().absoluteFraction()<=MetaClock.getMaxFraction()) {
+							if (MetaConfig.getDirectionArray(regretOrDecision,this) != null && getTilePosition().getAbsFraction()<=MetaClock.getMaxFraction()) {
 								locked = true;
 							}
 							decide(regretOrDecision);
@@ -225,7 +225,7 @@ public class ExtendedPieceModel {
 				// the corresponding decision should already be active
 				if (MetaConfig.getSpecialsSet().containsKey(keptDecision) && MetaConfig.getKeyMapping().get(type).containsValue(keptDecision)) {
 					raiseCooldownAndTurnsActiveAfterTurn(keptDecision);
-				} else if(getTilePosition().absoluteFraction()<=MetaClock.getMaxFraction()){
+				} else if(getTilePosition().getAbsFraction()<=MetaClock.getMaxFraction()){
 					// a movement
 					if (DecisionLogic.conditionsMet(keptDecision, this)) {
 						decide(keptDecision);
@@ -244,7 +244,7 @@ public class ExtendedPieceModel {
 		ExtendedTileModel position = MetaConfig.getBoardModel()
 				.getPiecePosition(this);
 		cooldownOfDecisions.put(decision,
-				DecisionLogic.getCooldown(position.absoluteFraction(), range));
+				DecisionLogic.getCooldown(position.getAbsFraction(), range));
 		turnsActiveOfDecisions.put(decision, 1);
 	}
 
@@ -253,7 +253,7 @@ public class ExtendedPieceModel {
 		ExtendedTileModel position = MetaConfig.getBoardModel()
 				.getPiecePosition(this);
 		keptDecisionCooldown.put(decision, Math.max(
-				DecisionLogic.getCooldown(position.absoluteFraction(), range),
+				DecisionLogic.getCooldown(position.getAbsFraction(), range),
 				keptDecisionCooldown.get(decision)));
 	}
 

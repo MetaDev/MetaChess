@@ -138,7 +138,7 @@ public class BoardLogic {
 			int horDir, int vertDir, boolean floating,
 			boolean ignoreOccupation, boolean penetrateLowerFraction) {
 		ExtendedTileModel it = tile;
-		int startFraction = it.absoluteFraction();
+		int startFraction = it.getAbsFraction();
 		// root tile
 		if (it.getParent() == null) {
 			return null;
@@ -209,7 +209,7 @@ public class BoardLogic {
 		}
 		// only continue movement if the piece didn't land on a lower fractioned
 		// tile or if penetraLowerFraction is on
-		if (startFraction <= it.absoluteFraction() || penetrateLowerFraction) {
+		if (startFraction <= it.getAbsFraction() || penetrateLowerFraction) {
 			// recursion if needed-> movement is not finished
 			if (Math.abs(remainingHorMov) + Math.abs(remainingVerMov) != 0) {
 				return getTileNeighbour(it, remainingHorMov, remainingVerMov,
@@ -219,7 +219,12 @@ public class BoardLogic {
 		return it;
 
 	}
-
+	//method for finding direct neighbour no need for floating and penetration options
+	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile,
+			int horDir, int vertDir, 
+			boolean ignoreOccupation) {
+		return getTileNeighbour(tile,horDir,vertDir,false,ignoreOccupation,false);
+	}
 	// one of many implementations to come
 	// return a child with the highest fraction and the opposit colour as the
 	// parent that is positioned on the border accesed by the movement.
@@ -279,22 +284,30 @@ public class BoardLogic {
 	}
 
 	// return a tile with an abs fraction smaller then the one given
-	public static ExtendedTileModel getRandomTile(int maxAbsFraction) {
+	public static ExtendedTileModel getRandomTile(int maxAbsFraction,
+			boolean canBeOccupied) {
+		ExtendedTileModel tileIt; 
+		do {
+			//start from root tile always
+			tileIt = MetaConfig.getBoardModel().getRootTile();
+			// now choose random tile
+			int randCol;
+			int randRow;
+			// pick a random max level of depth, different from root (0)
+			int randAbsFraction = MetaUtil.randInt(1, maxAbsFraction);
 
-		// now choose random tile
-		int randCol;
-		int randRow;
-		// pick a random max level of depth, different from root (0)
-		int randAbsFraction = MetaUtil.randInt(1, maxAbsFraction);
-		ExtendedTileModel tileIt = MetaConfig.getBoardModel().getRootTile();
-		while (tileIt.getChildren() != null
-				&& tileIt.getAbsFraction() < randAbsFraction) {
+			while (tileIt.getChildren() != null
+					&& tileIt.getAbsFraction() < randAbsFraction) {
 
-			// pick random child on current tile
-			randCol = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
-			randRow = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
-			tileIt = tileIt.getChildren()[randCol][randRow];
+				// pick random child on current tile
+				randCol = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
+				randRow = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
+				tileIt = tileIt.getChildren()[randCol][randRow];
+			}
 		}
+		//if the tile can't be occupied restart the search if the found random tile is occupied
+		while (!canBeOccupied&&MetaConfig.getBoardModel().getModelOnPosition(tileIt)!=null  );
+
 		return tileIt;
 
 	}

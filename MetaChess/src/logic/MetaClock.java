@@ -49,7 +49,7 @@ public class MetaClock {
 	public static boolean getTurn(ExtendedPieceModel piece) {
 		ExtendedTileModel tile = MetaConfig.getBoardModel().getPiecePosition(
 				piece);
-		return getTurn(tile.absoluteFraction(), piece.getSide());
+		return getTurn(tile.getAbsFraction(), piece.getSide());
 	}
 
 	public static int getAbsoluteTime() {
@@ -62,7 +62,7 @@ public class MetaClock {
 				piece);
 		if (tile == null)
 			return -1;
-		int fraction = tile.absoluteFraction();
+		int fraction = tile.getAbsFraction();
 		return getTileTurn(fraction);
 	}
 
@@ -84,7 +84,7 @@ public class MetaClock {
 				.getPiecePosition(player.getControlledModel());
 		if (playerTile == null)
 			return false;
-		int fraction = (playerTile).absoluteFraction();
+		int fraction = (playerTile).getAbsFraction();
 		int side = player.getSide();
 		return getTurn(fraction, side);
 	}
