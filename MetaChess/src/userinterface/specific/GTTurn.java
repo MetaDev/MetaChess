@@ -1,6 +1,6 @@
 package userinterface.specific;
 
-import logic.MetaClock;
+import meta.MetaClock;
 import meta.MetaConfig;
 import userinterface.generic.GUI1Tile;
 import userinterface.generic.GUITile;

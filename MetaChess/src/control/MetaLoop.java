@@ -5,7 +5,7 @@
  */
 package control;
 
-import logic.MetaClock;
+import meta.MetaClock;
 import meta.MetaConfig;
 import model.ExtendedBoardModel;
 import model.ExtendedPieceModel;

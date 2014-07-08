@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import logic.DecisionLogic;
-import logic.MetaClock;
+import meta.MetaClock;
 import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
 import meta.MetaUtil;

@@ -1,7 +1,7 @@
 package userinterface.specific;
 
 import logic.DecisionLogic;
-import logic.MetaClock;
+import meta.MetaClock;
 import meta.MetaConfig;
 import model.ExtendedPlayerModel;
 import userinterface.generic.GUI1Tile;

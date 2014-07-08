@@ -1,8 +1,8 @@
 package editor;
 
 import logic.BoardLogic;
-import logic.MetaClock;
 import logic.PieceLogic;
+import meta.MetaClock;
 import meta.MetaConfig;
 import model.ExtendedBishopModel;
 import model.ExtendedKingModel;

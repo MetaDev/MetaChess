@@ -1,6 +1,6 @@
 package model.paramobjects;
 
-import logic.MetaClock;
+import meta.MetaClock;
 
 public class PONrOfTurn implements ParamObject{
 	//return turn relative to parent

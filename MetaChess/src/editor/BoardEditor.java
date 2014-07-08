@@ -1,7 +1,7 @@
 package editor;
 
 import logic.BoardLogic;
-import logic.MetaClock;
+import meta.MetaClock;
 import meta.MetaConfig;
 import meta.MetaUtil;
 import model.ExtendedTileModel;

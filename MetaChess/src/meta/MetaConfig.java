@@ -116,7 +116,9 @@ public class MetaConfig {
 		}
 		return dir;
 	}
-
+	public static int getIndexfromDirection(int[] direction) {
+		return getIndexfromDirection(MetaUtil.convertIntArrayToString(direction));	
+	}
 	// 3 maps for the directions
 	private static Map<String, int[]> orthogonalSet;
 	private static Map<String, int[]> diagonalSet;

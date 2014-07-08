@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import meta.MetaConfig;
@@ -128,12 +129,14 @@ public class BoardLogic {
 
 	}
 
-	// implementation; go to neighbour tile do remainingmovement -1
-	// if remainingmovement>0 do recursion
-	// parameters: floating, never go to lower fraction, float on it
-	// ignoreoccupation, allowed to jump over pieces
-	// penetraLowerFraction, continue movement when entering a lower fractioned
-	// tile
+	/*
+	 * implementation; go to neighbour tile do remainingmovement -1 if
+	 * remainingmovement>0 do recursion parameters: floating, never go to lower
+	 * fraction, float on it ignoreoccupation, allowed to jump over pieces
+	 * penetraLowerFraction, continue movement when entering a lower fractioned
+	 * tile result: null if movement not allowed else desired tile
+	 */
+
 	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile,
 			int horDir, int vertDir, boolean floating,
 			boolean ignoreOccupation, boolean penetrateLowerFraction) {
@@ -203,28 +206,34 @@ public class BoardLogic {
 			}
 
 		}
-		// if a tile in the movement is occupied the movement is not allowed
-		if (it.isOccupied() && !ignoreOccupation) {
-			return null;
-		}
+
 		// only continue movement if the piece didn't land on a lower fractioned
 		// tile or if penetraLowerFraction is on
 		if (startFraction <= it.getAbsFraction() || penetrateLowerFraction) {
 			// recursion if needed-> movement is not finished
 			if (Math.abs(remainingHorMov) + Math.abs(remainingVerMov) != 0) {
+				// if a tile in the movement is occupied the movement is not
+				// allowed
+				if (it.isOccupied() && !ignoreOccupation) {
+					return null;
+				}
 				return getTileNeighbour(it, remainingHorMov, remainingVerMov,
 						floating, ignoreOccupation, penetrateLowerFraction);
 			}
 		}
+
 		return it;
 
 	}
-	//method for finding direct neighbour no need for floating and penetration options
+
+	// method for finding direct neighbour no need for floating and penetration
+	// options
 	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile,
-			int horDir, int vertDir, 
-			boolean ignoreOccupation) {
-		return getTileNeighbour(tile,horDir,vertDir,false,ignoreOccupation,false);
+			int horDir, int vertDir, boolean ignoreOccupation) {
+		return getTileNeighbour(tile, horDir, vertDir, false, ignoreOccupation,
+				false);
 	}
+
 	// one of many implementations to come
 	// return a child with the highest fraction and the opposit colour as the
 	// parent that is positioned on the border accesed by the movement.
@@ -286,9 +295,9 @@ public class BoardLogic {
 	// return a tile with an abs fraction smaller then the one given
 	public static ExtendedTileModel getRandomTile(int maxAbsFraction,
 			boolean canBeOccupied) {
-		ExtendedTileModel tileIt; 
+		ExtendedTileModel tileIt;
 		do {
-			//start from root tile always
+			// start from root tile always
 			tileIt = MetaConfig.getBoardModel().getRootTile();
 			// now choose random tile
 			int randCol;
@@ -305,10 +314,21 @@ public class BoardLogic {
 				tileIt = tileIt.getChildren()[randCol][randRow];
 			}
 		}
-		//if the tile can't be occupied restart the search if the found random tile is occupied
-		while (!canBeOccupied&&MetaConfig.getBoardModel().getModelOnPosition(tileIt)!=null  );
+		// if the tile can't be occupied restart the search if the found random
+		// tile is occupied
+		while (!canBeOccupied
+				&& MetaConfig.getBoardModel().getModelOnPosition(tileIt) != null);
 
 		return tileIt;
 
+	}
+
+	public static void printAllPiecePositions() {
+		for (Map.Entry<ExtendedPieceModel, ExtendedTileModel> pair : MetaConfig
+				.getBoardModel().getEntityModels().entrySet()) {
+			System.out.println(pair.getKey().getType().name() + " "
+					+ pair.getKey().getSide() + " : " + pair.getValue().getI()
+					+ " - " + pair.getValue().getJ());
+		}
 	}
 }
