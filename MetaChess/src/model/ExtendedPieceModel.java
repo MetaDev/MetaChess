@@ -21,19 +21,38 @@ public class ExtendedPieceModel {
 	// only the rook will adapt this
 	protected int viewing = 0;
 	// only the bishop will adapt this
-	protected int maxRange = 0;
+	protected int maxRange = 8;
 
+	// viewing doubles the view
 	public int getNrOfViewTiles() {
 		if (getTilePosition().getParent().getLevel() == 0) {
 			return 4;
 		}
-		return Math.min(8 + influencedTileView + getRange() * viewing,
+		return Math.min((8 + influencedTileView) * (1 + viewing),
 				getTilePosition().getAbsFraction() / 2);
 	}
 
 	protected int range = 1;
 
 	protected boolean ignoreOccupationOfTile = false;
+	protected boolean showType=true;
+	protected boolean lethal=true;
+	public boolean isLethal() {
+		return lethal;
+	}
+
+	public void setLethal(boolean lethal) {
+		this.lethal = lethal;
+	}
+
+	public boolean isShowType() {
+		return showType;
+	}
+
+	public void setShowType(boolean showType) {
+		this.showType = showType;
+	}
+
 	protected boolean penetrateLowerFraction = false;
 	protected PieceType type;
 
@@ -198,7 +217,10 @@ public class ExtendedPieceModel {
 						if (DecisionLogic.conditionsMet(regretOrDecision, this)) {
 							// lock if its a movement, unless under lowest
 							// fraction
-							if (MetaConfig.getDirectionArray(regretOrDecision,this) != null && getTilePosition().getAbsFraction()<=MetaClock.getMaxFraction()) {
+							if (MetaConfig.getDirectionArray(regretOrDecision,
+									this) != null
+									&& getTilePosition().getAbsFraction() <= MetaClock
+											.getMaxFraction()) {
 								locked = true;
 							}
 							decide(regretOrDecision);
@@ -219,13 +241,17 @@ public class ExtendedPieceModel {
 					.get(inputs[i].split(":")[1]);
 			if (MetaConfig.getKeyMapping().get(type)
 					.containsValue(keptDecision)) {
-				
-				// if this decision is a special one and belongs to this piece type, don't redecide but
+
+				// if this decision is a special one and belongs to this piece
+				// type, don't redecide but
 				// increase cooldown and turnsactive
 				// the corresponding decision should already be active
-				if (MetaConfig.getSpecialsSet().containsKey(keptDecision) && MetaConfig.getKeyMapping().get(type).containsValue(keptDecision)) {
+				if (MetaConfig.getSpecialsSet().containsKey(keptDecision)
+						&& MetaConfig.getKeyMapping().get(type)
+								.containsValue(keptDecision)) {
 					raiseCooldownAndTurnsActiveAfterTurn(keptDecision);
-				} else if(getTilePosition().getAbsFraction()<=MetaClock.getMaxFraction()){
+				} else if (getTilePosition().getAbsFraction() <= MetaClock
+						.getMaxFraction()) {
 					// a movement
 					if (DecisionLogic.conditionsMet(keptDecision, this)) {
 						decide(keptDecision);
@@ -338,6 +364,14 @@ public class ExtendedPieceModel {
 		}
 	}
 
+	public Map<String, Integer> getCooldownOfDecisions() {
+		return cooldownOfDecisions;
+	}
+
+	public Map<String, Integer> getTurnsActiveOfDecisions() {
+		return turnsActiveOfDecisions;
+	}
+
 	public int getColor() {
 		return color;
 	}
@@ -356,8 +390,7 @@ public class ExtendedPieceModel {
 
 	// the range is ranged between 1 and 8 + influencedRange
 	public int getRange() {
-		return Math.max(Math.min(range, 8 + 100 * maxRange)
-				+ influencedMaxRange, 1);
+		return Math.max(Math.min(range, maxRange + influencedMaxRange), 1);
 	}
 
 	// if range is set negative the directions are inverted
@@ -438,6 +471,14 @@ public class ExtendedPieceModel {
 
 	public String getDirection() {
 		return null;
+	}
+
+	public int getRogue() {
+		return 0;
+	}
+
+	public void setRogue(int rogue) {
+		// do nothing
 	}
 
 }

@@ -1,6 +1,5 @@
 package userinterface.specific;
 
-import logic.DecisionLogic;
 import meta.MetaClock;
 import meta.MetaConfig;
 import model.ExtendedPlayerModel;
@@ -32,17 +31,17 @@ public class GTMetaActionCooldownTurnsActive extends GUI1Tile {
 		if(player.getControlledModel()==null){
 			return grid;
 		}
+
 		//cooldown is relative and represents number of turns you have to wait on this tile to cool it down
 		int cooldown = Math.min(
 				player.getControlledModel().getCooldown(decision)
-						/ (MetaClock.getMaxFraction()/player.getControlledModel().getTilePosition()
-								.getAbsFraction()), 40);
+						/ (Math.max(MetaClock.getMaxFraction()/player.getControlledModel().getTilePosition()
+								.getAbsFraction(), 1)), 40);
 		int turnsActive = Math.min(player.getControlledModel()
 				.getTurnsOfActivity(decision), 16);
 
 		// if something change, adapt the grid
 		if (cooldown != oldCooldown) {
-			System.out.println(cooldown);
 			oldCooldown = cooldown;
 			updateCooldownRows();
 		}

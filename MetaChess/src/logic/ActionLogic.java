@@ -1,9 +1,10 @@
 package logic;
 
+import java.util.Random;
+
 import meta.MetaClock;
 import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
-import meta.MetaUtil;
 import model.ExtendedKingModel;
 import model.ExtendedPawnModel;
 import model.ExtendedPieceModel;
@@ -69,18 +70,23 @@ public class ActionLogic {
 	// handle logic when 2 pieces are on same tile, return of piece can make
 	// move or not
 	private static boolean handlePieceCollision(ExtendedPieceModel piece,
-			ExtendedPieceModel pieceOnnewTile, boolean ignoreOccupation) {
+			ExtendedPieceModel pieceOnnewTile, boolean sideStep) {
 		if (pieceOnnewTile != null) {
+			// if a piece is not lethal it can't kill another piece
+
 			if (pieceOnnewTile.getSide() != piece.getSide()) {
 
 				// the model is a dragon knight or it isn't a sidestep
 				// and the target tile is occupied
-				if ((piece.isDragon() != 0 || !ignoreOccupation)) {
-					pieceKill(pieceOnnewTile);
-					
+				// TODO dragon kills 1 fraction deep
+				if ((piece.isDragon() != 0) || !sideStep) {
+					return pieceKill(piece, pieceOnnewTile);
+
 				}
 				// either killed piece or stepped above it, move can be made
-				return true;
+				if(sideStep)
+					return true;
+	
 			}
 			// the piece on the new tile is from same side
 			else {
@@ -91,7 +97,12 @@ public class ActionLogic {
 		return true;
 	}
 
-	private static void pieceKill(ExtendedPieceModel pieceOnnewTile) {
+	// return whether a piece is killed
+	private static boolean pieceKill(ExtendedPieceModel piece,
+			ExtendedPieceModel pieceOnnewTile) {
+		if (!piece.isLethal()) {
+			return false;
+		}
 		// TODO check if piece is occupied by a player
 		MetaConfig.getBoardModel().decreaseSideLives(pieceOnnewTile.getSide(),
 				pieceOnnewTile.getLives());
@@ -106,21 +117,26 @@ public class ActionLogic {
 							BoardLogic.getRandomTile(
 									MetaClock.getMaxFraction(), false));
 		}
-
+		System.out.println("killed piece");
+		return true;
 		//
 		// TODO networking
 		// switch on correct player the switch under
 		// MetaConfig.getSpecialsSet().get("SWITCH").setParam(1);
-		System.out.println("killed piece");
+
 	}
 
 	// collision for the king and his wall are handled slightly differently, as
 	// in that collision between them is allowed, because they all move in the
 	// same direction
 	private static boolean handlePawnWallAndKingCollision(
-			ExtendedPieceModel pawnOrKing, ExtendedPieceModel pieceOnnewTile,ExtendedKingModel king) {
+			ExtendedPieceModel pawnOrKing, ExtendedPieceModel pieceOnnewTile,
+			ExtendedKingModel king) {
 		// move is legal if new tile is empty, ocuppied by
 		// opponent or this king or a pawn in the wall from our side
+		if (!pawnOrKing.isLethal()) {
+			return false;
+		}
 		if (pieceOnnewTile == null
 				|| pieceOnnewTile == king
 				|| (pieceOnnewTile.getType() == PieceType.PAWN
@@ -128,9 +144,8 @@ public class ActionLogic {
 						.getIndexOfPawnInWallOnBoard((ExtendedPawnModel) pieceOnnewTile) != -1)) {
 			return true;
 		}
-		if(pieceOnnewTile.getSide() != pawnOrKing.getSide()){
-			pieceKill(pieceOnnewTile);
-			return true;
+		if (pieceOnnewTile.getSide() != pawnOrKing.getSide()) {
+			return pieceKill(pawnOrKing,pieceOnnewTile);
 		}
 		return false;
 	}
@@ -174,7 +189,6 @@ public class ActionLogic {
 		// king makes a legal move, if king moves on a pawn not in wall
 		// add to wall
 		if (newKingPos != null) {
-			BoardLogic.printAllPiecePositions();
 			ExtendedPieceModel piecOnKingNewPos = MetaConfig.getBoardModel()
 					.getModelOnPosition(newKingPos);
 			// check if any condition of the kings's new tile could end the
@@ -219,8 +233,8 @@ public class ActionLogic {
 						ExtendedTileModel newPawnPos = BoardLogic
 								.getTileNeighbour(newKingPos, pawnPosInWall[0],
 										pawnPosInWall[1], true);
-						//new pawn position not allowed
-						if(newPawnPos==null){
+						// new pawn position not allowed
+						if (newPawnPos == null) {
 							return;
 						}
 						ExtendedPieceModel pieceOnnewTile = MetaConfig
@@ -254,7 +268,7 @@ public class ActionLogic {
 			// handle it's piece collision and influence
 
 			// king
-			handlePawnWallAndKingCollision(king, piecOnKingNewPos,king);
+			handlePawnWallAndKingCollision(king, piecOnKingNewPos, king);
 			MetaConfig.getBoardModel().setPiecePosition(king, newKingPos);
 
 			// pawn wall
@@ -264,7 +278,7 @@ public class ActionLogic {
 					// if there's a new position
 					if (newPawnPositions[i] != null) {
 						handlePawnWallAndKingCollision(king.getPawnWall()[i],
-								collisionPieces[i],king);
+								collisionPieces[i], king);
 						MetaConfig.getBoardModel().setPiecePosition(
 								king.getPawnWall()[i], newPawnPositions[i]);
 					}
@@ -291,14 +305,20 @@ public class ActionLogic {
 
 	// horsteStep
 	public static void horseStep(String type, ExtendedPieceModel model) {
-		// TODO to implement dragon correctly, movent like 2,1 should be done
-		// 1,0 1,0 0,1
+
 		String dir = type;
 
 		int[] direction = MetaConfig.getDirectionArray(dir, model);
+		// pick a random order of jumping
+		Random random = new Random();
+		if (random.nextBoolean()) {
+			if (movement(direction[0], 0, model, true))
+				movement(0, direction[1], model, false);
+		} else {
+			if (movement(0, direction[1], model, true))
+				movement(direction[0], 0, model, false);
+		}
 
-		if (movement(0, direction[1], model, true))
-			movement(direction[0], 0, model, false);
 	}
 
 	// int decideOrRegret, tells wether the change of param is positive or

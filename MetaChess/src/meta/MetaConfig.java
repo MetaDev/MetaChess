@@ -100,7 +100,7 @@ public class MetaConfig {
 		}
 		if (dir != -1)
 			return directionTurn[(dir + turn) % directionTurn.length];
-		return null;
+		return direction;
 	}
 
 	public static String getDirectionWithIndex(int index) {
@@ -149,7 +149,9 @@ public class MetaConfig {
 	// method thar return direction array for any movement
 	public static int[] getDirectionArray(String direction,
 			ExtendedPieceModel piece) {
-		direction = MetaConfig.getDirectionWithTurn(direction, piece.getTurn());
+		if(piece.getType()==PieceType.PAWN){
+			direction = MetaConfig.getDirectionWithTurn(direction, piece.getTurn());
+		}
 		if (orthogonalSet.containsKey(direction)) {
 			return orthogonalSet.get(direction);
 		} else if (diagonalSet.containsKey(direction)) {
@@ -229,36 +231,36 @@ public class MetaConfig {
 		orthogonalList.add(new int[] { -1, 0 });
 		orthogonalSet = mapDirections(orthogonalList);
 		List<int[]> diagonalList = new ArrayList<int[]>();
-		orthogonalList.add(new int[] { 1, 1 });
-		orthogonalList.add(new int[] { 1, -1 });
-		orthogonalList.add(new int[] { -1, -1 });
-		orthogonalList.add(new int[] { -1, 1 });
+		diagonalList.add(new int[] { 1, 1 });
+		diagonalList.add(new int[] { 1, -1 });
+		diagonalList.add(new int[] { -1, -1 });
+		diagonalList.add(new int[] { -1, 1 });
 		diagonalSet = mapDirections(diagonalList);
 		List<int[]> horseList = new ArrayList<int[]>();
-		orthogonalList.add(new int[] { 1, 2 });
-		orthogonalList.add(new int[] { 1, -2 });
-		orthogonalList.add(new int[] { -1, -2 });
-		orthogonalList.add(new int[] { -1, 2 });
-		orthogonalList.add(new int[] { 2, 1 });
-		orthogonalList.add(new int[] { 2, -1 });
-		orthogonalList.add(new int[] { -2, -1 });
-		orthogonalList.add(new int[] { -2, 1 });
+		horseList.add(new int[] { 1, 2 });
+		horseList.add(new int[] { 1, -2 });
+		horseList.add(new int[] { -1, -2 });
+		horseList.add(new int[] { -1, 2 });
+		horseList.add(new int[] { 2, 1 });
+		horseList.add(new int[] { 2, -1 });
+		horseList.add(new int[] { -2, -1 });
+		horseList.add(new int[] { -2, 1 });
 		horseSet = mapDirections(horseList);
 		// fill specialset with
-		specialsSet.put("TILEVIEW", new POTileView());
-		specialsSet.put("MAXRANGE", new POMaxRange());
+		specialsSet.put("HORIZON", new POTileView());
+		specialsSet.put("ROGUE", new POMaxRange());
 		specialsSet.put("DRAGON", new PODragon());
 		specialsSet.put("TURN", new POTurn());
 		specialsSet.put("SWITCH", new POSwitch());
-
+		//TODO rogue for bischop and command for king
 		// map to initial keymapping
 
 		// special decisions
 		Map<String, String> map = new HashMap<>();
-		map.put(Keyboard.KEY_SPACE + "", "TILEVIEW");
+		map.put(Keyboard.KEY_SPACE + "", "HORIZON");
 		setKeyMappingForPiece(PieceType.ROOK, map);
 		map = new HashMap<>();
-		map.put(Keyboard.KEY_SPACE + "", "MAXRANGE");
+		map.put(Keyboard.KEY_SPACE + "", "ROGUE");
 		setKeyMappingForPiece(PieceType.BISHOP, map);
 		map = new HashMap<>();
 		map.put(Keyboard.KEY_SPACE + "", "DRAGON");
@@ -266,9 +268,9 @@ public class MetaConfig {
 		map = new HashMap<>();
 		map.put(Keyboard.KEY_SPACE + "", "TURN");
 		setKeyMappingForPiece(PieceType.PAWN, map);
-		map = new HashMap<>();
-		map.put(Keyboard.KEY_SPACE + "", "RANGED");
-		setKeyMappingForPiece(PieceType.KING, map);
+//		map = new HashMap<>();
+//		map.put(Keyboard.KEY_SPACE + "", "RANGED");
+//		setKeyMappingForPiece(PieceType.KING, map);
 		// range
 		map = new HashMap<>();
 		map.put(Keyboard.KEY_NUMPAD1 + "", "1");

@@ -4,7 +4,9 @@ import java.util.Random;
 
 import logic.BoardLogic;
 import meta.MetaConfig;
+import meta.MetaConfig.GUIPosition;
 import meta.MetaConfig.PieceType;
+import meta.MetaUtil;
 
 //contains all info about player
 public class ExtendedPlayerModel {
@@ -17,12 +19,14 @@ public class ExtendedPlayerModel {
 	public void setControlledModel(ExtendedPieceModel controlledModel) {
 		this.controlledModel = controlledModel;
 		// unbind if current piece is a pawn and it is bound
-		if (controlledModel.getType() == PieceType.PAWN) {
+		if (controlledModel.getType() == PieceType.PAWN && ((ExtendedPawnModel)controlledModel).isBound()) {
 			((ExtendedKingModel) MetaConfig.getBoardModel()
 					.getPieceByTypeAndSide(PieceType.KING, getSide()))
 					.removePawnFromWall((ExtendedPawnModel) controlledModel);
-
 		}
+		//change the layout of the decision panel
+		System.out.println("sdfsdf");
+		ExtendedGUI.getGuis().get(GUIPosition.LEFT).refresh();
 	}
 
 	private String name;
@@ -67,8 +71,8 @@ public class ExtendedPlayerModel {
 			Random generator = new Random();
 			Object[] entries = MetaConfig.getBoardModel().getEntityModels()
 					.keySet().toArray();
-			controlledModel = (ExtendedPieceModel) entries[generator
-					.nextInt(entries.length)];
+			setControlledModel((ExtendedPieceModel) entries[generator
+					.nextInt(entries.length)]);
 		}
 		// nearest
 		else if (mode == 2) {
@@ -82,7 +86,7 @@ public class ExtendedPlayerModel {
 					minDist = tempDist;
 				}
 			}
-			controlledModel = newPiece;
+			setControlledModel(newPiece);
 		}
 	}
 

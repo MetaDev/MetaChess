@@ -302,11 +302,11 @@ public class BoardLogic {
 			// now choose random tile
 			int randCol;
 			int randRow;
-			// pick a random max level of depth, different from root (0)
-			int randAbsFraction = MetaUtil.randInt(1, maxAbsFraction);
+			// pick a random max level of fraction, different from root (0)
+			int randAbsFraction = MetaUtil.randInt(8, maxAbsFraction);
 
 			while (tileIt.getChildren() != null
-					&& tileIt.getAbsFraction() < randAbsFraction) {
+					&& tileIt.getAbsFraction() <= randAbsFraction) {
 
 				// pick random child on current tile
 				randCol = MetaUtil.randInt(0, tileIt.getChildren().length - 1);

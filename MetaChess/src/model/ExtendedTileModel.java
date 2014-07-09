@@ -145,7 +145,7 @@ public class ExtendedTileModel {
 
 	public int getAbsFraction() {
 		if (parent != null) {
-			return parent.childFraction + parent.getAbsFraction();
+			return parent.childFraction * parent.getAbsFraction();
 		} else {
 			return 1;
 		}

@@ -43,6 +43,16 @@ public class IconLoader {
 			MetaConfig.setIcon("ROOK", icon);
 			icon = stringToDrawing(readFile("res/bitgrid/harald.txt"));
 			MetaConfig.setIcon("HARALD", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/rogue.txt"));
+			MetaConfig.setIcon("ROGUE", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/horizon.txt"));
+			MetaConfig.setIcon("HORIZON", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/switch.txt"));
+			MetaConfig.setIcon("SWITCH", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/turn.txt"));
+			MetaConfig.setIcon("TURN", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/playerTurn.txt"));
+			MetaConfig.setIcon("PLAYERTURN", icon);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

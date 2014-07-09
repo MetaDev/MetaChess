@@ -9,7 +9,7 @@ import model.ExtendedTileModel;
 public class BoardEditor extends Editor {
 
 	public static void init() {
-		boolean fractionRandom = false;
+		boolean fractionRandom = true;
 		// number of fractions allowed under the maxfraction, where the game
 		// becomes real-time
 		int fractionUnderMaxFraction = 32;
@@ -34,7 +34,7 @@ public class BoardEditor extends Editor {
 				// pick random fraction
 				randFraction = (int) Math.pow(2, MetaUtil.randInt(1, 3));
 				// pick a random max level of depth
-				randAbsFraction = MetaUtil.randInt(1, maxAbsFraction);
+				randAbsFraction = MetaUtil.randInt(8, maxAbsFraction);
 
 				// now choose random tile
 				BoardLogic.getRandomTile(randAbsFraction,true).divide(randFraction);

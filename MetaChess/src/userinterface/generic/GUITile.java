@@ -7,10 +7,11 @@ public class GUITile {
 	// number of blocks it takes in the container
 	protected int rowsInContainer;
 	protected int columnsInContainer;
-	//number of rows and columns it has itself, could be accessed through the size of elements
+	// number of rows and columns it has itself, could be accessed through the
+	// size of elements
 	protected int rows;
 	protected int columns;
-	
+
 	protected int color;
 	protected GUITile container;
 	protected int i;
@@ -88,8 +89,9 @@ public class GUITile {
 			return y;
 		}
 	}
-	//get size relative to container
-	
+
+	// get size relative to container
+
 	public float getHeight() {
 		if (container != null) {
 			return rowsInContainer * (container.getHeight() / container.rows);
@@ -99,14 +101,13 @@ public class GUITile {
 
 	public float getWidth() {
 		if (container != null) {
-			return columnsInContainer * (container.getWidth() / container.columns);
+			return columnsInContainer
+					* (container.getWidth() / container.columns);
 		}
 		return width;
 	}
 
-	
-
-	public GUITile(int columnsInContainer, int  rowsInContainer, int columns,
+	public GUITile(int columnsInContainer, int rowsInContainer, int columns,
 			int rows, int color, GUITile container, int i, int j) {
 		this.rowsInContainer = rowsInContainer;
 		this.columnsInContainer = columnsInContainer;
@@ -117,10 +118,11 @@ public class GUITile {
 		this.i = i;
 		this.j = j;
 	}
-	//root container
-	public GUITile(int columns,
-			int rows, int color, GUITile container, int i, int j) {
-		this.rowsInContainer =1;
+
+	// root container
+	public GUITile(int columns, int rows, int color, GUITile container, int i,
+			int j) {
+		this.rowsInContainer = 1;
 		this.columnsInContainer = 1;
 		this.rows = rows;
 		this.columns = columns;
@@ -134,18 +136,26 @@ public class GUITile {
 		return elements;
 	}
 
-	public void addElement(GUITile[][] elements, GUITile element) {
+	private void addElement(GUITile[][] elements, GUITile element) {
 		if (elements != null) {
 			element.setContainer(this);
 			elements[element.getI()][element.getJ()] = element;
 		}
 	}
 
-	public void addElement( GUITile element) {
+	public void addElement(GUITile element) {
 		if (elements == null) {
 			elements = new GUITile[columns][rows];
 		}
-		addElement(elements,  element);
+		addElement(elements, element);
+	}
+
+	public void clearTile() {
+		elements = null;
+	}
+	//to override
+	public void refresh(){
+		System.out.println("dsknjgvsk");
 	}
 
 	// only in GUITiles the position and size can be set absolutely

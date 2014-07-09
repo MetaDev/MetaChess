@@ -7,6 +7,10 @@ public class GUI1Tile extends GUITile {
 		super(1, 1, 8, 8, color, container, i, j);
 		grid = new int[8][8];
 	}
+	public GUI1Tile(int color, GUITile container, int i, int j,int[][] grid) {
+		super(1, 1, 8, 8, color, container, i, j);
+		this.grid = grid;
+	}
 	protected void reset() {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j <8; j ++) {
