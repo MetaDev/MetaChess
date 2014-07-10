@@ -153,10 +153,6 @@ public class GUITile {
 	public void clearTile() {
 		elements = null;
 	}
-	//to override
-	public void refresh(){
-		System.out.println("dsknjgvsk");
-	}
 
 	// only in GUITiles the position and size can be set absolutely
 	// and only if it has no parent
@@ -183,6 +179,18 @@ public class GUITile {
 	// check whether GUIElements are overlapping
 	public boolean isOverlapping() {
 		return false;
+	}
+
+	public void refresh() {
+		if(elements!=null){
+			for(int i=0; i<elements.length;i++){
+				for(int j=0; j<elements[0].length;j++){
+					if(elements[i][j]!=null){
+						elements[i][j].refresh();
+					}
+				}
+			}
+		}
 	}
 
 }

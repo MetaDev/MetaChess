@@ -5,14 +5,11 @@ import view.zgpu.RectangleRenderer;
 public class GridRenderer {
 
 	public static void render(int[][] grid,   float cellSize){
-		for (int i = 0; i < grid.length; i++) {
-			for (int j = 0; j < grid.length; j++) {
-					RectangleRenderer.drawRectangle(i*cellSize, j*cellSize, cellSize, cellSize, grid[i][j]);
-				
-			}
-		}
+		render(grid,cellSize,1);
 	}
 	public static void render(int[][] grid,   float cellSize, int color){
+		if(grid==null)
+			return;
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid.length; j++) {
 					RectangleRenderer.drawRectangle(i*cellSize, j*cellSize, cellSize, cellSize, (grid[i][j] +color+1)%2);
@@ -21,6 +18,8 @@ public class GridRenderer {
 		}
 	}
 	public static void transparentRender(int[][] grid,   float cellSize, int color){
+		if(grid==null)
+			return;
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid.length; j++) {
 				//don't overwrite underlying color if pixel is not colored

@@ -1,7 +1,6 @@
 package logic;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
@@ -17,7 +16,6 @@ public class BoardLogic {
 
 	private static double[][][][] enterTileMapping;
 	private static int enterTileMode = 1;
-	private static boolean hoover = true;
 
 	public static int getEnterTileMode() {
 		return enterTileMode;
@@ -27,13 +25,7 @@ public class BoardLogic {
 		BoardLogic.enterTileMode = enterTileMode;
 	}
 
-	public static boolean isHoover() {
-		return hoover;
-	}
-
-	public static void setHoover(boolean hoover) {
-		BoardLogic.hoover = hoover;
-	}
+	
 
 	public static void init() {
 		fillMapping(enterTileMode);
@@ -134,12 +126,14 @@ public class BoardLogic {
 	 * remainingmovement>0 do recursion parameters: floating, never go to lower
 	 * fraction, float on it ignoreoccupation, allowed to jump over pieces
 	 * penetraLowerFraction, continue movement when entering a lower fractioned
-	 * tile result: null if movement not allowed else desired tile
+	 * tile result: null if movement not allowed else desired tile save alle
+	 * encountered pieces on movement in a list
 	 */
 
 	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile,
-			int horDir, int vertDir, boolean floating,
-			boolean ignoreOccupation, boolean penetrateLowerFraction) {
+			int horDir, int vertDir, boolean hoover, boolean ignoreOccupation,
+			boolean penetrateLowerFraction,
+			List<ExtendedTileModel> tilePath) {
 		ExtendedTileModel it = tile;
 		int startFraction = it.getAbsFraction();
 		// root tile
@@ -190,9 +184,9 @@ public class BoardLogic {
 						+ verMov + it.getChildFraction())
 						% it.getChildFraction()];
 			} else {
-				// when hover is on and the piece doesn't stop on the
+				// when hoover is on and the piece doesn't stop on the
 				// fractioning
-				if (floating
+				if (hoover
 						&& Math.abs(remainingHorMov)
 								+ Math.abs(remainingVerMov) != 0)
 					break;
@@ -215,10 +209,19 @@ public class BoardLogic {
 				// if a tile in the movement is occupied the movement is not
 				// allowed
 				if (it.isOccupied() && !ignoreOccupation) {
+
+					if (tilePath != null) {
+						tilePath.add(it);
+					}
+				}
+				// if a piece is encountered and occupation can't be ignored,
+				// stop move
+				if (it.isOccupied() && ignoreOccupation) {
 					return null;
 				}
 				return getTileNeighbour(it, remainingHorMov, remainingVerMov,
-						floating, ignoreOccupation, penetrateLowerFraction);
+						hoover, ignoreOccupation, penetrateLowerFraction,
+						tilePath);
 			}
 		}
 
@@ -227,11 +230,11 @@ public class BoardLogic {
 	}
 
 	// method for finding direct neighbour no need for floating and penetration
+	// and occupation
 	// options
 	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile,
-			int horDir, int vertDir, boolean ignoreOccupation) {
-		return getTileNeighbour(tile, horDir, vertDir, false, ignoreOccupation,
-				false);
+			int horDir, int vertDir) {
+		return getTileNeighbour(tile, horDir, vertDir, false, true, false, null);
 	}
 
 	// one of many implementations to come
@@ -326,9 +329,7 @@ public class BoardLogic {
 	public static void printAllPiecePositions() {
 		for (Map.Entry<ExtendedPieceModel, ExtendedTileModel> pair : MetaConfig
 				.getBoardModel().getEntityModels().entrySet()) {
-			System.out.println(pair.getKey().getType().name() + " "
-					+ pair.getKey().getSide() + " : " + pair.getValue().getI()
-					+ " - " + pair.getValue().getJ());
+
 		}
 	}
 }

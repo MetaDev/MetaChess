@@ -25,7 +25,6 @@ public class ExtendedPlayerModel {
 					.removePawnFromWall((ExtendedPawnModel) controlledModel);
 		}
 		//change the layout of the decision panel
-		System.out.println("sdfsdf");
 		ExtendedGUI.getGuis().get(GUIPosition.LEFT).refresh();
 	}
 

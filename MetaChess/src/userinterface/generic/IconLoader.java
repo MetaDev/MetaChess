@@ -53,6 +53,8 @@ public class IconLoader {
 			MetaConfig.setIcon("TURN", icon);
 			icon = stringToDrawing(readFile("res/bitgrid/playerTurn.txt"));
 			MetaConfig.setIcon("PLAYERTURN", icon);
+			icon = stringToDrawing(readFile("res/bitgrid/dragon.txt"));
+			MetaConfig.setIcon("DRAGON", icon);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

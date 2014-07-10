@@ -22,12 +22,12 @@ public class PieceEditor extends Editor {
 	private static List<ExtendedPieceModel> initPieces(int side) {
 		List<ExtendedPieceModel> list = new ArrayList<>();
 		// create all pieces
-		for (int i = 0; i < 8; i++) {
-			list.add(new ExtendedPawnModel(side));
-		}
+//		for (int i = 0; i < 8; i++) {
+//			list.add(new ExtendedPawnModel(side));
+//		}
 
-		list.add(new ExtendedRookModel(side));
-		list.add(new ExtendedRookModel(side));
+//		list.add(new ExtendedRookModel(side));
+//		list.add(new ExtendedRookModel(side));
 
 		list.add(new ExtendedKnightModel(side));
 		list.add(new ExtendedKnightModel(side));
@@ -35,9 +35,9 @@ public class PieceEditor extends Editor {
 		list.add(new ExtendedBishopModel(side));
 		list.add(new ExtendedBishopModel(side));
 
-		list.add(new ExtendedQueenModel(side));
-
-		list.add(new ExtendedKingModel(side));
+//		list.add(new ExtendedQueenModel(side));
+//
+//		list.add(new ExtendedKingModel(side));
 		return list;
 	}
 
@@ -57,7 +57,7 @@ public class PieceEditor extends Editor {
 
 		// assign pieces randomly to player(s)
 		ExtendedPlayerModel player = new ExtendedPlayerModel(1,
-				list1.get(MetaUtil.randInt(0, 15)), "HARALD",
+				list1.get(MetaUtil.randInt(0, 3)), "HARALD",
 				MetaConfig.getIcon("HARALD"));
 		MetaConfig.getBoardModel().setPlayer(player);
 

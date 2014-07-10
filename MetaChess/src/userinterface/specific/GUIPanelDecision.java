@@ -16,7 +16,6 @@ public class GUIPanelDecision extends GUITile {
 
 	@Override
 	public void refresh() {
-		System.out.println("srtsr");
 		clearTile();
 		int k = 0;
 		// decision of piece
@@ -25,8 +24,6 @@ public class GUIPanelDecision extends GUITile {
 		for (String decision : playerPiece.getCooldownOfDecisions().keySet()) {
 			if (MetaConfig.getSpecialsSet().keySet().contains(decision)) {
 				addElement(new GTIcon((color + 1) % 2, this, 0, k, decision));
-				System.out.println(decision + " "
-						+ MetaConfig.getSpecialsSet().get(decision));
 				addElement(new GTNumber((color + 1) % 2, this, 1, k, MetaConfig
 						.getSpecialsSet().get(decision)));
 				addElement(new GTMetaActionCooldownTurnsActive((color + 1) % 2,

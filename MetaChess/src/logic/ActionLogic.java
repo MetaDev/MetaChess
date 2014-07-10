@@ -1,11 +1,14 @@
 package logic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import meta.MetaClock;
 import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
 import model.ExtendedKingModel;
+import model.ExtendedKnightModel;
 import model.ExtendedPawnModel;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
@@ -34,13 +37,9 @@ public class ActionLogic {
 		}
 		// diagonal or orthogonal step
 		if (MetaConfig.getDiagonalSet().containsKey(type)
-				|| MetaConfig.getOrthogonalSet().containsKey(type)) {
+				|| MetaConfig.getOrthogonalSet().containsKey(type)
+				|| MetaConfig.getHorseSet().containsKey(type)) {
 			step(type, model);
-			return;
-		}
-		// horse step
-		if (MetaConfig.getHorseSet().containsKey(type)) {
-			horseStep(type, model);
 			return;
 		}
 
@@ -78,15 +77,14 @@ public class ActionLogic {
 
 				// the model is a dragon knight or it isn't a sidestep
 				// and the target tile is occupied
-				// TODO dragon kills 1 fraction deep
 				if ((piece.isDragon() != 0) || !sideStep) {
 					return pieceKill(piece, pieceOnnewTile);
 
 				}
 				// either killed piece or stepped above it, move can be made
-				if(sideStep)
+				if (sideStep)
 					return true;
-	
+
 			}
 			// the piece on the new tile is from same side
 			else {
@@ -145,29 +143,57 @@ public class ActionLogic {
 			return true;
 		}
 		if (pieceOnnewTile.getSide() != pawnOrKing.getSide()) {
-			return pieceKill(pawnOrKing,pieceOnnewTile);
+			return pieceKill(pawnOrKing, pieceOnnewTile);
 		}
 		return false;
 	}
 
 	public static boolean movement(int i, int j, ExtendedPieceModel piece,
 			boolean isSideStep) {
-
+		List<ExtendedTileModel> path = null;
+		if (piece.isDragon() != 0) {
+			path = new ArrayList<>();
+		}
 		ExtendedTileModel previousTile = MetaConfig.getBoardModel()
 				.getPiecePosition(piece);
 		ExtendedTileModel newTile = BoardLogic.getTileNeighbour(previousTile,
-				i, j, BoardLogic.isHoover(), isSideStep,
-				piece.isPenetrateLowerFraction());
+				i, j, piece.isHoover(), isSideStep,
+				piece.isPenetrateLowerFraction(), path);
 		// movement did not succeed
 		if (newTile == null)
 			return false;
+
 		// handle influence
 		handleInfluence(piece);
-		// if there's a piece on the new tile and it's from the opposite team
+		
+		// if there's a piece on the new tile 
 		ExtendedPieceModel pieceOnnewTile = MetaConfig.getBoardModel()
 				.getModelOnPosition(newTile);
-		// move made
+		// check if there's a conflict with the state of the tile
 		if (handlePieceCollision(piece, pieceOnnewTile, isSideStep)) {
+			//check if a dragon didn't hoover over pieces on lower fraction
+			//no conflicts possible 
+			if (piece.isDragon() != 0) {
+				for(ExtendedTileModel tile: path){
+					// if there's a piece on the hoovered tile
+					ExtendedPieceModel pieceOnHooveredTile = MetaConfig.getBoardModel()
+							.getModelOnPosition(tile);
+					handlePieceCollision(piece, pieceOnHooveredTile, isSideStep);
+					//now check 1 fraction deeper
+					if(tile.getChildren()!=null){
+						//iterate over all children
+						for (int r = 0; r < tile.getChildren().length; r++) {
+							for (int c = 0; c < tile.getChildren().length; c++) {
+								// if there's a piece on the hoovered tile
+								ExtendedPieceModel pieceOnHooveredChildTile = MetaConfig.getBoardModel()
+										.getModelOnPosition(tile.getChildren()[r][c]);
+								handlePieceCollision(piece, pieceOnHooveredChildTile, isSideStep);
+								
+							}
+						}
+					}
+				}
+			}
 			// set new position for model
 			MetaConfig.getBoardModel().setPiecePosition(piece, newTile);
 			return true;
@@ -182,7 +208,7 @@ public class ActionLogic {
 		// influence, when moving king, check of first of
 		ExtendedTileModel kingPos = king.getTilePosition();
 		ExtendedTileModel newKingPos = BoardLogic.getTileNeighbour(kingPos,
-				direction[0], direction[1], true);
+				direction[0], direction[1], false, true, false, null);
 		// if the stepping model is a king, check if it's pawns can be moved
 		// with him
 
@@ -232,7 +258,8 @@ public class ActionLogic {
 						// would be occupied
 						ExtendedTileModel newPawnPos = BoardLogic
 								.getTileNeighbour(newKingPos, pawnPosInWall[0],
-										pawnPosInWall[1], true);
+										pawnPosInWall[1], false, true, false,
+										null);
 						// new pawn position not allowed
 						if (newPawnPos == null) {
 							return;
@@ -270,6 +297,7 @@ public class ActionLogic {
 			// king
 			handlePawnWallAndKingCollision(king, piecOnKingNewPos, king);
 			MetaConfig.getBoardModel().setPiecePosition(king, newKingPos);
+			// king is not influenced by itslef
 
 			// pawn wall
 			// if the king had one
@@ -281,6 +309,8 @@ public class ActionLogic {
 								collisionPieces[i], king);
 						MetaConfig.getBoardModel().setPiecePosition(
 								king.getPawnWall()[i], newPawnPositions[i]);
+						// handle influence
+						handleInfluence(king.getPawnWall()[i]);
 					}
 
 				}
@@ -292,31 +322,16 @@ public class ActionLogic {
 		int[] direction = MetaConfig.getDirectionArray(type, model);
 
 		if (model.getType() == PieceType.KING) {
+			// king movement is handled differently because of it's wall of
+			// pawns
 			ExtendedKingModel king = (ExtendedKingModel) model;
 			kingMovement(direction, king);
 
 		} else {
 			// normal movement
 			movement(direction[0] * model.getRange(),
-					direction[1] * model.getRange(), model, false);
-		}
-
-	}
-
-	// horsteStep
-	public static void horseStep(String type, ExtendedPieceModel model) {
-
-		String dir = type;
-
-		int[] direction = MetaConfig.getDirectionArray(dir, model);
-		// pick a random order of jumping
-		Random random = new Random();
-		if (random.nextBoolean()) {
-			if (movement(direction[0], 0, model, true))
-				movement(0, direction[1], model, false);
-		} else {
-			if (movement(0, direction[1], model, true))
-				movement(direction[0], 0, model, false);
+					direction[1] * model.getRange(), model,
+					model.isIgnoreOccupationOfTile());
 		}
 
 	}

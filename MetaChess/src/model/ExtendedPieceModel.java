@@ -23,6 +23,15 @@ public class ExtendedPieceModel {
 	// only the bishop will adapt this
 	protected int maxRange = 8;
 
+	protected boolean hoover=false;
+	public boolean isHoover() {
+		return hoover;
+	}
+
+	public void setHoover(boolean hoover) {
+		this.hoover = hoover;
+	}
+
 	// viewing doubles the view
 	public int getNrOfViewTiles() {
 		if (getTilePosition().getParent().getLevel() == 0) {
@@ -35,22 +44,14 @@ public class ExtendedPieceModel {
 	protected int range = 1;
 
 	protected boolean ignoreOccupationOfTile = false;
-	protected boolean showType=true;
-	protected boolean lethal=true;
+	protected boolean lethal = true;
+
 	public boolean isLethal() {
 		return lethal;
 	}
 
 	public void setLethal(boolean lethal) {
 		this.lethal = lethal;
-	}
-
-	public boolean isShowType() {
-		return showType;
-	}
-
-	public void setShowType(boolean showType) {
-		this.showType = showType;
 	}
 
 	protected boolean penetrateLowerFraction = false;
@@ -139,8 +140,9 @@ public class ExtendedPieceModel {
 						// fraction
 						entry.setValue(Math.max(
 								entry.getValue()
-										- (MetaClock.getMaxFraction() / position
-												.getAbsFraction()), 0));
+										- (Math.max(MetaClock.getMaxFraction()
+												/ position.getAbsFraction(), 1)),
+								0));
 						turnsActiveOfDecisions.put(entry.getKey(),
 								turnsActiveOfDecisions.get(entry.getKey()) - 1);
 					}
@@ -166,6 +168,10 @@ public class ExtendedPieceModel {
 		// unlock piece
 		locked = false;
 		absTime = MetaClock.getAbsoluteTime();
+	}
+
+	public int[][] getGrid() {
+		return MetaConfig.getIcon(type.name());
 	}
 
 	/*
