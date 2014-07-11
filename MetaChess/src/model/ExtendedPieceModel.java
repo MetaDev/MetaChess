@@ -119,7 +119,6 @@ public class ExtendedPieceModel {
 		// turn regretted decision non-active, and active turn=0 and regret them
 		for (Map.Entry<String, Boolean> entry : regrettedDecisions.entrySet()) {
 			if (entry.getValue()) {
-				System.out.println("regret");
 				keptDecisionCooldown.put(entry.getKey(), 0);
 				activeDecisions.put(entry.getKey(), false);
 				turnsActiveOfDecisions.put(entry.getKey(), 0);
@@ -196,7 +195,6 @@ public class ExtendedPieceModel {
 			} else {
 				// regret
 				if (!press) {
-					System.out.println("rege");
 					regret(regretOrDecision);
 				}
 				// decision
@@ -245,8 +243,6 @@ public class ExtendedPieceModel {
 	}
 
 	public void decideAndRegret(String inputSequence) {
-		if (!inputSequence.isEmpty())
-			System.out.println(inputSequence);
 		// no input, no decisions or regretes
 		// TODO: here can be saved wether a team makes at least 1 decision every
 		// main turn
@@ -265,7 +261,6 @@ public class ExtendedPieceModel {
 			String decisionName = MetaConfig.getKeyMapping().get(type)
 					.get(inputs[i].split(":")[1]);
 			String decisionType = inputs[i].split(":")[0];
-			System.out.println(inputs[i]);
 			if(decisionName!=null){
 				if (decisionType.equals("PRESS")) {
 					handlePressRelease(decisionName, true);

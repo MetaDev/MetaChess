@@ -4,11 +4,11 @@
 .classpath
 
 # Folders #
-MetaChess/dist
+#MetaChess/dist also push final dist#
 MetaChess/bin
 .metadata
 
 # Package Files #
-#*.jar the build file should be accesible too#0
+#*.jar the build file should be accesible too#
 *.war
 *.ear
