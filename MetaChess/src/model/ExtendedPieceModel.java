@@ -23,7 +23,8 @@ public class ExtendedPieceModel {
 	// only the bishop will adapt this
 	protected int maxRange = 8;
 
-	protected boolean hoover=false;
+	protected boolean hoover = false;
+
 	public boolean isHoover() {
 		return hoover;
 	}
@@ -118,6 +119,7 @@ public class ExtendedPieceModel {
 		// turn regretted decision non-active, and active turn=0 and regret them
 		for (Map.Entry<String, Boolean> entry : regrettedDecisions.entrySet()) {
 			if (entry.getValue()) {
+				System.out.println("regret");
 				keptDecisionCooldown.put(entry.getKey(), 0);
 				activeDecisions.put(entry.getKey(), false);
 				turnsActiveOfDecisions.put(entry.getKey(), 0);
@@ -129,9 +131,9 @@ public class ExtendedPieceModel {
 		ExtendedTileModel position = MetaConfig.getBoardModel()
 				.getPiecePosition(this);
 		int newFraction = position.getAbsFraction();
-		if (previousFraction <= newFraction) {
+		if (previousFraction == newFraction) {
 			// decrease cooldown of non-active decisions with cooldown, if on
-			// same fraction or higher as previous turn
+			// same fraction
 			for (Map.Entry<String, Integer> entry : cooldownOfDecisions
 					.entrySet()) {
 				if (!activeDecisions.get(entry.getKey())) {
@@ -168,6 +170,7 @@ public class ExtendedPieceModel {
 		// unlock piece
 		locked = false;
 		absTime = MetaClock.getAbsoluteTime();
+		previousFraction = newFraction;
 	}
 
 	public int[][] getGrid() {
@@ -178,8 +181,72 @@ public class ExtendedPieceModel {
 	 * makes decisions or regrets them based on the input And the current tile
 	 * standing on
 	 */
-	public void decideAndRegret(String inputSequence) {
+	public void handlePressRelease(String regretOrDecision, boolean press) {
+		// does this type contains this decision
+		if (regretOrDecision != null) {
+			// first handle if range change
+			if (MetaUtil.isNumeric(regretOrDecision)) {
+				int changeRange = MetaUtil.convertToInteger(regretOrDecision);
+				if (!press) {
+					range -= changeRange;
+				} else {
+					range += changeRange;
+				}
 
+			} else {
+				// regret
+				if (!press) {
+					System.out.println("rege");
+					regret(regretOrDecision);
+				}
+				// decision
+				if (press) {
+					// if the conditions: activity, cooldown and turn are
+					// okay
+					if (DecisionLogic.conditionsMet(regretOrDecision, this)) {
+						// lock if its a movement, unless under lowest
+						// fraction
+						if (MetaConfig
+								.getDirectionArray(regretOrDecision, this) != null
+								&& getTilePosition().getAbsFraction() <= MetaClock
+										.getMaxFraction()) {
+							locked = true;
+						}
+						decide(regretOrDecision);
+					}
+				}
+			}
+
+		}
+	}
+
+	public void handleDown(String keptDecision) {
+		if (MetaConfig.getKeyMapping().get(type).containsValue(keptDecision)) {
+
+			// if this decision is a special one and belongs to this piece
+			// type, don't redecide but
+			// increase cooldown and turnsactive
+			// the corresponding decision should already be active
+			if (MetaConfig.getSpecialsSet().containsKey(keptDecision)
+					&& MetaConfig.getKeyMapping().get(type)
+							.containsValue(keptDecision)) {
+				raiseCooldownAndTurnsActiveAfterTurn(keptDecision);
+			} else if (getTilePosition().getAbsFraction() <= MetaClock
+					.getMaxFraction()) {
+				// a movement
+				if (DecisionLogic.conditionsMet(keptDecision, this)) {
+					decide(keptDecision);
+					locked = true;
+				}
+
+			}
+
+		}
+	}
+
+	public void decideAndRegret(String inputSequence) {
+		if (!inputSequence.isEmpty())
+			System.out.println(inputSequence);
 		// no input, no decisions or regretes
 		// TODO: here can be saved wether a team makes at least 1 decision every
 		// main turn
@@ -189,85 +256,26 @@ public class ExtendedPieceModel {
 
 		String[] inputs = inputSequence.split(";");
 		int i = 0;
-		// regret or decide in pressed key
-		while (i < inputs.length
-				&& (inputs[i].startsWith("RELEASE") || inputs[i]
-						.startsWith("PRESS"))) {
+		// check all input and handle according type
+		while (i < inputs.length) {
 
 			// a key has been released
 			// always a single key
 			// translate key to decision
-			String regretOrDecision = MetaConfig.getKeyMapping().get(type)
+			String decisionName = MetaConfig.getKeyMapping().get(type)
 					.get(inputs[i].split(":")[1]);
-			// does this type contains this decision
-			if (regretOrDecision != null) {
-				// first handle if range change
-				if (MetaUtil.isNumeric(regretOrDecision)) {
-					int changeRange = MetaUtil
-							.convertToInteger(regretOrDecision);
-					if (inputs[i].startsWith("RELEASE")) {
-						range -= changeRange;
-					} else if (inputs[i].startsWith("PRESS")) {
-						range += changeRange;
-					}
-
-				} else {
-					// regret
-					if (inputs[i].startsWith("RELEASE")) {
-						regret(regretOrDecision);
-					}
-					// decision
-					if (inputs[i].startsWith("PRESS")) {
-						// if the conditions: activity, cooldown and turn are
-						// okay
-						if (DecisionLogic.conditionsMet(regretOrDecision, this)) {
-							// lock if its a movement, unless under lowest
-							// fraction
-							if (MetaConfig.getDirectionArray(regretOrDecision,
-									this) != null
-									&& getTilePosition().getAbsFraction() <= MetaClock
-											.getMaxFraction()) {
-								locked = true;
-							}
-							decide(regretOrDecision);
-						}
-					}
+			String decisionType = inputs[i].split(":")[0];
+			System.out.println(inputs[i]);
+			if(decisionName!=null){
+				if (decisionType.equals("PRESS")) {
+					handlePressRelease(decisionName, true);
+				} else if (decisionType.equals("RELEASE")) {
+					handlePressRelease(decisionName, false);
+				} else if (decisionType.equals("DOWN")) {
+					handleDown(decisionName);
 				}
-
 			}
-			// skip seen input
 			i++;
-		}
-
-		String keptDecision = "";
-		// save the largest cooldown when a decision is kept
-		// or redecide if a movement is being held down
-		for (; i < inputs.length; i++) {
-			keptDecision = MetaConfig.getKeyMapping().get(type)
-					.get(inputs[i].split(":")[1]);
-			if (MetaConfig.getKeyMapping().get(type)
-					.containsValue(keptDecision)) {
-
-				// if this decision is a special one and belongs to this piece
-				// type, don't redecide but
-				// increase cooldown and turnsactive
-				// the corresponding decision should already be active
-				if (MetaConfig.getSpecialsSet().containsKey(keptDecision)
-						&& MetaConfig.getKeyMapping().get(type)
-								.containsValue(keptDecision)) {
-					raiseCooldownAndTurnsActiveAfterTurn(keptDecision);
-				} else if (getTilePosition().getAbsFraction() <= MetaClock
-						.getMaxFraction()) {
-					// a movement
-					if (DecisionLogic.conditionsMet(keptDecision, this)) {
-						decide(keptDecision);
-						locked = true;
-					}
-
-				}
-
-			}
-
 		}
 
 	}
