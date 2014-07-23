@@ -19,7 +19,7 @@ import model.paramobjects.ParamObject;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.Color;
 
-import userinterface.generic.IconLoader;
+import userinterface.init.IconLoader;
 import view.renderer.BoardRenderer;
 import view.renderer.GUIRenderer;
 

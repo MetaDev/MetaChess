@@ -4,7 +4,6 @@ import meta.MetaConfig;
 import meta.MetaConfig.GUIPosition;
 import model.ExtendedGUI;
 import userinterface.generic.GUITile;
-import userinterface.specific.GTTurn;
 import userinterface.specific.GUIPanelDecision;
 import userinterface.specific.GUIPanelStats;
 

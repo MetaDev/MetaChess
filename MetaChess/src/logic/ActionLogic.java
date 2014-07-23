@@ -2,13 +2,11 @@ package logic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import meta.MetaClock;
 import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
 import model.ExtendedKingModel;
-import model.ExtendedKnightModel;
 import model.ExtendedPawnModel;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;

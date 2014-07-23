@@ -1,8 +1,7 @@
-package userinterface.generic;
+package userinterface.init;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
+import java.io.InputStream;
 
 import meta.MetaConfig;
 
@@ -55,38 +54,27 @@ public class IconLoader {
 			MetaConfig.setIcon("PLAYERTURN", icon);
 			icon = stringToDrawing(readFile("res/bitgrid/dragon.txt"));
 			MetaConfig.setIcon("DRAGON", icon);
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-	}
 
-	
-	
+	}
 
 	private static String readFile(String pathname) throws IOException {
-
-	    File file = new File(pathname);
-	    StringBuilder fileContents = new StringBuilder((int)file.length());
-	    Scanner scanner = new Scanner(file);
-	    String lineSeparator = System.getProperty("line.separator");
-
-	    try {
-	        while(scanner.hasNextLine()) {        
-	            fileContents.append(scanner.nextLine() + lineSeparator);
-	        }
-	        return fileContents.toString();
-	    } finally {
-	        scanner.close();
-	    }
+		InputStream inputStream = IconLoader.class.getClassLoader()
+				.getResourceAsStream(pathname);
+		try (java.util.Scanner s = new java.util.Scanner(inputStream)) {
+			return s.useDelimiter("\\A").hasNext() ? s.next() : "";
+		}
 	}
+
 	public static int[][] stringToDrawing(String text) {
 		String[] rows = text.split("\n");
 		int[][] drawing = null;
 		for (int i = 0; i < rows.length; i++) {
-			
+
 			String row = rows[i];
 			for (int j = 0; j < rows.length; j++) {
 				if (drawing == null) {

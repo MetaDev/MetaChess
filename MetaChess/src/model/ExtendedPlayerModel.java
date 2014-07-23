@@ -6,7 +6,6 @@ import logic.BoardLogic;
 import meta.MetaConfig;
 import meta.MetaConfig.GUIPosition;
 import meta.MetaConfig.PieceType;
-import meta.MetaUtil;
 
 //contains all info about player
 public class ExtendedPlayerModel {
