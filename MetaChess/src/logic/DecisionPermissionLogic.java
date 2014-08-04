@@ -7,26 +7,9 @@ import meta.MetaConfig;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
 
-public class DecisionLogic {
+public class DecisionPermissionLogic {
 
-	// if it's a special decision, define positive, else not
-	public static void decide(String name, ExtendedPieceModel model) {
-		if (MetaConfig.getSpecialsSet().keySet().contains(name)) {
-			ActionLogic.decisionMediator(1, name, model);
-		} else {
-			ActionLogic.decisionMediator(7, name, model);
-		}
-	}
-
-	// if it's a special decision, define negative, movement decision aren't
-	// regretted
-	public static void regret(String name, ExtendedPieceModel model) {
-		if (MetaConfig.getSpecialsSet().keySet().contains(name)) {
-			ActionLogic.decisionMediator(0, name, model);
-		}
-
-	}
-
+	
 	// add this cooldown after every turn that the decision is active
 	public static int getCooldown(int tileFraction, int range) {
 		return range * Math.max(MetaClock.getMaxFraction() / tileFraction, 1);
@@ -35,19 +18,23 @@ public class DecisionLogic {
 	public static int getCooldown(int[] tileFractions, int range) {
 		int cooldown = 0;
 		for (int i = 0; i < tileFractions.length; i++) {
-			cooldown += range
-					* Math.max(MetaClock.getMaxFraction() / tileFractions[i], 1);
+			// for the moment the range doesn't influence the type of decision
+			// neither the cooldown
+			// cooldown += range
+			// * Math.max(MetaClock.getMaxFraction() / tileFractions[i], 1);
+			cooldown += 1 * Math.max(MetaClock.getMaxFraction()
+					/ tileFractions[i], 1);
 		}
 		return cooldown;
 	}
 
 	// get effect from decision, based on side
-	//0 means same side-> friendly, 1 means oppisite
+	// 0 means same side-> friendly, 1 means oppisite
 	public static int getEffect(int balance, int influence, int friendly) {
-		if(friendly==0){
-			return influence-balance;
+		if (friendly == 0) {
+			return influence - balance;
 		}
-		return -1*(balance-influence);
+		return -1 * (balance - influence);
 	}
 
 	// returns wether the decision is still active based on the current

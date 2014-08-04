@@ -1,5 +1,6 @@
 package model;
 
+import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
 
 public class ExtendedBishopModel extends ExtendedPieceModel {
@@ -14,11 +15,12 @@ public class ExtendedBishopModel extends ExtendedPieceModel {
 	public int getRogue() {
 		return rogue;
 	}
+	//use the range for gradually stronger rogue modes
 
 	@Override
-	public void setRogue(int rogue) {
-		// go rogue
-		if (rogue != 0) {
+	public void setRogue(int decideOrRegret) {
+		// go rogue 
+		if (!MetaConfig.hasRegret(decideOrRegret)) {
 			//pass through pieces
 			ignoreOccupationOfTile = true;
 			//allow penetration of lower fractioned tiles

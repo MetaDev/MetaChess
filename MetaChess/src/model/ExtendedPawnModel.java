@@ -1,10 +1,12 @@
 package model;
 
+import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
 
 public class ExtendedPawnModel extends ExtendedPieceModel {
 	private int turn = 0;
-	private boolean bound=false;
+	private boolean bound = false;
+
 	public boolean isBound() {
 		return bound;
 	}
@@ -27,12 +29,16 @@ public class ExtendedPawnModel extends ExtendedPieceModel {
 		return 1 + influencedMaxRange;
 	}
 
+	// only change turn on the decision
+
 	@Override
-	public void setTurn(int test) {
-		this.turn = (this.turn + 2) % 8;
+	public void setTurn(int decideOrRegret) {
+		if (!MetaConfig.hasRegret(decideOrRegret))
+			this.turn = (this.turn + 2) % 8;
 	}
+
 	@Override
-	public int getTurn(){
+	public int getTurn() {
 		return turn;
 	}
 
@@ -43,6 +49,5 @@ public class ExtendedPawnModel extends ExtendedPieceModel {
 		}
 		return 4 + influencedTileView;
 	}
-	
 
 }

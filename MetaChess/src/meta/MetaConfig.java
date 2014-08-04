@@ -9,10 +9,11 @@ import logic.BoardLogic;
 import model.ExtendedBoardModel;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
+import model.paramobjects.POCommand;
 import model.paramobjects.PODragon;
-import model.paramobjects.POMaxRange;
+import model.paramobjects.POHorizon;
+import model.paramobjects.PORogue;
 import model.paramobjects.POSwitch;
-import model.paramobjects.POTileView;
 import model.paramobjects.POTurn;
 import model.paramobjects.ParamObject;
 
@@ -38,7 +39,11 @@ public class MetaConfig {
 	// map String "MetaAction name, number , char" to icons for GUI and board
 	// representation
 	private static Map<String, int[][]> decisionsIcons = new HashMap<>();
-
+	public static int DECIDE=1;
+	public static int REGRET=-1;
+	public static boolean hasRegret(int param){
+		return param<0;
+	}
 	// mapping of range keys
 	private static Map<Integer, Integer> rangeKeys = new HashMap<>();
 
@@ -247,12 +252,12 @@ public class MetaConfig {
 		horseList.add(new int[] { -2, 1 });
 		horseSet = mapDirections(horseList);
 		// fill specialset with
-		specialsSet.put("HORIZON", new POTileView());
-		specialsSet.put("ROGUE", new POMaxRange());
+		specialsSet.put("HORIZON", new POHorizon());
+		specialsSet.put("ROGUE", new PORogue());
 		specialsSet.put("DRAGON", new PODragon());
 		specialsSet.put("TURN", new POTurn());
 		specialsSet.put("SWITCH", new POSwitch());
-		//TODO rogue for bischop and command for king
+		specialsSet.put("COMMAND", new POCommand());
 		// map to initial keymapping
 
 		// special decisions
@@ -268,9 +273,9 @@ public class MetaConfig {
 		map = new HashMap<>();
 		map.put(Keyboard.KEY_SPACE + "", "TURN");
 		setKeyMappingForPiece(PieceType.PAWN, map);
-//		map = new HashMap<>();
-//		map.put(Keyboard.KEY_SPACE + "", "RANGED");
-//		setKeyMappingForPiece(PieceType.KING, map);
+		map = new HashMap<>();
+		map.put(Keyboard.KEY_SPACE + "", "COMMAND");
+		setKeyMappingForPiece(PieceType.KING, map);
 		// range
 		map = new HashMap<>();
 		map.put(Keyboard.KEY_NUMPAD1 + "", "1");

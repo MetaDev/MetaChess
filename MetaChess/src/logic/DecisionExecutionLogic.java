@@ -1,7 +1,9 @@
 package logic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import meta.MetaClock;
 import meta.MetaConfig;
@@ -15,7 +17,7 @@ import network.NetworkMessages;
 import network.client.MetaClient;
 
 //geef builder mee omdat controller het hele object moet kunnen vernietigen
-public class ActionLogic {
+public class DecisionExecutionLogic {
 
 	public static void decisionMediator(int decideOrRegret, String type,
 			ExtendedPieceModel model) {
@@ -54,8 +56,8 @@ public class ActionLogic {
 		if (king != null) {
 			// king found, in range?
 			if (BoardLogic.isInrange(piece, king)) {
-				int effect = DecisionLogic.getEffect(king.getBalance(),
-						king.getInfluence(),
+				int effect = DecisionPermissionLogic.getEffect(
+						king.getBalance(), king.getInfluence(),
 						(king.getSide() + piece.getSide()) % 2);
 				// set influence of king
 				piece.setInfluence(effect);
@@ -122,6 +124,39 @@ public class ActionLogic {
 
 	}
 
+	// return new positions of pawns in wall if allowed
+	// if not return null
+	public static Map<ExtendedPawnModel, ExtendedTileModel> handlePawnAndKingTurnCollision(
+			ExtendedKingModel king, int newPawnHeadPos) {
+		// find new position based on new pawn head position
+		// check if new position isn't occupied or outside of board
+		Map<ExtendedPawnModel, ExtendedTileModel> newPositions = new HashMap<>();
+		for (int i = 0; i < 8; i++) {
+			ExtendedPawnModel pawn = king.getPawnWall()[i];
+			if (pawn != null) {
+				// new direction
+				String newDirection = MetaConfig.getDirectionWithTurn(
+						MetaConfig.getDirectionWithIndex(i), newPawnHeadPos);
+				int[] dir = MetaConfig.getDirectionArray(newDirection, pawn);
+				ExtendedTileModel newPawnPosition = BoardLogic
+						.getTileNeighbour(pawn.getTilePosition(), dir[0],
+								dir[1]);
+
+				if (handlePawnWallAndKingCollision(pawn, MetaConfig
+						.getBoardModel().getModelOnPosition(newPawnPosition),
+						king)) {
+					// add new position
+					newPositions.put(pawn, newPawnPosition);
+				} else {
+					return null;
+				}
+			}
+		}
+		if (!newPositions.isEmpty())
+			return newPositions;
+		return null;
+	}
+
 	// collision for the king and his wall are handled slightly differently, as
 	// in that collision between them is allowed, because they all move in the
 	// same direction
@@ -130,9 +165,6 @@ public class ActionLogic {
 			ExtendedKingModel king) {
 		// move is legal if new tile is empty, ocuppied by
 		// opponent or this king or a pawn in the wall from our side
-		if (!pawnOrKing.isLethal()) {
-			return false;
-		}
 		if (pieceOnnewTile == null
 				|| pieceOnnewTile == king
 				|| (pieceOnnewTile.getType() == PieceType.PAWN
@@ -140,6 +172,12 @@ public class ActionLogic {
 						.getIndexOfPawnInWallOnBoard((ExtendedPawnModel) pieceOnnewTile) != -1)) {
 			return true;
 		}
+		// if the position isn't free and the piece isn't lethal, the move can't
+		// be made
+		if (!pawnOrKing.isLethal()) {
+			return false;
+		}
+		// if lethal and from different side, kill piece
 		if (pieceOnnewTile.getSide() != pawnOrKing.getSide()) {
 			return pieceKill(pawnOrKing, pieceOnnewTile);
 		}
@@ -163,30 +201,32 @@ public class ActionLogic {
 
 		// handle influence
 		handleInfluence(piece);
-		
-		// if there's a piece on the new tile 
+
+		// if there's a piece on the new tile
 		ExtendedPieceModel pieceOnnewTile = MetaConfig.getBoardModel()
 				.getModelOnPosition(newTile);
 		// check if there's a conflict with the state of the tile
 		if (handlePieceCollision(piece, pieceOnnewTile, isSideStep)) {
-			//check if a dragon didn't hoover over pieces on lower fraction
-			//no conflicts possible 
+			// check if a dragon didn't hoover over pieces on lower fraction
+			// no conflicts possible
 			if (piece.isDragon() != 0) {
-				for(ExtendedTileModel tile: path){
+				for (ExtendedTileModel tile : path) {
 					// if there's a piece on the hoovered tile
-					ExtendedPieceModel pieceOnHooveredTile = MetaConfig.getBoardModel()
-							.getModelOnPosition(tile);
+					ExtendedPieceModel pieceOnHooveredTile = MetaConfig
+							.getBoardModel().getModelOnPosition(tile);
 					handlePieceCollision(piece, pieceOnHooveredTile, isSideStep);
-					//now check 1 fraction deeper
-					if(tile.getChildren()!=null){
-						//iterate over all children
+					// now check 1 fraction deeper
+					if (tile.getChildren() != null) {
+						// iterate over all children
 						for (int r = 0; r < tile.getChildren().length; r++) {
 							for (int c = 0; c < tile.getChildren().length; c++) {
 								// if there's a piece on the hoovered tile
-								ExtendedPieceModel pieceOnHooveredChildTile = MetaConfig.getBoardModel()
-										.getModelOnPosition(tile.getChildren()[r][c]);
-								handlePieceCollision(piece, pieceOnHooveredChildTile, isSideStep);
-								
+								ExtendedPieceModel pieceOnHooveredChildTile = MetaConfig
+										.getBoardModel().getModelOnPosition(
+												tile.getChildren()[r][c]);
+								handlePieceCollision(piece,
+										pieceOnHooveredChildTile, isSideStep);
+
 							}
 						}
 					}

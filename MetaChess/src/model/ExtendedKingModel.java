@@ -1,5 +1,9 @@
 package model;
 
+import java.util.Map;
+
+import logic.DecisionExecutionLogic;
+import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
 
 public class ExtendedKingModel extends ExtendedPieceModel {
@@ -35,20 +39,24 @@ public class ExtendedKingModel extends ExtendedPieceModel {
 		wallSize--;
 		pawn.setBound(false);
 	}
+
 	public void removePawnFromWall(ExtendedPawnModel pawn) {
 		pawnWall[indexInWall(pawn)] = null;
 		wallSize--;
 		pawn.setBound(false);
 	}
+
 	public int getIndexOfPawnInWallOnBoard(ExtendedPawnModel pawn) {
 		return (pawnWallHeadPos + indexInWall(pawn)) % 8;
 	}
+
 	public int getIndexOfPawnInWallOnBoard(int index) {
 		return (pawnWallHeadPos + index) % 8;
 	}
+
 	private int indexInWall(ExtendedPawnModel pawn) {
 		for (int i = 0; i < 8; i++) {
-			if (pawnWall[i]!=null &&pawnWall[i].equals(pawn)) {
+			if (pawnWall[i] != null && pawnWall[i].equals(pawn)) {
 				return i;
 			}
 		}
@@ -59,8 +67,34 @@ public class ExtendedKingModel extends ExtendedPieceModel {
 		return pawnWallHeadPos;
 	}
 
-	public void setPawnWallHeadPos(int pawnWallHeadPos) {
-		this.pawnWallHeadPos = pawnWallHeadPos;
+	@Override
+	public void setCommand(int decideOrRegret) {
+		if (!MetaConfig.hasRegret(decideOrRegret)) {
+			if (wallSize != 0) {
+				setPawnWallHeadPos();
+			} else {
+				setBalance();
+			}
+		}
+
+	}
+
+	@Override
+	public int getCommand() {
+		return wallSize;
+	}
+
+	public void setPawnWallHeadPos() {
+		int newPawnHeadPos = (this.pawnWallHeadPos + getRange()) % 8;
+		Map<ExtendedPawnModel, ExtendedTileModel> newPositions = DecisionExecutionLogic
+				.handlePawnAndKingTurnCollision(this, newPawnHeadPos);
+		if (newPositions != null) {
+			this.pawnWallHeadPos = newPawnHeadPos;
+			//move all pawns 
+			for(ExtendedPawnModel pawn: newPositions.keySet()){
+				pawn.setTilePosition(newPositions.get(pawn));
+			}
+		}
 	}
 
 	// the model is thinking about a decision
@@ -105,8 +139,8 @@ public class ExtendedKingModel extends ExtendedPieceModel {
 		return balance;
 	}
 
-	public void setBalance(int balance) {
-		this.balance = balance;
+	public void setBalance() {
+		this.balance = (this.balance + getRange()) % 8;
 	}
 
 	public int getInfluence() {

@@ -11,7 +11,7 @@ public class POTileView implements ParamObject{
 
 	@Override
 	public void setParam(int param) {
-		 MetaConfig.getBoardModel().getPlayer().getControlledModel().setViewing(param);
+		 MetaConfig.getBoardModel().getPlayer().getControlledModel().setNrOfViewTiles(param);
 	}
 
 }

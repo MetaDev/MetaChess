@@ -15,9 +15,9 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
 		return dragon;
 	}
 	@Override
-	public void setDragon(int dragon) {
-		this.dragon = dragon;
-		if (dragon != 0) {
+	public void setDragon(int decideOrRegret) {
+		this.dragon = decideOrRegret;
+		if (!MetaConfig.hasRegret(decideOrRegret)) {
 			//if a dragon the piece can step over a tile and kill pieces in the fractioned tile in the proces
 			hoover=true;
 		}else{
@@ -26,7 +26,7 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
 	}
 	@Override
 	public int[][] getGrid() {
-		if (dragon != 0) {
+		if (!MetaConfig.hasRegret(dragon)) {
 			return MetaConfig.getIcon("DRAGON");
 		}else{
 			return super.getGrid();

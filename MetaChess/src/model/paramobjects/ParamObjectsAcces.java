@@ -4,7 +4,6 @@ public class ParamObjectsAcces {
 	private static ParamObject poView;
 	private static ParamObject poMovement;
 	private static ParamObject poLives;
-	private static ParamObject poAffectedTiles;
 	private static ParamObject poNrOfTurn;
 
 	public static ParamObject getPOView() {

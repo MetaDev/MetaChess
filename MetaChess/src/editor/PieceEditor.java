@@ -7,6 +7,7 @@ import logic.BoardLogic;
 import logic.PieceLogic;
 import meta.MetaClock;
 import meta.MetaConfig;
+import meta.MetaConfig.PieceType;
 import meta.MetaUtil;
 import model.ExtendedBishopModel;
 import model.ExtendedKingModel;
@@ -26,16 +27,16 @@ public class PieceEditor extends Editor {
 			list.add(new ExtendedPawnModel(side));
 		}
 
-		list.add(new ExtendedRookModel(side));
-		list.add(new ExtendedRookModel(side));
-
-		list.add(new ExtendedKnightModel(side));
-		list.add(new ExtendedKnightModel(side));
-
-		list.add(new ExtendedBishopModel(side));
-		list.add(new ExtendedBishopModel(side));
-
-		list.add(new ExtendedQueenModel(side));
+		// list.add(new ExtendedRookModel(side));
+		// list.add(new ExtendedRookModel(side));
+		//
+		// list.add(new ExtendedKnightModel(side));
+		// list.add(new ExtendedKnightModel(side));
+		//
+		// list.add(new ExtendedBishopModel(side));
+		// list.add(new ExtendedBishopModel(side));
+		//
+		// list.add(new ExtendedQueenModel(side));
 
 		list.add(new ExtendedKingModel(side));
 		return list;
@@ -56,9 +57,12 @@ public class PieceEditor extends Editor {
 		initPiecePosition(list0);
 
 		// assign pieces randomly to player(s)
-		ExtendedPlayerModel player = new ExtendedPlayerModel(1,
-				list1.get(MetaUtil.randInt(0, 3)), "HARALD",
-				MetaConfig.getIcon("HARALD"));
+		// ExtendedPlayerModel player = new ExtendedPlayerModel(1,
+		// list1.get(MetaUtil.randInt(0, 3)), "HARALD",
+		// MetaConfig.getIcon("HARALD"));
+		ExtendedPlayerModel player = new ExtendedPlayerModel(1, MetaConfig
+				.getBoardModel().getPieceByTypeAndSide(PieceType.KING, 0),
+				"HARALD", MetaConfig.getIcon("HARALD"));
 		MetaConfig.getBoardModel().setPlayer(player);
 
 	}

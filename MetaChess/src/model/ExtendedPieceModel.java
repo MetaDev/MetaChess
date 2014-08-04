@@ -3,7 +3,8 @@ package model;
 import java.util.HashMap;
 import java.util.Map;
 
-import logic.DecisionLogic;
+import logic.DecisionExecutionLogic;
+import logic.DecisionPermissionLogic;
 import meta.MetaClock;
 import meta.MetaConfig;
 import meta.MetaConfig.PieceType;
@@ -40,6 +41,10 @@ public class ExtendedPieceModel {
 		}
 		return Math.min((8 + influencedTileView) * (1 + viewing),
 				getTilePosition().getAbsFraction() / 2);
+	}
+
+	public void setNrOfViewTiles(int param) {
+		// do nothing
 	}
 
 	protected int range = 1;
@@ -122,7 +127,8 @@ public class ExtendedPieceModel {
 				keptDecisionCooldown.put(entry.getKey(), 0);
 				activeDecisions.put(entry.getKey(), false);
 				turnsActiveOfDecisions.put(entry.getKey(), 0);
-				DecisionLogic.regret(entry.getKey(), this);
+				DecisionExecutionLogic.decisionMediator(MetaConfig.REGRET,
+						entry.getKey(), this);
 				// remove from regretted list
 				entry.setValue(false);
 			}
@@ -201,7 +207,8 @@ public class ExtendedPieceModel {
 				if (press) {
 					// if the conditions: activity, cooldown and turn are
 					// okay
-					if (DecisionLogic.conditionsMet(regretOrDecision, this)) {
+					if (DecisionPermissionLogic.conditionsMet(regretOrDecision,
+							this)) {
 						// lock if its a movement, unless under lowest
 						// fraction
 						if (MetaConfig
@@ -232,7 +239,7 @@ public class ExtendedPieceModel {
 			} else if (getTilePosition().getAbsFraction() <= MetaClock
 					.getMaxFraction()) {
 				// a movement
-				if (DecisionLogic.conditionsMet(keptDecision, this)) {
+				if (DecisionPermissionLogic.conditionsMet(keptDecision, this)) {
 					decide(keptDecision);
 					locked = true;
 				}
@@ -261,7 +268,7 @@ public class ExtendedPieceModel {
 			String decisionName = MetaConfig.getKeyMapping().get(type)
 					.get(inputs[i].split(":")[1]);
 			String decisionType = inputs[i].split(":")[0];
-			if(decisionName!=null){
+			if (decisionName != null) {
 				if (decisionType.equals("PRESS")) {
 					handlePressRelease(decisionName, true);
 				} else if (decisionType.equals("RELEASE")) {
@@ -278,8 +285,8 @@ public class ExtendedPieceModel {
 	private void raiseCooldownAndTurnsActiveNow(String decision) {
 		ExtendedTileModel position = MetaConfig.getBoardModel()
 				.getPiecePosition(this);
-		cooldownOfDecisions.put(decision,
-				DecisionLogic.getCooldown(position.getAbsFraction(), range));
+		cooldownOfDecisions.put(decision, DecisionPermissionLogic.getCooldown(
+				position.getAbsFraction(), range));
 		turnsActiveOfDecisions.put(decision, 1);
 	}
 
@@ -287,8 +294,8 @@ public class ExtendedPieceModel {
 	private void raiseCooldownAndTurnsActiveAfterTurn(String decision) {
 		ExtendedTileModel position = MetaConfig.getBoardModel()
 				.getPiecePosition(this);
-		keptDecisionCooldown.put(decision, Math.max(
-				DecisionLogic.getCooldown(position.getAbsFraction(), range),
+		keptDecisionCooldown.put(decision, Math.max(DecisionPermissionLogic
+				.getCooldown(position.getAbsFraction(), range),
 				keptDecisionCooldown.get(decision)));
 	}
 
@@ -305,14 +312,19 @@ public class ExtendedPieceModel {
 	// handle the decision
 	// set initial cooldown, set active, set turnsactive to 1
 	public void decide(String decision) {
-		DecisionLogic.decide(decision, this);
-		// if it's a movent decision no cooldown is added or made active on the
-		// model
-		if (MetaConfig.getSpecialsSet().keySet().contains(decision)) {
-			activeDecisions.put(decision, true);
-			// initial cooldown is payed directly
-			raiseCooldownAndTurnsActiveNow(decision);
+		if (DecisionPermissionLogic.conditionsMet(decision, this)) {
+			DecisionExecutionLogic.decisionMediator(MetaConfig.DECIDE,
+					decision, this);
+			// if it's a movent decision no cooldown is added or made active on
+			// the
+			// model
+			if (MetaConfig.getSpecialsSet().keySet().contains(decision)) {
+				activeDecisions.put(decision, true);
+				// initial cooldown is payed directly
+				raiseCooldownAndTurnsActiveNow(decision);
+			}
 		}
+
 	}
 
 	// executes incoming decision from server
@@ -326,7 +338,7 @@ public class ExtendedPieceModel {
 	// dDecisionLogic.decide(decision,this);
 	// }
 
-	public boolean isMetaActionActive(DecisionLogic metaAction) {
+	public boolean isMetaActionActive(DecisionPermissionLogic metaAction) {
 		return activeDecisions.get(metaAction);
 	}
 
@@ -438,6 +450,10 @@ public class ExtendedPieceModel {
 		return MetaConfig.getBoardModel().getPiecePosition(this);
 	}
 
+	public void setTilePosition(ExtendedTileModel tile) {
+		MetaConfig.getBoardModel().setPiecePosition(this, tile);
+	}
+
 	public String getPendingDecision() {
 		return null;
 	}
@@ -490,4 +506,11 @@ public class ExtendedPieceModel {
 		// do nothing
 	}
 
+	public int getCommand() {
+		return 0;
+	}
+
+	public void setCommand(int decideOrRegret) {
+		// do nothing;
+	}
 }

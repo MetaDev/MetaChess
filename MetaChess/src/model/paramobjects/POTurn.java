@@ -12,7 +12,7 @@ public class POTurn implements ParamObject {
 
 	@Override
 	public void setParam(int param) {
-		if (param != 0)
+		//only change if the key is pressed
 			MetaConfig.getBoardModel().getPlayer().getControlledModel()
 					.setTurn(param);
 	}
