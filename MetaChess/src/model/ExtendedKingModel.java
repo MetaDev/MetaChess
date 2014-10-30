@@ -24,12 +24,9 @@ public class ExtendedKingModel extends ExtendedPieceModel {
 		return wallSize;
 	}
 
-	public ExtendedPawnModel[] getPawnWall() {
-		return pawnWall;
-	}
-
-	public void addPawnToWall(ExtendedPawnModel pawn, int index) {
-		pawnWall[index] = pawn;
+	
+	public void addPawnToWallWithBoardIndex(ExtendedPawnModel pawn, int boardIndex) {
+		pawnWall[getWallIndexOfPawnFromBoard(boardIndex)] = pawn;
 		wallSize++;
 		pawn.setBound(true);
 	}
@@ -47,11 +44,26 @@ public class ExtendedKingModel extends ExtendedPieceModel {
 	}
 
 	public int getIndexOfPawnInWallOnBoard(ExtendedPawnModel pawn) {
-		return (pawnWallHeadPos + indexInWall(pawn)) % 8;
+		int indexInWall = indexInWall(pawn);
+		// pawn not in wall
+		if (indexInWall == -1) {
+			return -1;
+		}
+		return (pawnWallHeadPos + indexInWall) % 8;
 	}
 
-	public int getIndexOfPawnInWallOnBoard(int index) {
-		return (pawnWallHeadPos + index) % 8;
+	public ExtendedPawnModel getPawnFromBoardIndex(int boardIndex) {
+		return pawnWall[getWallIndexOfPawnFromBoard(boardIndex)];
+	}
+	public ExtendedPawnModel getPawnFromWallIndex(int wallIndex) {
+		return pawnWall[wallIndex];
+	}
+	public int getBoardIndexOfPawnInWall(int wallIndex) {
+		return (pawnWallHeadPos + wallIndex) % 8;
+	}
+
+	public int getWallIndexOfPawnFromBoard(int boardIndex) {
+		return (boardIndex - pawnWallHeadPos+8) % 8;
 	}
 
 	private int indexInWall(ExtendedPawnModel pawn) {
@@ -81,7 +93,11 @@ public class ExtendedKingModel extends ExtendedPieceModel {
 
 	@Override
 	public int getCommand() {
-		return wallSize;
+		if (wallSize != 0) {
+			return getPawnWallHeadPos();
+		} else {
+			return getBalance();
+		}
 	}
 
 	public void setPawnWallHeadPos() {
@@ -90,25 +106,11 @@ public class ExtendedKingModel extends ExtendedPieceModel {
 				.handlePawnAndKingTurnCollision(this, newPawnHeadPos);
 		if (newPositions != null) {
 			this.pawnWallHeadPos = newPawnHeadPos;
-			//move all pawns 
-			for(ExtendedPawnModel pawn: newPositions.keySet()){
+			// move all pawns
+			for (ExtendedPawnModel pawn : newPositions.keySet()) {
 				pawn.setTilePosition(newPositions.get(pawn));
 			}
 		}
-	}
-
-	// the model is thinking about a decision
-	private String pendingDecision;
-	// direction for ranged decision
-	private String direction;
-
-	@Override
-	public String getPendingDecision() {
-		return pendingDecision;
-	}
-
-	public void setPendingDecision(String pendingDecision) {
-		this.pendingDecision = pendingDecision;
 	}
 
 	public ExtendedKingModel(int side) {
@@ -116,23 +118,8 @@ public class ExtendedKingModel extends ExtendedPieceModel {
 	}
 
 	@Override
-	public int getRange() {
+	public int getMovementRange() {
 		return 1;
-	}
-
-	@Override
-	public int getMaxRange() {
-		return 1;
-	}
-
-	@Override
-	public void setDirection(String direction) {
-		this.direction = direction;
-	}
-
-	@Override
-	public String getDirection() {
-		return direction;
 	}
 
 	public int getBalance() {

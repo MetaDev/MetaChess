@@ -27,16 +27,16 @@ public class PieceEditor extends Editor {
 			list.add(new ExtendedPawnModel(side));
 		}
 
-		// list.add(new ExtendedRookModel(side));
-		// list.add(new ExtendedRookModel(side));
-		//
-		// list.add(new ExtendedKnightModel(side));
-		// list.add(new ExtendedKnightModel(side));
-		//
-		// list.add(new ExtendedBishopModel(side));
-		// list.add(new ExtendedBishopModel(side));
-		//
-		// list.add(new ExtendedQueenModel(side));
+		 list.add(new ExtendedRookModel(side));
+		 list.add(new ExtendedRookModel(side));
+		
+		 list.add(new ExtendedKnightModel(side));
+		 list.add(new ExtendedKnightModel(side));
+		
+		 list.add(new ExtendedBishopModel(side));
+		 list.add(new ExtendedBishopModel(side));
+		
+		 list.add(new ExtendedQueenModel(side));
 
 		list.add(new ExtendedKingModel(side));
 		return list;

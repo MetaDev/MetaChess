@@ -1,6 +1,7 @@
 package logic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +40,10 @@ public class DecisionExecutionLogic {
 		if (MetaConfig.getDiagonalSet().containsKey(type)
 				|| MetaConfig.getOrthogonalSet().containsKey(type)
 				|| MetaConfig.getHorseSet().containsKey(type)) {
-			step(type, model);
-			return;
+			if(!MetaConfig.hasRegret(decideOrRegret)){
+				step(type, model);
+				return;
+			}
 		}
 
 	}
@@ -115,7 +118,6 @@ public class DecisionExecutionLogic {
 							BoardLogic.getRandomTile(
 									MetaClock.getMaxFraction(), false));
 		}
-		System.out.println("killed piece");
 		return true;
 		//
 		// TODO networking
@@ -125,6 +127,7 @@ public class DecisionExecutionLogic {
 	}
 
 	// return new positions of pawns in wall if allowed
+	//based on new pawn head position
 	// if not return null
 	public static Map<ExtendedPawnModel, ExtendedTileModel> handlePawnAndKingTurnCollision(
 			ExtendedKingModel king, int newPawnHeadPos) {
@@ -132,17 +135,17 @@ public class DecisionExecutionLogic {
 		// check if new position isn't occupied or outside of board
 		Map<ExtendedPawnModel, ExtendedTileModel> newPositions = new HashMap<>();
 		for (int i = 0; i < 8; i++) {
-			ExtendedPawnModel pawn = king.getPawnWall()[i];
+			ExtendedPawnModel pawn = king.getPawnFromWallIndex(i);
 			if (pawn != null) {
 				// new direction
 				String newDirection = MetaConfig.getDirectionWithTurn(
 						MetaConfig.getDirectionWithIndex(i), newPawnHeadPos);
-				int[] dir = MetaConfig.getDirectionArray(newDirection, pawn);
+				int[] newDir = MetaConfig.getDirectionArray(newDirection, pawn);
 				ExtendedTileModel newPawnPosition = BoardLogic
-						.getTileNeighbour(pawn.getTilePosition(), dir[0],
-								dir[1]);
-
-				if (handlePawnWallAndKingCollision(pawn, MetaConfig
+						.getTileNeighbour(king.getTilePosition(), newDir[0],
+								newDir[1]);
+				
+				if (newPawnPosition!=null && handlePawnWallAndKingCollision(pawn, MetaConfig
 						.getBoardModel().getModelOnPosition(newPawnPosition),
 						king)) {
 					// add new position
@@ -263,13 +266,14 @@ public class DecisionExecutionLogic {
 						&& piecOnKingNewPos.getSide() == king.getSide()) {
 					// pawn is not in wall
 					if (king.getIndexOfPawnInWallOnBoard((ExtendedPawnModel) piecOnKingNewPos) == -1) {
-						// add to wall
-						king.addPawnToWall(
+						// add to wall if room on that position
+						king.addPawnToWallWithBoardIndex(
 								(ExtendedPawnModel) piecOnKingNewPos,
 								MetaConfig.getIndexfromDirection(direction));
 						// end movement
 						return;
-					}// movement is allowed if pawn already in wall
+					}
+					// king moves in a direction where he has already a pawn in the wall
 				} else if (piecOnKingNewPos.getSide() == king.getSide()) {
 					// not a pawn and from same side
 					// end movement
@@ -285,18 +289,17 @@ public class DecisionExecutionLogic {
 
 				// check if every pawn around the king can be moved
 				for (int i = 0; i < 8; i++) {
-					ExtendedPawnModel pawn = king.getPawnWall()[i];
+					ExtendedPawnModel pawn = king.getPawnFromBoardIndex(i);
 					// there's a pawn
 					if (pawn != null) {
 						// position of pawn in wall
-						int[] pawnPosInWall = MetaConfig.getDirectionArray(
-								MetaConfig.getDirectionWithIndex(king
-										.getIndexOfPawnInWallOnBoard(i)), pawn);
+						int[] pawnDirInWall = MetaConfig.getDirectionArray(
+								MetaConfig.getDirectionWithIndex(i), pawn);
 						// get new pawn position, now we allow that a tile
 						// would be occupied
 						ExtendedTileModel newPawnPos = BoardLogic
-								.getTileNeighbour(newKingPos, pawnPosInWall[0],
-										pawnPosInWall[1], false, true, false,
+								.getTileNeighbour(newKingPos, pawnDirInWall[0],
+										pawnDirInWall[1], false, true, false,
 										null);
 						// new pawn position not allowed
 						if (newPawnPos == null) {
@@ -304,8 +307,9 @@ public class DecisionExecutionLogic {
 						}
 						ExtendedPieceModel pieceOnnewTile = MetaConfig
 								.getBoardModel().getModelOnPosition(newPawnPos);
-						// move is legal if new tile is empty, ocuppied by
+						// move is legal if new tile is empty, occupied by
 						// opponent or a king, pawn in the wall from our side
+						
 						if (pieceOnnewTile == null
 								|| pieceOnnewTile.getSide() != king.getSide()
 								|| pieceOnnewTile == king
@@ -313,6 +317,7 @@ public class DecisionExecutionLogic {
 										&& pieceOnnewTile.getSide() == king
 												.getSide() && king
 										.getIndexOfPawnInWallOnBoard((ExtendedPawnModel) pieceOnnewTile) != -1)) {
+	 
 							// save pieceOnNewTile in array too
 							collisionPieces[i] = pieceOnnewTile;
 							// save new legal position
@@ -343,12 +348,12 @@ public class DecisionExecutionLogic {
 				for (int i = 0; i < 8; i++) {
 					// if there's a new position
 					if (newPawnPositions[i] != null) {
-						handlePawnWallAndKingCollision(king.getPawnWall()[i],
+						handlePawnWallAndKingCollision(king.getPawnFromBoardIndex(i),
 								collisionPieces[i], king);
 						MetaConfig.getBoardModel().setPiecePosition(
-								king.getPawnWall()[i], newPawnPositions[i]);
+								king.getPawnFromBoardIndex(i), newPawnPositions[i]);
 						// handle influence
-						handleInfluence(king.getPawnWall()[i]);
+						handleInfluence(king.getPawnFromBoardIndex(i));
 					}
 
 				}
@@ -367,8 +372,8 @@ public class DecisionExecutionLogic {
 
 		} else {
 			// normal movement
-			movement(direction[0] * model.getRange(),
-					direction[1] * model.getRange(), model,
+			movement(direction[0] * model.getMovementRange(),
+					direction[1] * model.getMovementRange(), model,
 					model.isIgnoreOccupationOfTile());
 		}
 

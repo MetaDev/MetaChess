@@ -29,7 +29,7 @@ public class DecisionPermissionLogic {
 	}
 
 	// get effect from decision, based on side
-	// 0 means same side-> friendly, 1 means oppisite
+	// 0 means same side-> friendly, 1 means opposite
 	public static int getEffect(int balance, int influence, int friendly) {
 		if (friendly == 0) {
 			return influence - balance;

@@ -20,14 +20,11 @@ public class ExtendedPawnModel extends ExtendedPieceModel {
 	}
 
 	@Override
-	public int getRange() {
+	public int getMovementRange() {
 		return 1;
 	}
 
-	@Override
-	public int getMaxRange() {
-		return 1 + influencedMaxRange;
-	}
+
 
 	// only change turn on the decision
 

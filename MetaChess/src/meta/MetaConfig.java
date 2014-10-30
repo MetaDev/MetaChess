@@ -2,10 +2,14 @@ package meta;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import logic.BoardLogic;
+import model.DecisionModel;
+import model.DecisionModel.ButtonType;
+import model.DecisionModel.CooldownType;
 import model.ExtendedBoardModel;
 import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
@@ -130,6 +134,7 @@ public class MetaConfig {
 	private static Map<String, int[]> horseSet;
 	private static Map<String, ParamObject> specialsSet = new HashMap<>();
 
+	private static Set<DecisionModel> decisionModels=new HashSet<>();
 	// for the range decision, check if mapping is
 	public static int isNumber(String s) {
 		try {
@@ -213,22 +218,21 @@ public class MetaConfig {
 
 	// init all necessary constants
 	public static void initConstants() {
-		// tile entering mapping
-		BoardLogic.init();
 		// map colors
 		setColor(0, new Color(Color.BLACK));
 		setColor(1, new Color(Color.WHITE));
 
-		// Map MetaActions
+		//init singletons
 		boardRenderer = new BoardRenderer();
 		guiRenderer = new GUIRenderer();
 		ExtendedTileModel floor = new ExtendedTileModel(1, tileSize);
 		MetaConfig.setBoardModel(new ExtendedBoardModel(floor));
 
-		// draw MetaAction icons
+		
+		// load icons
 		IconLoader.loadIcons();
 
-		// map all possible directions
+		// model decisions
 		List<int[]> orthogonalList = new ArrayList<int[]>();
 		orthogonalList.add(new int[] { 0, 1 });
 		orthogonalList.add(new int[] { 0, -1 });
@@ -317,9 +321,16 @@ public class MetaConfig {
 		map.put(Keyboard.KEY_S + "", "[-2,-1]");
 		map.put(Keyboard.KEY_X + "", "[-1,-2]");
 		setKeyMappingForPiece(PieceType.KNIGHT, map);
+		//make mapping for model of decision
+		//movement
+		//orthogonal
+		decisionModels.add(new DecisionModel(false, CooldownType.NONE,  ButtonType.HOLD, Keyboard.KEY_Z, new int[] { 1, 0 },  "[1,0]"));
 
 	}
 
+	
+	
+	
 	public static Map<String, ParamObject> getSpecialsSet() {
 		return specialsSet;
 	}

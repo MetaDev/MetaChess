@@ -1,7 +1,10 @@
 package model;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import logic.DecisionExecutionLogic;
 import logic.DecisionPermissionLogic;
@@ -56,6 +59,10 @@ public class ExtendedPieceModel {
 		return lethal;
 	}
 
+	public int getMovementRange() {
+		return range;
+	}
+
 	public void setLethal(boolean lethal) {
 		this.lethal = lethal;
 	}
@@ -91,6 +98,16 @@ public class ExtendedPieceModel {
 	// highest range
 	protected Map<String, Integer> keptDecisionCooldown = new HashMap<>();;
 
+	//Keep a set of decisionmodels with all allowed decisions for this piece
+	protected Set<DecisionModel> allowedDecisions=new HashSet<>();
+	
+	public void addAllowedDecision(DecisionModel decision){
+		allowedDecisions.add(decision);
+	}
+	public void addAllowedDecisions(Collection<DecisionModel> decisions){
+		allowedDecisions.addAll(decisions);
+	}
+	
 	// if the piece already made a move this turn it's locked and can't be moved
 	// again
 	protected boolean locked = false;
@@ -227,11 +244,12 @@ public class ExtendedPieceModel {
 
 	public void handleDown(String keptDecision) {
 		if (MetaConfig.getKeyMapping().get(type).containsValue(keptDecision)) {
-
+			
 			// if this decision is a special one and belongs to this piece
 			// type, don't redecide but
 			// increase cooldown and turnsactive
 			// the corresponding decision should already be active
+			//unless the decision doesn't regret
 			if (MetaConfig.getSpecialsSet().containsKey(keptDecision)
 					&& MetaConfig.getKeyMapping().get(type)
 							.containsValue(keptDecision)) {

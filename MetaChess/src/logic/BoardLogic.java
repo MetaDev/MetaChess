@@ -1,7 +1,6 @@
 package logic;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -13,23 +12,6 @@ import model.ExtendedPieceModel;
 import model.ExtendedTileModel;
 
 public class BoardLogic {
-
-	private static double[][][][] enterTileMapping;
-	private static int enterTileMode = 1;
-
-	public static int getEnterTileMode() {
-		return enterTileMode;
-	}
-
-	public static void setEnterTileMode(int enterTileMode) {
-		BoardLogic.enterTileMode = enterTileMode;
-	}
-
-	
-
-	public static void init() {
-		fillMapping(enterTileMode);
-	}
 
 	public static ExtendedTileModel getTile(int[] I, int[] J) {
 		ExtendedTileModel currTile = (ExtendedTileModel) MetaConfig
@@ -58,69 +40,6 @@ public class BoardLogic {
 		return null;
 	}
 
-	public static void changeTileMapping(int mode) {
-		enterTileMode = mode;
-		fillMapping(mode);
-	}
-
-	// fill entertilemapping array
-	// this array consists the inter-tile mapping to it's children depending on
-	// movement direction and neigbour color
-	private static void fillMapping(int mode) {
-		// moded: 0: random (hoover) 1:opposite color + corner(in-tile movement)
-		// 2:...
-		// value -1 means that the movement in combination with the color is not
-		// mapped on the children of the tile
-		// this mapping will later be made editable -> one of the pawn's spells
-		// mapping: movement (1,-1) -> (2,0) in array
-		enterTileMapping = new double[3][3][2][2];
-
-		double[] temp1 = { -1, -1 };
-
-		for (double[][][] m2 : enterTileMapping) {
-			for (double[][] m1 : m2) {
-				Arrays.fill(m1, temp1);
-			}
-		}
-		switch (mode) {
-		case 0:
-			Random rn = new Random();
-			// movement-color combinations with same mapping are combined
-			enterTileMapping[1][0][0] = enterTileMapping[1][0][1] = new double[] {
-					rn.nextDouble(), 1 };
-			enterTileMapping[1][2][0] = enterTileMapping[1][2][1] = new double[] {
-					rn.nextDouble(), 0 };
-			enterTileMapping[2][1][0] = enterTileMapping[2][1][1] = new double[] {
-					0, rn.nextDouble() };
-			enterTileMapping[0][1][0] = enterTileMapping[0][1][1] = new double[] {
-					1, rn.nextDouble() };
-			enterTileMapping[2][2][0] = enterTileMapping[2][2][1] = new double[] {
-					0, 0 };
-			enterTileMapping[0][0][0] = enterTileMapping[0][0][1] = new double[] {
-					1, 1 };
-			enterTileMapping[2][0][0] = enterTileMapping[2][0][1] = new double[] {
-					0, 1 };
-			enterTileMapping[0][2][0] = enterTileMapping[0][1][1] = new double[] {
-					1, 0 };
-			enterTileMapping[2][0][0] = enterTileMapping[2][0][1] = new double[] {
-					0, 1 };
-			break;
-		case 1:
-			// not correct, but it's just an example
-			// movement-color combinations with same mapping are combined
-			enterTileMapping[1][2][1] = enterTileMapping[0][1][1] = enterTileMapping[0][2][1] = new double[] {
-					1, 0 };
-			enterTileMapping[2][1][1] = enterTileMapping[1][0][1] = enterTileMapping[2][0][1] = new double[] {
-					0, 1 };
-			enterTileMapping[1][0][0] = enterTileMapping[0][1][0] = enterTileMapping[0][0][0] = new double[] {
-					1, 1 };
-			enterTileMapping[1][2][0] = enterTileMapping[2][1][0] = enterTileMapping[2][2][0] = new double[] {
-					0, 0 };
-			break;
-		}
-
-	}
-
 	/*
 	 * implementation; go to neighbour tile do remainingmovement -1 if
 	 * remainingmovement>0 do recursion parameters: floating, never go to lower
@@ -132,8 +51,7 @@ public class BoardLogic {
 
 	public static ExtendedTileModel getTileNeighbour(ExtendedTileModel tile,
 			int horDir, int vertDir, boolean hoover, boolean ignoreOccupation,
-			boolean penetrateLowerFraction,
-			List<ExtendedTileModel> tilePath) {
+			boolean penetrateLowerFraction, List<ExtendedTileModel> tilePath) {
 		ExtendedTileModel it = tile;
 		int startFraction = it.getAbsFraction();
 		// root tile
@@ -237,8 +155,8 @@ public class BoardLogic {
 		return getTileNeighbour(tile, horDir, vertDir, false, true, false, null);
 	}
 
-	// one of many implementations to come
-	// return a child with the highest fraction and the opposit colour as the
+	// return a random child with the highest fraction and the opposit colour as
+	// the
 	// parent that is positioned on the border accesed by the movement.
 	public static ExtendedTileModel enterLowerFractionOfTile(
 			ExtendedTileModel tile, int horMov, int verMov) {
@@ -246,20 +164,20 @@ public class BoardLogic {
 		// c==1 -> tile your on is white, if you want to use colour in your
 		// function
 		// int c = (int) it.getColor().b;
-
-		double i = enterTileMapping[horMov + 1][verMov + 1][it.getColor()][0];
-		double j = enterTileMapping[horMov + 1][verMov + 1][it.getColor()][1];
-		// movement implies deeper level positioning
-		if (i != -1 && j != -1) {
-			while (it.getChildren() != null) {
-				// map movement (i,j), like (-1,0)-> left, to a position in a
-				// higher
-				// fractioned tile
-
-				it = it.getChildren()[(int) (i * (it.getChildFraction() - 1))][(int) (j * (it
-						.getChildFraction() - 1))];
-			}
+		Random rn = new Random();
+		double i = rn.nextDouble();
+		double j = rn.nextDouble();
+		// go to second lowest fraction with random position
+		while (it.getChildren() != null) {
+			it = it.getChildren()[(int) (i * (it.getChildFraction() - 1))][(int) (j * (it
+					.getChildFraction() - 1))];
 		}
+		ExtendedTileModel[][] siblings= it.getChildren();
+		//once in second lowest fraction choose a tile with opposite color from the lowest fractioned tiles
+		do{
+			it = siblings[(int) (i * (it.getChildFraction() - 1))][(int) (j * (it
+					.getChildFraction() - 1))];
+		}while(it.getColor()!=tile.getColor());
 
 		return it;
 	}
