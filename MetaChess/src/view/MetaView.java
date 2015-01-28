@@ -23,110 +23,116 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.util.Map;
-
-import meta.MetaMapping;
-import meta.MetaMapping.GUIPosition;
+import meta.MetaConfig;
+import meta.MetaConfig.GUIPosition;
 import model.ExtendedBoardModel;
 import model.ExtendedGUI;
 import model.ExtendedPlayerModel;
 import model.ExtendedTileModel;
 
-import org.lwjgl.opengl.Display;
-
 import userinterface.generic.GUITile;
+import view.zgpu.RectangleRenderer;
 
 public class MetaView {
 
-	public static void show() {
-		float width = Display.getWidth();
-		float height = Display.getHeight();
-		float centerBoardX = 0;
-		float centerBoardY = 0;
-		if (width > height) {
-			centerBoardX = (width - height) / 2;
-		} else {
-			centerBoardY = (height - width) / 2;
-		}
+    private static int height = 8 * 64 * 2;
+    private static int width = 8 * 64 * 2;
 
-		float min = Math.min(height, width);
-		float startSize = Display.getDisplayMode().getWidth();
-		float resizeToDisplay = min / startSize;
+    public static void setWindowSize(int height, int width) {
+        MetaView.height = height * 2;
+        MetaView.width = width * 2;
+        refresh();
+    }
 
-		ExtendedBoardModel board = MetaMapping.getBoardModel();
-		ExtendedPlayerModel player = board.getPlayer();
-		ExtendedTileModel PlayerTile = board.getPiecePosition(player);
-		// set the drawing as absolute
-		glClear(GL_COLOR_BUFFER_BIT);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0.0, Display.getWidth(), 0, Display.getHeight(), -1.0, 1.0);
+    public static void refresh() {
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+        float centerBoardX = 0;
+        float centerBoardY = 0;
+        if (width > height) {
+            centerBoardX = (width - height) / 2;
+        } else {
+            centerBoardY = (height - width) / 2;
+        }
 
-		glLoadIdentity();
-		glViewport(0, 0, Display.getWidth(), Display.getHeight());
-		glScissor((int) centerBoardX, (int) centerBoardY, (int) min, (int) min);
-		glEnable(GL_SCISSOR_TEST);
+        float min = Math.min(height, width);
+        //float startSize = Math.max(height,width);
+        //float resizeToDisplay = min/startSize ;
 
-		glPushMatrix();
+        ExtendedBoardModel board = MetaConfig.getBoardModel();
+        ExtendedPlayerModel player = board.getPlayer();
+        ExtendedTileModel PlayerTile = board.getPiecePosition(player.getControlledModel());
 
-		// move board to center of display
-		glTranslatef(centerBoardX, centerBoardY, 0);
-		// scale to display
-		glScalef(resizeToDisplay, resizeToDisplay, 0);
+        // set the drawing as absolute
+        glClear(GL_COLOR_BUFFER_BIT);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0.0, width, 0, height, -1.0, 1.0);
 
-		// (zoom in) scale to 1 tile in playerview
-		int zoomIn = PlayerTile.absoluteFraction();
-		glScalef(zoomIn, zoomIn, 1);
-		// zoom out depending on nr of tiles allowed to see
-		int tiles = 1;
-		if (player != null) {
-			tiles = player.getNrOfViewTiles();
-		}
-		glScalef((float) 1 / (2 * tiles + 1), (float) 1 / (2 * tiles + 1), 1);
-		// move player to center
-		float currentTileSize = PlayerTile.getAbsSize();
-		float centerPlayer = tiles * currentTileSize;
-		glTranslatef(-PlayerTile.getAbsX() + centerPlayer, -PlayerTile.getAbsY()
-				+ centerPlayer, 0);
-		// render board
-		MetaMapping.getBoardRenderer().render(board);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
 
-		glPopMatrix();
-		glPushMatrix();
-		glDisable(GL_SCISSOR_TEST);
+        glLoadIdentity();
+        //set view size; equals window
+        glViewport(0, 0, (int) width, (int) height);
+        
+        //move and scale the view to fit the board 
+        glPushMatrix();
+        
+        //move the board to center of the screen
+        glTranslatef(centerBoardX, centerBoardY, 0);
+        //cut everything outside center space of window
+        glScissor((int) centerBoardX, (int) centerBoardY, (int) min, (int) min);
+        glEnable(GL_SCISSOR_TEST);
 
-		// draw UI
-		// ipv de width en height mee te geven beter herschalen
-		// different depending if GUI draws left, right, top or bottom
-		// an optimisation could be to only resize when the window resizes
-		Map<GUIPosition, GUITile> guis = ExtendedGUI.getGuis();
+     
+        int tiles = player.getControlledModel().getNrOfViewTiles();
+        float singleTileSize = min / (2 * tiles + 1);
+        float scaleCurrentTileToDesiredTileSize = singleTileSize / PlayerTile.getAbsSize();
+       
+        //zoom such that the tiles fill exactly the view
+        glScalef(scaleCurrentTileToDesiredTileSize, scaleCurrentTileToDesiredTileSize, 1);
+        
+        //after scaling the coordinates of the board can be used
+        //move board such that the player is in the exact middle
 
-		for (Map.Entry<GUIPosition, GUITile> gui : guis.entrySet()) {
-			GUIPosition position = gui.getKey();
-			GUITile guiBlock = gui.getValue();
-			if (position == GUIPosition.LEFT) {
-				//position 0,0
-				guiBlock.setWidth(centerBoardX);
-				guiBlock.setHeight(Display.getHeight());
-			} else if (position == GUIPosition.BOTTOM) {
-				//position 0,0
-				guiBlock.setWidth(Display.getWidth());
-				guiBlock.setHeight(centerBoardY);
-			} else if (position == GUIPosition.RIGHT) {
-				guiBlock.setWidth(centerBoardX);
-				guiBlock.setHeight(Display.getHeight());
-				guiBlock.setX(((Display.getWidth() - centerBoardX)));
-			} else if (position == GUIPosition.TOP) {
-				guiBlock.setWidth(Display.getWidth());
-				guiBlock.setHeight(centerBoardY);
-				guiBlock.setY((Display.getHeight() - centerBoardY));
-			}
-			MetaMapping.getGuiRenderer().render(guiBlock);
+        glTranslatef(-PlayerTile.getAbsX() + tiles*PlayerTile.getAbsSize(), -PlayerTile.getAbsY()+tiles*PlayerTile.getAbsSize() , 0);
+        
+        
+        // render board
+        MetaConfig.getBoardRenderer().render(board);
+        //System.out.println(width + ";" + height + ";" + centerBoardX + ";" +centerBoardY + ";" + tiles);
+        glDisable(GL_SCISSOR_TEST);
 
-		}
-		glPopMatrix();
+        glPopMatrix();
 
-	}
+        // draw UI
+        // ipv de width en height mee te geven beter herschalen
+        // different depending if GUI draws left, right, top or bottom
+        // an optimisation could be to only resize when the window resizes
+        Map<GUIPosition, GUITile> guis = ExtendedGUI.getGuis();
+        for (Map.Entry<GUIPosition, GUITile> gui : guis.entrySet()) {
+            GUIPosition position = gui.getKey();
+            GUITile guiBlock = gui.getValue();
+            if (position == GUIPosition.LEFT) {
+                //position 0,0
+                guiBlock.setWidth(centerBoardX);
+                guiBlock.setHeight(height);
+            } else if (position == GUIPosition.BOTTOM) {
+                //position 0,0
+                guiBlock.setWidth(width);
+                guiBlock.setHeight(centerBoardY);
+            } else if (position == GUIPosition.RIGHT) {
+                guiBlock.setWidth(centerBoardX);
+                guiBlock.setHeight(height);
+                guiBlock.setX(((width - centerBoardX)));
+            } else if (position == GUIPosition.TOP) {
+                guiBlock.setWidth(width);
+                guiBlock.setHeight(centerBoardY);
+                guiBlock.setY((height - centerBoardY));
+            }
+            MetaConfig.getGuiRenderer().render(guiBlock);
+
+        }
+
+    }
 }

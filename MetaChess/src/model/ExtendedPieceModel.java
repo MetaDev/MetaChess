@@ -1,375 +1,349 @@
 package model;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
+import logic.BoardLogic;
 
-import logic.MetaClock;
-import meta.MetaMapping;
-import meta.MetaMapping.ActionType;
-import meta.MetaMapping.ControllerType;
-import meta.MetaMapping.PieceRendererType;
-import decision.Decision;
+import logic.DecisionExecutionLogic;
+import meta.MetaClock;
+import meta.MetaConfig;
+import meta.MetaConfig.PieceType;
+import meta.MetaWindow;
+import org.lwjgl.glfw.GLFW;
 
 public class ExtendedPieceModel {
-	protected int color;
-	protected int side;
-	protected int absTime = 0;
 
-	protected int maxMovementRange = 8;
-	protected int maxDecisionRange = 8;
-	protected int range = 1;
-	protected String direction;
-	//0-3
-	protected int turn;
-	public void addTurn(){
-		turn=(turn+1)%4;
-	}
-	public int getTurn() {
-		return turn;
-	}
+    public void step(int[] direction) {
+        if (type == PieceType.KING) {
+            ExtendedKingModel king = (ExtendedKingModel) this;
+            DecisionExecutionLogic.kingMovement(direction, king);
+        } else {
+            DecisionExecutionLogic.movement(direction[0] * getMovementRange(), direction[1] * getMovementRange(), this, isIgnoreOccupationOfTile());
+        }
+    }
 
-	protected boolean ignoreOccupationOfTile = false;
-	protected boolean penetrateLowerFraction = false;
-	protected PieceRendererType renderType;
-	protected ControllerType controllerType;
-	// the model is thinking about a decision
-	private Decision pendingDecision;
+    protected int color;
+    protected int side;
+    protected int absTime = 0;
+    private int lives;
+    private int previousFraction = 8;
+    protected int increaseTileView = 0;
+    protected int increasedMovementRange = 0;
+    // only the rook will adapt this
+    protected boolean viewing = false;
+    protected boolean extendedSpecial = false;
+    protected boolean hoover = false;
 
-	public Decision getPendingDecision() {
-		return pendingDecision;
-	}
+    public boolean isHoover() {
+        return hoover;
+    }
 
-	public void setPendingDecision(Decision pendingDecision) {
-		this.pendingDecision = pendingDecision;
-	}
+    public int getNrOfViewTiles() {
+        //nr of tiles seen is max half the absolute fraction of the tile standong on
+        //if viewing activated add range to 
+        return Math.min(8 + increaseTileView,
+                getTilePosition().getAbsFraction() / 2);
+    }
 
-	// this MetaAction is special because the cooldown and turns of activity
-	// don't have to lowered with every turn change
-	// and it's revert if the piece changes position to a tile without the
-	// MetaAction
-	protected Decision boardMetaAction;
+    public void setInceasedTileview(int param) {
+        increaseTileView = param;
+    }
 
-	public PieceRendererType getRenderType() {
-		return renderType;
-	}
+    protected int range = 1;
 
-	public void setRenderType(PieceRendererType renderType) {
-		this.renderType = renderType;
-	}
+    protected boolean ignoreOccupationOfTile = false;
+    protected boolean killOnHooverByChance = false;
+    protected boolean killOnHoover = false;
+    protected boolean penetrateLowerFraction = false;
+    protected PieceType type;
 
-	// save remaining cooldown of all metaActions applied on this model
-	protected Map<Decision, Integer> cooldownOfMetaActions;
-	// save metaActions turnsOfActivity if it has a fixed amount of active turns
-	// only decreased of the MetaAction has a cooldown on current model
-	// this means that MetaActions without a cooldown don't change
-	protected Map<Decision, Integer> turnsActiveOfmetaActions;
-	// saves all MetaActions executed on this activated on model, needed to
-	// verify if MetaAction has
-	// to be reversed
-	protected Map<Decision, Boolean> metaActionIsActive;
+    public PieceType getType() {
+        return type;
+    }
 
-	// if the piece already made a move this turn it's locked and can't be moved
-	// again
-	protected boolean locked = false;
+    protected int cooldown;
+    protected int rangeOfActiveDecsion;
+    protected int absFractionOfActiveDecision;
+    protected SpecialDecisionModel activeDecision;
 
-	public boolean isPenetrateLowerFraction() {
-		return penetrateLowerFraction;
-	}
+    // again
+    protected boolean locked = false;
 
-	public void setPenetrateLowerFraction(boolean penetrateLowerFraction) {
-		this.penetrateLowerFraction = penetrateLowerFraction;
-	}
+    public boolean isPenetrateLowerFraction() {
+        return penetrateLowerFraction;
+    }
 
-	public void turnChange() {
-		// with every change of turn check wether a MetaAction is still active
-		for (Map.Entry<Decision, Integer> entry : cooldownOfMetaActions
-				.entrySet()) {
-			// metaactions that have a cooldown and are active
-			if (entry.getValue() != null) {
-				if (entry.getValue() > 0) {
-					// decrease cooldown
-					entry.setValue(entry.getValue() - 1);
-					// if it has a cooldown
-					if (turnsActiveOfmetaActions.get(entry.getKey()) > 0) {
-						// decrease turns of activity
-						turnsActiveOfmetaActions
-								.put(entry.getKey(), turnsActiveOfmetaActions
-										.get(entry.getKey()) - 1);
-					}
-				}
+    public void setPenetrateLowerFraction(boolean penetrateLowerFraction) {
+        this.penetrateLowerFraction = penetrateLowerFraction;
+    }
 
-			}
-		}
-		// unlock piece
-		locked = false;
-		absTime = MetaClock.getAbsoluteTime();
-	}
+    // on the turn change, you should add cooldown if active decision
+    // cooldown is paid after every turn, with the highest range in that turn
+    // cooldown is payed after making decision, and while it stays active after
+    // every turn change
+    public void turnChange() {
 
-	public void regret() {
-		// check if board MetaAction has to be reversed
-		if (boardMetaAction != null) {
-			ExtendedTileModel position = MetaMapping.getBoardModel()
-					.getPiecePosition(this);
-			if (MetaMapping.getBoardModel().getActiveMetaAction(position) != boardMetaAction) {
-				boardMetaAction.regret(this);
-				boardMetaAction = null;
-			}
-		}
-		// if no longer active, do a revert
-		// for all active decisions
-		for (Map.Entry<Decision, Boolean> entry : metaActionIsActive.entrySet()) {
-			// revert if MetaAction is active on model
-			// and no longer active in the game
-			Decision decision = entry.getKey();
-			if (entry.getValue() && !decision.veto(this)) {
+        ExtendedTileModel position = getTilePosition();
+        int newFraction = position.getAbsFraction();
+        if (previousFraction >= newFraction && activeDecision == null) {
+            cooldown -= getCooldown();
+            //cooldown is min 0
+            cooldown = Math.max(0, cooldown);
+        }
 
-				// And if it has still turns active on this model
-				if (turnsActiveOfmetaActions.get(decision) == 0) {
-					// maybe optimasation is removing the decision from the map
-					// all together
+        //if a decision is active 
+        if (activeDecision != null) {
+            //raise cooldown
+            cooldown += getCooldown();
+            //and reexecute special decision
+            activeDecision.getSpecialObject().setParam(this);
+        }
+        // unlock piece
+        locked = false;
+        absTime = MetaClock.getAbsoluteTime();
+        previousFraction = newFraction;
+    }
 
-					// set inactive in model
-					entry.setValue(false);
-					// regret decision
-					decision.regret(this);
-				}
+    public int[][] getGrid() {
+        return MetaConfig.getIcon(type.name());
+    }
 
-			}
-		}
-	}
+    public int getMovementRange() {
+        return getRange();
+    }
 
-	// special method to invoke reaching decisions when a directional button is
-	// pressed
-	public void makeDecision(Decision decision) {
-		// act if the activity conditions of the MetaAction are met, already checked if input is OK
-		if (decision.conditionsMet(this)) {
-			// lock if needed
-			if (decision.isLocking()) {
-				locked = true;
-			}
-			ExtendedTileModel position = MetaMapping.getBoardModel()
-					.getPiecePosition(this);
-			Set<ExtendedTileModel> reach = decision.getReach(this);
-			// is the decision is reaching and it's range is not empty
-			if (decision.isReaching() && !reach.isEmpty()) {
-				// apply range to board
-				// while applying range calculated absolute affected tile
-				// weight
-				int tileWeight = 0;
-				for (ExtendedTileModel tile : reach) {
-					tileWeight += ((float) position.getAbsFraction())
-							/ ((float) tile.getAbsFraction());
-					// apply for each tile if not already applied to board
-					MetaMapping.getBoardModel().setActiveMetaAction(decision,
-							tile, this);
-				}
-				// set cooldown
-				cooldownOfMetaActions.put(decision,
-						decision.getCooldown(tileWeight));
+    //to be overriden
+    public Set<DecisionModel> getAllowedDecision() {
+        return null;
+    }
 
-			}
-		}
-	}
+    public int getIncreasedTileview() {
+        return increaseTileView;
+    }
 
-	public void makeDecisions() {
-		// act if on a tile with a MetaAction, a board MetaAction never locks
-		// the piece
-		// it also doesn't affect the MetaActions cooldown of this piece
+    public void handleDecision(DecisionModel decision) {
+        //decision is movement
+        if (decision.isLocks()) {
+            if (!locked) {
+                //1 is pressed 0 up
+                if (decisionMade(decision)) {
+                    locked = true;
+                    step(((MovementDecisionModel) decision).getDirection());
+                }
+                
+            }
+            return;
+        }
+        //if special decision check if no cooldown left and not active
+        //if range (no cooldown not locking) change it
+        if (!decision.isCooldown() || (cooldown == 0 && !decision.equals(activeDecision))) {
+            //execute param object
+            ((SpecialDecisionModel) decision).getSpecialObject().setParam(this);
+            //raise cooldown and set active decisoion
+            if (decision.isCooldown()) {
+                cooldown += getCooldown();
+                activeDecision = (SpecialDecisionModel) decision;
+            }
 
-		// check if this MetaAction is already registered
-		// if so, check if not already active
-		// if the board Decision is null, this means that the previous decision
-		// has been reverted
-		ExtendedTileModel position = MetaMapping.getBoardModel()
-				.getPiecePosition(this);
-		if (boardMetaAction == null) {
-			// get current position
-			boardMetaAction = MetaMapping.getBoardModel().getActiveMetaAction(
-					position);
-			// decide board decision
-			if (boardMetaAction != null)
-				boardMetaAction.decide(this);
-		}
+        }
 
-		// iterate over all MetaAction that the piece can execute
-		for (Map.Entry<Decision, Integer> entry : cooldownOfMetaActions
-				.entrySet()) {
-			Decision decision = entry.getKey();
-			// act if the decision has veto
-				
-			if (decision.veto(this)) {
-				
-				// lock if needed
-				if (decision.isLocking()) {
-					locked = true;
-				}
-				Set<ExtendedTileModel> reach = decision.getReach(this);
-				// is the decision is reaching and it's range is not empty
-				if (decision.isReaching() && !reach.isEmpty()) {
-					
-					// apply range to board
-					// while applying range calculated absolute affected
-					// tile
-					// weight
-					int tileWeight = 0;
-					for (ExtendedTileModel tile : reach) {
-						tileWeight += ((float) position.getAbsFraction())
-								/ ((float) tile.getAbsFraction());
-						// apply for each tile if not already applied to
-						// board
-						MetaMapping.getBoardModel().setActiveMetaAction(
-								decision, tile, this);
-					}
-					// set cooldown
-					entry.setValue(decision.getCooldown(tileWeight));
+    }
 
-				}
-				// if it's not a ranged MetaAction, you can execute it
-				// directly if MetaAction is not active on this model
+    public int getCooldown() {
+        int maxFraction = Math.min(getTilePosition().getAbsFraction(), MetaClock.getMaxFraction());
+        return (maxFraction / MetaClock.getMaxFraction()) * rangeOfActiveDecsion;
+    }
 
-				else if (!metaActionIsActive.get(decision)) {
-					// set active on model if the metaAction has a lasting, not
-					// a switch
-					// effect->has to revert
-					// no MetaAction is permanent
-					if (decision.reverts()) {
-						metaActionIsActive.put(decision, true);
-					}
-					// set cooldown, only 1 tile affected, your own
-					int cooldown = decision.getCooldown(1);
-					// set turns of activity if it has a cooldown
-					if (cooldown > 0) {
-						entry.setValue(cooldown);
-						turnsActiveOfmetaActions.put(decision,
-								decision.getTurnsActive());
-					}
-					// decide decision
-					decision.decide(this);
+    public void update() {
+        //reset parameters
+        range = 1;
+        penetrateLowerFraction = false;
+        increaseTileView = 0;
+        increasedMovementRange = 0;
+        hoover = false;
+        killOnHoover = false;
+        killOnHooverByChance = false;
+        extendedSpecial = false;
+        //check if key of active decision is still
+        if (activeDecision != null && !decisionMade(activeDecision)) {
+            activeDecision = null;
+        }
+        //decisions handled by priority range , special , movement
+        for (DecisionModel decision : this.getAllowedDecision()) {
+            //1 is pressed 0 up
+            if (decisionMade(decision)) {
+                handleDecision(decision);
+            }
 
-				}
+        }
 
-			}
-		}
+        //check if turn changed, decrease or increase cooldown
+        //if the turn calculated from current is different from turn calculated from the abs time from the latest registered turnchange
+        ExtendedTileModel tile = getTilePosition();
+        if (MetaClock.getTurn(tile.getAbsFraction(), getSide()) != MetaClock
+                .getTurn(tile.getAbsFraction(), getSide(), getAbsTime())) {
+            turnChange();
+        }
+        // TODO: here can be saved wether a team makes at least 1 decision every
 
-	}
+    }
 
-	public boolean isMetaActionActive(Decision metaAction) {
-		return metaActionIsActive.get(metaAction);
-	}
+    public void propagateViewInflunce(int increasedTileView) {
 
-	public int getAbsTime() {
-		return absTime;
-	}
+        //for each piece in view, pass increased tile view
+        for (ExtendedPieceModel piece : MetaConfig.getBoardModel().getEntityModels().keySet()) {
+            if (piece.getIncreasedTileview() == 0 && BoardLogic.isInrange(piece, this)) {
+                piece.setInceasedTileview(increasedTileView);
+                //proipagate
+                piece.propagateViewInflunce(increasedTileView);
+            }
+        }
+    }
+//check if decision is made iether by AI, player or nothing
 
-	public void setAbsTime(int absTime) {
-		this.absTime = absTime;
-	}
+    public boolean decisionMade(DecisionModel decision) {
+        //if it's a player 
+        if (MetaConfig.getBoardModel().getPlayer().getControlledModel().equals(this)) {
+            if (1 == GLFW.glfwGetKey(MetaWindow.getWindow(), decision.getKey())) {
+                return true;
+            }
+        }
+        //here comes code for AI
+        return false;
+    }
 
-	public boolean isLocked() {
-		return locked;
-	}
+    public int getAbsTime() {
+        return absTime;
+    }
 
-	public void setLocked(boolean locked) {
-		this.locked = locked;
-	}
+    public void setAbsTime(int absTime) {
+        this.absTime = absTime;
+    }
 
-	public boolean isIgnoreOccupationOfTile() {
-		return ignoreOccupationOfTile;
-	}
+    public boolean isLocked() {
+        return locked;
+    }
 
-	public void setIgnoreOccupationOfTile(boolean ignoreOccupationOfTile) {
-		this.ignoreOccupationOfTile = ignoreOccupationOfTile;
-	}
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
 
-	public int getRange() {
-		return range;
-	}
+    public boolean isIgnoreOccupationOfTile() {
+        return ignoreOccupationOfTile;
+    }
 
-	public ExtendedPieceModel(PieceRendererType renderType, int side,
-			ControllerType controllerType, int maxRange) {
-		this.side = side;
-		this.color = side;
-		this.maxMovementRange = maxRange;
-		this.controllerType = controllerType;
-		this.renderType = renderType;
-		// fill with all available MetaActions
-		cooldownOfMetaActions = new HashMap<>();
-		metaActionIsActive = new HashMap<>();
-		turnsActiveOfmetaActions = new HashMap<>();
-		//not necessary, use the controltype to get all makeable decisions others will be added to map while playing 
-		for (Map.Entry<String, Decision> pair : MetaMapping.getAllDecisions()
-				.entrySet()) {
-			cooldownOfMetaActions.put(pair.getValue(), 0);
-			turnsActiveOfmetaActions.put(pair.getValue(), 0);
-			metaActionIsActive.put(pair.getValue(), false);
-		}
-	}
+    public void setIgnoreOccupationOfTile(boolean ignoreOccupationOfTile) {
+        this.ignoreOccupationOfTile = ignoreOccupationOfTile;
+    }
 
-	public int getColor() {
-		return color;
-	}
+    public int getLives() {
+        return lives;
+    }
 
-	public void setColor(int color) {
-		this.color = color;
-	}
+    public ExtendedPieceModel(PieceType type, int side, int lives) {
+        this.side = side;
+        this.color = side;
+        this.type = type;
+        this.lives = lives;
 
-	public int getSide() {
-		return side;
-	}
+    }
 
-	public void setSide(int side) {
-		this.side = side;
-	}
+    public int getColor() {
+        return color;
+    }
 
-	public ControllerType getControllerType() {
-		return controllerType;
-	}
+    public void setColor(int color) {
+        this.color = color;
+    }
 
-	public void setControllerType(ControllerType controllerType) {
-		this.controllerType = controllerType;
-	}
+    public int getSide() {
+        return side;
+    }
 
-	// the range is always at least 1
-	public int getMovementRange() {
-		return Math.max(Math.min(range, maxMovementRange), 1);
-	}
+    public void setSide(int side) {
+        this.side = side;
+    }
 
-	public int getDecisionRange() {
-		return Math.max(Math.min(range, maxDecisionRange) - 1, 0);
-	}
+    // the range is ranged between 1 and 8 + influencedRange
+    public int getRange() {
+        return range;
+    }
 
-	// if range is set negative the directions are inverted
-	public void setRange(int range) {
-		this.range = range;
+    // if range is set negative the directions are inverted
+    public void setRange(int range) {
+        this.range = range;
 
-	}
+    }
 
-	public Integer getCooldown(Decision metaAction) {
-		return cooldownOfMetaActions.get(metaAction);
-	}
+    public float getRelSize() {
+        return MetaConfig.getBoardModel().getPiecePosition(this).getRelSize();
+    }
 
-	public Integer getTurnsOfActivity(Decision metaAction) {
-		return turnsActiveOfmetaActions.get(metaAction);
-	}
+    public ExtendedTileModel getTilePosition() {
+        return MetaConfig.getBoardModel().getPiecePosition(this);
+    }
 
-	public void setMetaActionCooldown(Decision metaAction, int cooldown) {
-		cooldownOfMetaActions.put(metaAction, cooldown);
-	}
+    public void setTilePosition(ExtendedTileModel tile) {
+        MetaConfig.getBoardModel().setPiecePosition(this, tile);
+    }
 
-	public void setDirection(String direction) {
-		this.direction = direction;
-	}
+    public boolean isDragon() {
+        return killOnHooverByChance;
+    }
 
-	public String getDirection() {
-		return direction;
-	}
+    public void setDragon() {
+        if (extendedSpecial) {
+            //set var killAllHooverTles to true
+            killOnHoover = true;
+        }
+        killOnHooverByChance = true;
+    }
 
-	public float getRelSize() {
-		return MetaMapping.getBoardModel().getPiecePosition(this).getRelSize();
-	}
+    public boolean isRogue() {
+        return penetrateLowerFraction || increasedMovementRange > 0;
+    }
 
-	public ExtendedTileModel getTilePosition() {
-		return MetaMapping.getBoardModel().getPiecePosition(this);
-	}
+    public void setRogue() {
+        if (extendedSpecial) {
+            penetrateLowerFraction = true;
+        }
+        increasedMovementRange = getRange();
+    }
+
+    public boolean getViewing() {
+        return viewing;
+    }
+
+    public void setViewing() {
+        if (extendedSpecial) {
+            //propagate tile view influence
+            propagateViewInflunce(getRange());
+        }
+        increaseTileView = getRange();
+    }
+    private int turn = 0;
+
+    public void setTurn() {
+        this.turn = (this.turn + 2) % 8;
+    }
+
+    public void setExtendeSpecial() {
+        extendedSpecial = true;
+    }
+
+    public boolean isExtendeSpecial() {
+        return extendedSpecial;
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public int getCommand() {
+        return 0;
+    }
+
+    public void setCommand() {
+
+    }
+
 }

@@ -1,9 +1,12 @@
 package model;
 
-import meta.MetaMapping;
+import meta.MetaConfig;
 
 public class ExtendedTileModel {
 
+	private float absSize;
+	private float absPosX;
+	private float absPosY;
 	private float size;
 	private int color;
 	private ExtendedTileModel[][] children;
@@ -16,7 +19,7 @@ public class ExtendedTileModel {
 	private int j;
 
 	public boolean isOccupied() {
-		if (MetaMapping.getBoardModel().getModelOnPosition(this) != null)
+		if (MetaConfig.getBoardModel().getModelOnPosition(this) != null)
 			return true;
 		if (children == null)
 			return false;
@@ -45,6 +48,10 @@ public class ExtendedTileModel {
 		this.level = level;
 		this.i = i;
 		this.j = j;
+		this.absPosX = getAbsX();
+		this.absPosY = getAbsY();
+		this.absSize = getAbsSize();
+
 	}
 
 	public int getI() {
@@ -59,15 +66,7 @@ public class ExtendedTileModel {
 		children = null;
 	}
 
-	public int absoluteFraction() {
-		if (parent != null) {
-			return parent.getChildFraction() * parent.absoluteFraction();
-
-		} else {
-			return 1;
-		}
-
-	}
+	
 
 	// don't allow empty (null) children
 	public void divide(int fraction) {
@@ -128,36 +127,43 @@ public class ExtendedTileModel {
 	}
 
 	public float getAbsX() {
-		if (parent != null) {
+		if (absPosX == 0 && parent != null) {
 			return getRelX() + parent.getAbsX();
 		} else {
-			return 0;
+			return absPosX;
 		}
+
 	}
 
 	public float getAbsY() {
-		if (parent != null) {
+		if (absPosY == 0 && parent != null) {
 			return getRelY() + parent.getAbsY();
 		} else {
-			return 0;
+			return absPosY;
 		}
 	}
 
 	public int getAbsFraction() {
 		if (parent != null) {
-			return parent.childFraction + parent.getAbsFraction();
+			return parent.childFraction * parent.getAbsFraction();
 		} else {
-			return 0;
+			return 1;
 		}
 	}
 
 	// get size relative to container
 
 	public float getRelSize() {
-		if (parent != null) {
-			return (parent.getRelSize() / parent.getChildFraction());
+		if (absSize == 0) {
+			if (parent != null) {
+				return (parent.getRelSize() / parent.getChildFraction());
+			} else {
+				return size;
+			}
+		} else {
+			return absSize;
 		}
-		return size;
+
 	}
 
 	public float getAbsSize() {

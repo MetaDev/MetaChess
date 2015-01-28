@@ -1,6 +1,16 @@
 package model.paramobjects;
 
-public interface ParamObject {
-	public int getParam();
-	public void setParam(int param);
+import model.ExtendedPieceModel;
+
+public abstract class ParamObject {
+    public abstract int getParam(ExtendedPieceModel model);
+
+    public abstract void setParam(ExtendedPieceModel model);
+
+    protected int booleanToInt(boolean bool) {
+        if (bool) {
+            return 1;
+        }
+        return 0;
+    }
 }

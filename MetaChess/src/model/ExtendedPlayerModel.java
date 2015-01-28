@@ -1,18 +1,35 @@
 package model;
 
-import meta.MetaMapping.ControllerType;
-import meta.MetaMapping.PieceRendererType;
+import java.util.Random;
+
+import logic.BoardLogic;
+import meta.MetaConfig;
+import meta.MetaConfig.GUIPosition;
+import meta.MetaConfig.PieceType;
 
 //contains all info about player
-public class ExtendedPlayerModel extends ExtendedPieceModel {
-	private int nrOfViewTiles = 4;
-	private String name = "Gray";
+public class ExtendedPlayerModel {
+	private int[][] core;
 
-	
-
-	public void setNrOfViewTiles(int nrOfViewTiles) {
-		this.nrOfViewTiles = nrOfViewTiles;
+	public ExtendedPieceModel getControlledModel() {
+		return controlledModel;
 	}
+
+	public void setControlledModel(ExtendedPieceModel controlledModel) {
+		this.controlledModel = controlledModel;
+		// unbind if current piece is a pawn and it is bound
+		if (controlledModel.getType() == PieceType.PAWN && ((ExtendedPawnModel)controlledModel).isBound()) {
+			((ExtendedKingModel) MetaConfig.getBoardModel()
+					.getPieceByTypeAndSide(PieceType.KING, getSide()))
+					.removePawnFromWall((ExtendedPawnModel) controlledModel);
+		}
+		//change the layout of the decision panel
+		ExtendedGUI.getGuis().get(GUIPosition.LEFT).refresh();
+	}
+
+	private String name;
+	// the model the player is in
+	private ExtendedPieceModel controlledModel;
 
 	public String getName() {
 		return name;
@@ -22,15 +39,65 @@ public class ExtendedPlayerModel extends ExtendedPieceModel {
 		this.name = name;
 	}
 
-	public ExtendedPlayerModel(PieceRendererType renderType, int side,
-			ControllerType controllerType, int lives, int maxLives, int range,
-			int nrOfViewTiles, String name) {
-		super(renderType, side, controllerType, range);
-		this.nrOfViewTiles = nrOfViewTiles;
+	public ExtendedPlayerModel(int side, ExtendedPieceModel controlledModel,
+			String name, int[][] core) {
+		this.controlledModel = controlledModel;
 		this.name = name;
+		this.core = core;
 	}
 
-	public int getNrOfViewTiles() {
-		return nrOfViewTiles;
+	// the side of the player is what side the first piece of control is
+	public int getSide() {
+		return controlledModel.getSide();
+	}
+
+
+	// a mode can be defined, for switch, like switch to nearest, furthest or a
+	// priorityqueue with types can be made
+	// will be implemented later
+	// you can't switch to piece occupied by another player
+	// the switch algorythm is defined by the range given
+	// if mode=0 this means the switch key has been released, mode=1 is the
+	// switch key pressed
+	public void switchPiece() {
+		double minDist = Double.MAX_VALUE;
+		double tempDist;
+		ExtendedPieceModel newPiece = null;
+		int mode = controlledModel.getRange();
+                //if the found piece is occupied, only switch is push is true, which makes the previous player switching to the next piece
+                boolean push = controlledModel.isExtendeSpecial();
+		// random
+		if (mode == 1) {
+			Random generator = new Random();
+			Object[] entries = MetaConfig.getBoardModel().getEntityModels()
+					.keySet().toArray();
+                        //TODO check here if not occupied
+			setControlledModel((ExtendedPieceModel) entries[generator
+					.nextInt(entries.length)]);
+                        //resfresh player gui
+                        ExtendedGUI.getGuis().get(GUIPosition.LEFT).refresh();
+		}
+		// nearest
+		else if (mode == 2) {
+			for (ExtendedPieceModel piece : MetaConfig.getBoardModel()
+					.getEntityModels().keySet()) {
+				if (controlledModel != piece
+						&& (tempDist = BoardLogic.calculateDistance(
+								controlledModel.getTilePosition(),
+								piece.getTilePosition())) < minDist) {
+					newPiece = piece;
+					minDist = tempDist;
+				}
+			}
+			setControlledModel(newPiece);
+		}
+	}
+
+	public int[][] getCore() {
+		return core;
+	}
+
+	public void setCore(int[][] core) {
+		this.core = core;
 	}
 }
