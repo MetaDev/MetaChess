@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/MovementDecisionModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedBoardModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/meta/MetaWindow.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/paramobjects/POExtendeSpecial.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedKingModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/logic/PieceMovementLogic.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/paramobjects/POCooldown.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedRookModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedQueenModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/PlayerInputModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/meta/MetaClock.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedGhostModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/specific/GTPlayerPiece.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedPieceModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/GUIEditor.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedKnightModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/meta/MetaConfig.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/PlayerModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/control/MetaLoop.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/paramobjects/PlayerStatsAccessObject.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedBishopModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/PieceEditor.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/model/ExtendedPawnModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/logic/BoardLogic.java</file>
+        </group>
+    </open-files>
+</project-private>
