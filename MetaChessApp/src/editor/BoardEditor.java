@@ -1,10 +1,10 @@
 package editor;
 
-import logic.BoardLogic;
-import meta.MetaClock;
+import engine.board.BoardLogic;
+import engine.MetaClock;
 import meta.MetaConfig;
 import meta.MetaUtil;
-import model.ExtendedTileModel;
+import engine.board.ExtendedTileModel;
 
 public class BoardEditor extends Editor {
 

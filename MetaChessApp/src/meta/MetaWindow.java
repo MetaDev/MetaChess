@@ -1,20 +1,23 @@
 package meta;
 
 import view.MetaView;
-import control.MetaLoop;
+import engine.MetaLoop;
 import editor.BoardEditor;
 import editor.GUIEditor;
 import editor.KeyMapEditor;
 import editor.PieceEditor;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLUtil;
 import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_REFRESH_RATE;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_STICKY_KEYS;
@@ -24,15 +27,16 @@ import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
+import static org.lwjgl.glfw.GLFW.glfwGetVideoModes;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
@@ -40,7 +44,6 @@ import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
-import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
@@ -133,12 +136,19 @@ public class MetaWindow {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
-        //opengl version 32
-//        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-//        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        int WIDTH = MetaConfig.getTileSize();
-        int HEIGHT = MetaConfig.getTileSize();
 
+        //later
+        //opengl version 32
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        
+       //set resolution
+        IntBuffer count = BufferUtils.createIntBuffer(1);
+        ByteBuffer modes = glfwGetVideoModes(glfwGetPrimaryMonitor(), count);
+
+        int WIDTH =MetaConfig.getTileSize();
+       int HEIGHT =MetaConfig.getTileSize();
+        glfwWindowHint(GLFW_REFRESH_RATE, GLFWvidmode.refreshRate(modes));
         // Create the window
         window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
         if (window == NULL) {
@@ -167,7 +177,7 @@ public class MetaWindow {
                 }
             }
         });
-        
+
         //set resize callback
         glfwSetWindowSizeCallback(window, windowSizeCallback = new GLFWWindowSizeCallback() {
 
@@ -184,7 +194,6 @@ public class MetaWindow {
                 (GLFWvidmode.width(vidmode) - WIDTH) / 2,
                 (GLFWvidmode.height(vidmode) - HEIGHT) / 2
         );
-
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
         // Enable v-sync
@@ -193,9 +202,10 @@ public class MetaWindow {
         // Make the window visible
         glfwShowWindow(window);
 
-        //set inpu mode
+        //set input mode
         glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
+        
     }
 
     private static void createMetaBoard() {
@@ -219,6 +229,22 @@ public class MetaWindow {
     // Update logic and control here
     private static void update() {
         MetaLoop.update();
+    }
+
+    private void printAllVideoModes() {
+        IntBuffer count = BufferUtils.createIntBuffer(1);
+        ByteBuffer modes = glfwGetVideoModes(glfwGetPrimaryMonitor(), count);
+
+        for (int i = 0; i < count.get(0); i++) {
+            modes.position(i * GLFWvidmode.SIZEOF);
+
+            int w = GLFWvidmode.width(modes);
+            int h = GLFWvidmode.height(modes);
+            int r = GLFWvidmode.refreshRate(modes);
+
+            System.out.println(w + " x " + h + " @ " + r + "Hz");
+        }
+
     }
 
     private void initRender() {

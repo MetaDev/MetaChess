@@ -6,6 +6,7 @@
 package engine;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,16 +53,8 @@ public class Directions {
         return allDirections.get(name);
     }
 
-    public static Direction turnDirection(String name, int turn) {
-        if (allDirections.isEmpty()) {
-            init();
-        }
-        return directionsOrthDiagOrder.get((directionsOrthDiagOrder.indexOf(allDirections.get(name)) + turn) % directionsOrthDiagOrder.size());
-
-    }
-
     public static Direction turnDirection(Direction direction, int turn) {
-        return turnDirection(direction.getName(), turn);
+        return directionsOrthDiagOrder.get((directionsOrthDiagOrder.indexOf(allDirections.get(direction.getName())) + turn) % directionsOrthDiagOrder.size());
     }
 
     private static void init() {
@@ -92,17 +85,52 @@ public class Directions {
         allDirections.put(d.getName(), d);
         directionsOrthDiagOrder.add(d);
 
-        //all knight directions
+         //all knight directions
         indices = new int[]{-2, -1, 1, 2};
         for (int x : indices) {
             for (int y : indices) {
                 if (Math.abs(x) != Math.abs(y)) {
-                    d = new Direction(x, y);
-                    allDirections.put(d.getName(), d);
+                     d = new Direction(x,y);
+                     allDirections.put(d.getName(), d);
                 }
             }
         }
 
+    }
+
+    public static void getKnightDirections(Collection<Direction> coll) {
+        //all knight directions
+        int[] indices = new int[]{-2, -1, 1, 2};
+        for (int x : indices) {
+            for (int y : indices) {
+                if (Math.abs(x) != Math.abs(y)) {
+                    coll.add(getDirection(x, y));
+                }
+            }
+        }
+    }
+
+    public static void getOrthoDirections(Collection<Direction> coll) {
+        //all knight directions
+        int[] indices = new int[]{-1, 0,1};
+        for (int x : indices) {
+            for (int y : indices) {
+                if (Math.abs(x) != Math.abs(y)) {
+                    coll.add(getDirection(x, y));
+                }
+            }
+        }
+    }
+    public static void getDiagDirections(Collection<Direction> coll) {
+        //all knight directions
+        int[] indices = new int[]{-1,1};
+        for (int x : indices) {
+            for (int y : indices) {
+                
+                    coll.add(getDirection(x, y));
+                
+            }
+        }
     }
 
 }

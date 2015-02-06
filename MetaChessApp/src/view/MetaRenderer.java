@@ -17,6 +17,7 @@ import static org.lwjgl.opengl.GL15.glBufferData;
  *
  * @author Harald
  */
+//recangle renderer with opengl 3
 public class MetaRenderer {
 
    static  FloatBuffer vertices;

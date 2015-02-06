@@ -3,13 +3,13 @@ package view.renderer;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
-import model.ExtendedPieceModel;
-import model.PlayerModel;
-import view.zgpu.RectangleRenderer;
+import engine.piece.ExtendedPieceModel;
+import engine.player.Player;
+import view.RectangleRenderer;
 
 public class PlayerRenderer {
 
-    public static void render(PlayerModel player) {
+    public static void render(Player player) {
         ExtendedPieceModel piece = player.getControlledModel();
         float w_8 = (piece.getRelSize()) / 8;
         float w_16 = (piece.getRelSize()) / 16;
@@ -19,7 +19,7 @@ public class PlayerRenderer {
         glTranslatef(piece.getTilePosition().getAbsX(), piece.getTilePosition().getAbsY(), 0);
         // draw from grid
         GridRenderer.transparentRender(piece.getGrid(), piece
-                .getTilePosition().getAbsSize() / 8, piece.getSide());
+                .getTilePosition().getAbsSize() / 8, piece.getColor());
 
         // if a player is present
         // draw players core
@@ -41,7 +41,7 @@ public class PlayerRenderer {
 
     }
 
-    public static void render(PlayerModel player, float cellSize) {
+    public static void render(Player player, float cellSize) {
         ExtendedPieceModel piece = player.getControlledModel();
 
         float w_8 = cellSize / 8;
@@ -51,7 +51,7 @@ public class PlayerRenderer {
         // draw from grid
         GridRenderer.transparentRender(
                 piece.getGrid(), cellSize / 8,
-                piece.getSide());
+                piece.getColor());
 
         glPushMatrix();
         glTranslatef(3 * w_8 + w_16, 3 * w_8, 0);

@@ -3,19 +3,19 @@ package editor;
 import java.util.ArrayList;
 import java.util.List;
 
-import logic.BoardLogic;
-import meta.MetaClock;
+import engine.board.BoardLogic;
+import engine.MetaClock;
 import meta.MetaConfig;
-import meta.MetaConfig.PieceType;
-import model.ExtendedBishopModel;
-import model.ExtendedKingModel;
-import model.ExtendedKnightModel;
-import model.ExtendedPawnModel;
-import model.ExtendedPieceModel;
-import model.ExtendedQueenModel;
-import model.ExtendedRookModel;
-import model.PlayerEmptyModel;
-import model.PlayerInputModel;
+import engine.piece.ExtendedBishopModel;
+import engine.piece.ExtendedKingModel;
+import engine.piece.ExtendedKnightModel;
+import engine.piece.ExtendedPawnModel;
+import engine.piece.ExtendedPieceModel;
+import engine.piece.ExtendedPieceModel.PieceType;
+import engine.piece.ExtendedQueenModel;
+import engine.piece.ExtendedRookModel;
+import engine.player.PlayerEmpty;
+import engine.player.PlayerInput;
 
 public class PieceEditor extends Editor {
 
@@ -44,7 +44,7 @@ public class PieceEditor extends Editor {
     private static void initPiecePosition(List<ExtendedPieceModel> list) {
         for (ExtendedPieceModel piece : list) {
             piece.setTilePosition(BoardLogic.getRandomTile(MetaClock.getMaxFraction(), false));
-            MetaConfig.getBoardModel().getPlayersOnBoard().add(new PlayerEmptyModel(piece.getSide(), piece, "test", MetaConfig.getIcon("PAWN")));
+            MetaConfig.getBoardModel().getPlayersOnBoard().add(new PlayerEmpty(piece.getColor(), piece, "test", MetaConfig.getIcon("PAWN")));
         }
     }
 
@@ -59,9 +59,13 @@ public class PieceEditor extends Editor {
         // PlayerModel player = new PlayerModel(1,
         // list1.get(MetaUtil.randInt(0, 3)), "HARALD",
         // MetaConfig.getIcon("HARALD"));
-        PlayerInputModel player = new PlayerInputModel(1, MetaConfig
-                .getBoardModel().getPieceByTypeAndSide(PieceType.ROOK, 0),
+        //the input players piece
+        ExtendedPieceModel myPiece = MetaConfig
+                .getBoardModel().getPieceByTypeAndSide(PieceType.ROOK, 1);
+        MetaConfig.getBoardModel().removePlayerByPiece(myPiece);
+        PlayerInput player = new PlayerInput(1, myPiece,
                 "HARALD", MetaConfig.getIcon("HARALD"));
+        
         MetaConfig.getBoardModel().setInputPlayer(player);
         MetaConfig.getBoardModel().getPlayersOnBoard().add(player);
     }
@@ -73,7 +77,7 @@ public class PieceEditor extends Editor {
 //        ExtendedRookModel rook1 = new ExtendedRookModel(1);
 //        PieceLogic
 //                .setPosition(rook1, BoardLogic.getTile(new int[]{0}, new int[]{0}));
-        PlayerInputModel player = new PlayerInputModel(1, rook,
+        PlayerInput player = new PlayerInput(1, rook,
                 "HARALD", MetaConfig.getIcon("HARALD"));
         MetaConfig.getBoardModel().setInputPlayer(player);
 

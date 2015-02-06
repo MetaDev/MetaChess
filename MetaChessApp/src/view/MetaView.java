@@ -25,13 +25,12 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import java.util.Map;
 import meta.MetaConfig;
 import meta.MetaConfig.GUIPosition;
-import model.ExtendedBoardModel;
-import model.ExtendedGUI;
-import model.PlayerModel;
-import model.ExtendedTileModel;
+import engine.board.ExtendedBoardModel;
+import userinterface.generic.ExtendedGUI;
+import engine.player.Player;
+import engine.board.ExtendedTileModel;
 
 import userinterface.generic.GUITile;
-import view.zgpu.RectangleRenderer;
 
 public class MetaView {
 
@@ -59,7 +58,7 @@ public class MetaView {
         //float resizeToDisplay = min/startSize ;
 
         ExtendedBoardModel board = MetaConfig.getBoardModel();
-        PlayerModel player = board.getInputPlayer();
+        Player player = board.getInputPlayer();
         ExtendedTileModel PlayerTile = player.getControlledModel().getTilePosition();
 
         // set the drawing as absolute

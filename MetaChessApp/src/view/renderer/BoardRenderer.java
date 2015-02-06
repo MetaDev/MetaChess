@@ -7,11 +7,11 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import java.util.Map;
 
 import meta.MetaConfig;
-import model.ExtendedBoardModel;
-import model.ExtendedPieceModel;
-import model.ExtendedTileModel;
-import model.PlayerModel;
-import view.zgpu.RectangleRenderer;
+import engine.board.ExtendedBoardModel;
+import engine.piece.ExtendedPieceModel;
+import engine.board.ExtendedTileModel;
+import engine.player.Player;
+import view.RectangleRenderer;
 
 public class BoardRenderer {
 
@@ -46,7 +46,7 @@ public class BoardRenderer {
 	}
 
 	private void recursivePieceRenderer() {
-		for (PlayerModel player : MetaConfig
+		for (Player player : MetaConfig
 				.getBoardModel().getPlayersOnBoard()) {
 			//draw player on the board
 			PlayerRenderer.render(player);

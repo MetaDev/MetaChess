@@ -5,20 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import model.DecisionModel;
-import model.ExtendedBishopModel;
-import model.ExtendedBoardModel;
-import model.ExtendedKingModel;
-import model.ExtendedKnightModel;
-import model.ExtendedPawnModel;
-import model.ExtendedQueenModel;
-import model.ExtendedRookModel;
-import model.ExtendedTileModel;
-import model.MovementDecisionModel;
-import model.SpecialDecisionModel;
-import model.paramobjects.POExtendeSpecial;
-import model.paramobjects.PORange;
-import org.lwjgl.glfw.GLFW;
+import engine.board.ExtendedBoardModel;
+import engine.board.ExtendedTileModel;
 
 import userinterface.init.IconLoader;
 import view.renderer.BoardRenderer;
@@ -27,11 +15,7 @@ import view.renderer.GUIRenderer;
 //contains and initialises all unique instances
 public class MetaConfig {
 
-    public enum PieceType {
-
-        PAWN, ROOK, KNIGHT, BISHOP, KING, QUEEN
-    }
-
+   
     // free means that the gui's position is based on absolute coordinates
     public enum GUIPosition {
 
@@ -87,7 +71,6 @@ public class MetaConfig {
         return getIndexfromDirection(MetaUtil.convertIntArrayToString(direction));
     }
 
-    private static Set<DecisionModel> decisionModels = new HashSet<>();
 
     // for the range decision, check if mapping is
     public static int isNumber(String s) {

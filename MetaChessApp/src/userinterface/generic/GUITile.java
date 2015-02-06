@@ -4,7 +4,7 @@ package userinterface.generic;
 public class GUITile {
 
     // a grid
-
+    protected boolean transparant=false;
     protected GUITile[][] elements;
     // number of blocks it takes in the container
     protected int rowsInContainer;
@@ -18,6 +18,10 @@ public class GUITile {
     protected GUITile container;
     protected int i;
     protected int j;
+
+    public boolean isTransparant() {
+        return transparant;
+    }
 
     public int getRows() {
         return rows;

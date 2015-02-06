@@ -3,10 +3,9 @@ package network;
 import java.util.Arrays;
 import java.util.Map;
 
-import logic.BoardLogic;
-import logic.MetaPosition;
+import engine.board.BoardLogic;
 import meta.MetaUtil;
-import model.ExtendedPieceModel;
+import engine.piece.ExtendedPieceModel;
 import network.client.MetaClient;
 
 public class NetworkMessages {
@@ -48,18 +47,18 @@ public class NetworkMessages {
 		return MetaClient.getClientId() + "::nomessage";
 	}
 
-	// server messages
-	// returns all the clients positions
-	public static String readyResponse(Map<Integer, MetaPosition> startPositions) {
-		String respons = "start";
-		for (Map.Entry<Integer, MetaPosition> clientPosition : startPositions
-				.entrySet()) {
-			respons += "::" + clientPosition.getKey() + "::"
-					+ clientPosition.getValue().getI()
-					+ clientPosition.getValue().getJ();
-		}
-		return respons;
-	}
+//	// server messages
+//	// returns all the clients positions
+//	public static String readyResponse(Map<Integer, MetaPosition> startPositions) {
+//		String respons = "start";
+//		for (Map.Entry<Integer, MetaPosition> clientPosition : startPositions
+//				.entrySet()) {
+//			respons += "::" + clientPosition.getKey() + "::"
+//					+ clientPosition.getValue().getI()
+//					+ clientPosition.getValue().getJ();
+//		}
+//		return respons;
+//	}
 
 	public static String introResponseMessage(int clientId) {
 		return "welcome::" + clientId;

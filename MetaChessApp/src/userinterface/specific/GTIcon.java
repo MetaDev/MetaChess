@@ -8,6 +8,7 @@ public class GTIcon extends GUI1Tile{
 	public GTIcon(int color, GUITile container, int i, int j,String name) {
 		super(color, container, i, j);
 		grid=MetaConfig.getIcon(name);
+                
 	}
 
 

@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import userinterface.generic.GUI1Tile;
 import userinterface.generic.GUITile;
-import view.zgpu.RectangleRenderer;
+import view.RectangleRenderer;
 
 public class GUIRenderer {
 
@@ -21,8 +21,8 @@ public class GUIRenderer {
         if (tile.getColumns() == 1 && tile.getRows() == 1) {
             //System.out.println(tile.getWidth());
             glTranslatef(tile.getX(), tile.getY(), 0);
-            GridRenderer.render(((GUI1Tile) tile).getGrid(),
-                    tile.getHeight() / 8);
+            GridRenderer.render(((GUI1Tile) tile));
+
         } else if (tile.getElements() != null) {
             // draw container
             RectangleRenderer.drawRectangle(tile.getX(), tile.getY(), tile.getWidth(),
