@@ -7,15 +7,14 @@ import userinterface.generic.GUITile;
 
 public class GTType extends GTInt {
 
-
     public GTType(int color, GUITile container, int i, int j) {
-        super(color, container, i, j,new POType());
-this.transparant=true;
+        super(color, container, i, j, new POType());
+        this.transparant = true;
     }
 
     @Override
     protected void updateRows() {
-        grid = MetaConfig.getIcon(ExtendedPieceModel.PieceType.values()[getParam()].name());
+        grid = ExtendedPieceModel.PieceType.values()[getParam()].name();
 
     }
 

@@ -5,7 +5,6 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import userinterface.generic.GUI1Tile;
 import userinterface.generic.GUITile;
-import view.RectangleRenderer;
 
 public class GUIRenderer {
 

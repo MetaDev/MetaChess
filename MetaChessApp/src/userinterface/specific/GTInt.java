@@ -21,7 +21,7 @@ public class GTInt extends GUI1Tile {
     }
 
     @Override
-    public int[][] getGrid() {
+    public String getGrid() {
         updateRows();
         return grid;
     }
@@ -31,20 +31,7 @@ public class GTInt extends GUI1Tile {
         int oppositeColor = (color + 1) % 2;
 
         int parameterValue = getParam();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                parameterValue--;
-                //draw the number in the color
-                if (parameterValue >= 0) {
-                    setColorInGrid(i, j, color);
-                }
-                //draw the background in opposite color
-                else{
-                    setColorInGrid(i, j, oppositeColor);
-                }
-            }
-          
-        }
+       //use param to get correct grid
 
     }
 

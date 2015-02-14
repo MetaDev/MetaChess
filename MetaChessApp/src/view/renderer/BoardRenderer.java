@@ -11,7 +11,6 @@ import engine.board.ExtendedBoardModel;
 import engine.piece.ExtendedPieceModel;
 import engine.board.ExtendedTileModel;
 import engine.player.Player;
-import view.RectangleRenderer;
 
 public class BoardRenderer {
 

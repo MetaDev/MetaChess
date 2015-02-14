@@ -30,9 +30,9 @@ public class PlayerInput extends Player {
     private Map<Integer, Integer> rangeKeys = new HashMap<>();
     private boolean keyUpdate = false;
 
-    public PlayerInput(int side, ExtendedPieceModel controlledModel, String name, int[][] core) {
+    public PlayerInput(int side, ExtendedPieceModel controlledModel, String name, String core) {
         super(side, controlledModel, name, core);
-        decreaseLivesOnKill=true;
+        decreaseLivesOnKill = true;
     }
 
     public void setSwitchKey(int switchKey) {
@@ -97,11 +97,18 @@ public class PlayerInput extends Player {
                 resetKey(rangeKey);
             }
             if (keyPressed(switchKey)) {
-                handleSwitch();
+                //if switch succesful reset key
+                if (handleSwitch()) {
+                    resetKey(switchKey);
+                }
+            } else if (keyReleased(switchKey)) {
+                resetKey(switchKey);
             }
             //special key is pressed
             if (keyPressed(specialKey)) {
-                handleSpecial(true);
+                if (handleSpecial(true)) {
+                    resetKey(specialKey);
+                }
             } else if (keyReleased(specialKey)) {
                 handleSpecial(false);
                 //special is reset on release
@@ -114,11 +121,12 @@ public class PlayerInput extends Player {
         //movement can occur when a key is held also
         for (Direction direction : controlledModel.getAllowedMovement()) {
             if (keyPressed(pieceKeyMovements.get(direction))) {
-                handleMovement(direction);
-                //if over max fraction only execute on press, so the press state is reset after movement
-                if (playerIsOverMaxFraction()) {
+                //if over max fraction only execute once per press
+                if (handleMovement(direction)&& playerIsOverMaxFraction()) {
                     resetKey(pieceKeyMovements.get(direction));
                 }
+            }else if(keyReleased(pieceKeyMovements.get(direction))&& playerIsOverMaxFraction()){
+                resetKey(pieceKeyMovements.get(direction));
             }
         }
 

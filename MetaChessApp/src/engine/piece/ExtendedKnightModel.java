@@ -12,17 +12,14 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
     public ExtendedKnightModel(int side) {
         super(PieceType.KNIGHT, side, 2);
         Directions.getKnightDirections(allowedMovement);
-        //for knight movement penetrate lower fraction is always true
-        penetrateLowerFraction = true;
     }
 
     @Override
-    public int[][] getGrid() {
-        if (isDragon()) {
-            return MetaConfig.getIcon("DRAGON");
-        } else {
-            return super.getGrid();
+    public String getName() {
+        if (!isDragon()) {
+            return super.getName();
         }
+        return "dragon";
     }
 
     @Override
@@ -43,39 +40,39 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
     @Override
     public boolean handleMovement(Directions.Direction direction, int range, boolean extendedSpecial) {
 
-        //if not dragon movement stays about the same
-        if (!isDragon()) {
-            super.handleMovement(direction, range, extendedSpecial);
-        }
         // if dragon
         int i = direction.getX();
         int j = direction.getY();
         //if dragon always hoover
-        boolean hoover = isDragon();
-        List<ExtendedTileModel> path1 = new ArrayList<>();
-        List<ExtendedTileModel> path2 = new ArrayList<>();
-        ExtendedTileModel previousTile = getTilePosition();
-        //calculate paths of hor and vert movement seperately if dragon
-        if (Math.abs(i) == 2) {
-            //first the longest movement
-            path2 = findPath(getTilePosition(), i + 1, 0, extendedSpecial);
-            //check if path succeeded
-            if (path2.get(1) == null) {
-                return false;
-            }
-            //continue movement
-            path1 = findPath(path2.get(1), i + 1, 0, extendedSpecial);
+        boolean hoover = isDragon() || extendedSpecial;
+        List<ExtendedTileModel> path1;
+        List<ExtendedTileModel> path2;
+        int firstHorMov;
+        int firstVerMov;
+        int lastHorMov;
+        int lastVerMov;
 
+        if (Math.abs(i) > Math.abs(j)) {
+            firstHorMov = i;
+            firstVerMov = 0;
+            lastHorMov = 0;
+            lastVerMov = j;
         } else {
-            //first the longest movement
-            path2 = findPath(getTilePosition(), 0, j + 1, extendedSpecial);
-//check if path succeeded
-            if (path2.get(1) == null) {
-                return false;
-            }
-            //continue movement
-            path1 = findPath(path2.get(1), i, 0, extendedSpecial);
-
+            firstHorMov = 0;
+            firstVerMov = j;
+            lastHorMov = i;
+            lastVerMov = 0;
+        }
+        //first the longest movement
+        path2 = findPath(getTilePosition(), firstHorMov, firstVerMov, hoover);
+        //check if path succeeded
+        if (path2 == null) {
+            return false;
+        }
+        //continue movement, last move never hoovers
+        path1 = findPath(path2.get(1), lastHorMov, lastVerMov, false);
+        if (path1 == null) {
+            return false;
         }
         ExtendedTileModel firstTile = path2.get(0);
         ExtendedTileModel intermediaryTile = path2.get(1);
@@ -85,13 +82,16 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
         if (!handleLastTileInPath(lastTile)) {
             return false;
         }
-        //the dragon fire kill happens recursively on the first tile of long path
-        //handle dragon fire
-        dragonFire(firstTile, getTilePosition().getAbsFraction(), (int) Math.pow(2, Math.ceil(range / 2)));
-        //if extended special k
-        if (extendedSpecial) {
-            dragonFire(intermediaryTile, getTilePosition().getAbsFraction(), (int) Math.pow(2, range / 2));
+        if (isDragon()) {
+            //the dragon fire kill happens recursively on the first tile of long path
+            //handle dragon fire
+            dragonFire(firstTile, getTilePosition().getAbsFraction(), (int) Math.pow(2, Math.ceil(range / 2)));
+            //if extended special k
+            if (extendedSpecial) {
+                dragonFire(intermediaryTile, getTilePosition().getAbsFraction(), (int) Math.pow(2, range / 2));
+            }
         }
+
         return true;
     }
 
@@ -104,10 +104,8 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
             pieceOnHooveredTile = MetaConfig
                     .getBoardModel().getPieceByPosition(tile);
             //take if from opposite tile
-            if (pieceOnHooveredTile != null && pieceOnHooveredTile.getColor() != getColor()) {
-                handlePieceTaken(pieceOnHooveredTile);
+            takePiece(pieceOnHooveredTile);
 
-            }
         } else // now check deeper fractions, recursively
         {
             recursiveTileKill(tile, startFraction, depth);
@@ -123,9 +121,9 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
                     // if there's a piece on the hoovered tile
                     ExtendedPieceModel pieceOnHooveredTile = MetaConfig
                             .getBoardModel().getPieceByPosition(tile.getChildren()[i][j]);
-                    handlePieceTaken(pieceOnHooveredTile);
+                    takePiece(pieceOnHooveredTile);
                     //continue recursion
-                    recursiveTileKill(tile.getChildren()[i][j],startFraction,depth);
+                    recursiveTileKill(tile.getChildren()[i][j], startFraction, depth);
 
                 }
             }

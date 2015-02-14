@@ -37,7 +37,7 @@ public class BoardEditor extends Editor {
 				randAbsFraction = MetaUtil.randInt(8, maxAbsFraction);
 
 				// now choose random tile
-				BoardLogic.getRandomTile(randAbsFraction,true).divide(randFraction);
+				BoardLogic.getRandomTile(true).divide(randFraction);
 
 			}
 		}

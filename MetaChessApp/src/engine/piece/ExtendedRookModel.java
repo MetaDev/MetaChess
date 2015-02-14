@@ -1,12 +1,16 @@
 package engine.piece;
 
 import engine.Directions;
+import static engine.piece.ExtendedPieceModel.specialIcon;
+import meta.MetaConfig;
 
 public class ExtendedRookModel extends ExtendedPieceModel {
 
     public ExtendedRookModel(int side) {
         super(PieceType.ROOK, side, 4);
         Directions.getOrthoDirections(allowedMovement);
+        specialIcon = "horizon";
+
     }
 
     @Override

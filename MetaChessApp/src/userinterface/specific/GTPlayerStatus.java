@@ -22,6 +22,7 @@ public class GTPlayerStatus extends GUITile {
 
     private void build() {
         addElement(new GTBool(color, this, 1, getRows() - 1, new POTurn()));
+        addElement(new GTIcon(color, this, 0, getRows() - 1, "YOURTURN"));
         addElement(new GTInt(color, this, 1, getRows() - 2, new PORange()));
         addElement(new GTInt(color, this, 1, getRows() - 3, new POCooldown()));
         addElement(new GTInt(color, this, 1, getRows() - 4, new PORangeOfDecision()));

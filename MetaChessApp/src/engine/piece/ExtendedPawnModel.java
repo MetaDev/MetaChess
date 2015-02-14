@@ -4,14 +4,14 @@ import engine.Directions;
 
 public class ExtendedPawnModel extends ExtendedPieceModel {
 
-    private boolean bound = false;
+    private ExtendedKingModel commander;
 
     public boolean isBound() {
-        return bound;
+        return commander!=null;
     }
 
-    public void setBound(boolean bound) {
-        this.bound = bound;
+    public void setBound(ExtendedKingModel commander) {
+        this.commander = commander;
     }
 
     public ExtendedPawnModel(int side) {
@@ -30,14 +30,21 @@ public class ExtendedPawnModel extends ExtendedPieceModel {
                 this.axis = (this.axis + 2) * range % 8;
 
             }
+        }else{
+            this.axis=0;
         }
-        //no else because it's an cyclic variabel, so it doesn't return to default variabel on undecision
+       
     }
 
     @Override
     public boolean handleMovement(Directions.Direction direction, int range, boolean extendedSpecial) {
         //use axis to alter direction
-        return super.handleMovement(direction, 1, extendedSpecial);
+        boolean succeeded = super.handleMovement(Directions.turnDirection(direction, axis), 1, extendedSpecial);
+        if (succeeded) {
+            commander.removePawnFromWall(this);
+            commander=null;
+        }
+        return succeeded;
     }
 
 }

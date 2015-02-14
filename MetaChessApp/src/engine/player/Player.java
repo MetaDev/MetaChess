@@ -16,12 +16,12 @@ public class Player {
     protected boolean extendeRangeOfActiveDecision;
     protected int absFractionOfActiveDecision;
     protected int side;
-    protected boolean decreaseLivesOnKill=false;
+    protected boolean decreaseLivesOnKill = false;
     protected boolean locked = false;
     protected int absTime = 0;
     protected int previousFraction = 8;
 
-    protected int[][] core;
+    protected String core;
     protected int range = 1;
     protected boolean extendedSpecial = false;
 
@@ -41,10 +41,10 @@ public class Player {
     }
 
     public void setControlledModel(ExtendedPieceModel controlledModel) {
-        if(controlledModel.getColor()!=side)
+        if (controlledModel.getColor() != side) {
             System.out.println("Trying to bind player from opposite side to piece");
+        }
         this.controlledModel = controlledModel;
-
 
     }
 
@@ -61,7 +61,7 @@ public class Player {
     }
 
     public Player(int side, ExtendedPieceModel controlledModel,
-            String name, int[][] core) {
+            String name, String core) {
         this.controlledModel = controlledModel;
         this.name = name;
         this.core = core;
@@ -80,10 +80,10 @@ public class Player {
     // the switch algorythm is defined by the range given
     // if mode=0 this means the switch key has been released, mode=1 is the
     // switch key pressed
-    public void handleSwitch() {
+    public boolean handleSwitch() {
         //only switch when not locked, has turn and no cooldown
         if (!hasTurn() || locked || cooldown > 0) {
-            return;
+            return false;
         }
         ExtendedPieceModel newPiece;
         Player newPieceOwner = null;
@@ -135,10 +135,10 @@ public class Player {
                 setControlledModel(newPiece);
                 //set cooldown and lock
                 payForSwitch();
-
+                return true;
             }
         }
-
+        return false;
     }
 
     //check if turn changed, decrease or increase cooldown
@@ -159,7 +159,7 @@ public class Player {
         }
     }
 
-    protected boolean playerIsOverMaxFraction() {
+    public boolean playerIsOverMaxFraction() {
         return controlledModel.getTilePosition().getAbsFraction() >= MetaClock.getMaxFraction();
     }
 
@@ -167,12 +167,14 @@ public class Player {
         return MetaClock.getTurn(this);
     }
 
-    protected void handleMovement(Direction direction) {
+    protected boolean handleMovement(Direction direction) {
         //don't lock for movement once passed max fraction
         if ((hasTurn() && !locked) || playerIsOverMaxFraction()) {
             controlledModel.handleMovement(direction, range, extendedSpecial);
             locked = true;
+            return true;
         }
+        return false;
     }
 
     private void payForSwitch() {
@@ -188,8 +190,8 @@ public class Player {
     }
 
     private int calculateCost() {
-        if(extendeRangeOfActiveDecision){
-            return rangeOfActiveDecision+3;
+        if (extendeRangeOfActiveDecision) {
+            return rangeOfActiveDecision + 3;
         }
         return rangeOfActiveDecision;
     }
@@ -198,14 +200,14 @@ public class Player {
         return controlledModel.getTilePosition().getAbsFraction();
     }
 
-    public void handleSpecial(boolean on) {
+    public boolean handleSpecial(boolean on) {
 
         //if special decision check if no cooldown left 
         if (hasTurn() && cooldown == 0 && on) {
             //save cost of decision
             rangeOfActiveDecision = range;
             if (extendedSpecial) {
-                extendeRangeOfActiveDecision=true;
+                extendeRangeOfActiveDecision = true;
             }
             //save fraction of position on decision
             absFractionOfActiveDecision = getFraction();
@@ -213,15 +215,16 @@ public class Player {
             cooldown = calculateCost();
             //execute on piece
             controlledModel.setSpecial(true, range, extendedSpecial);
-
+            return true;
         }
         if (!on) {
             rangeOfActiveDecision = 0;
-            extendeRangeOfActiveDecision=false;
+            extendeRangeOfActiveDecision = false;
             //execute on piece
             controlledModel.setSpecial(false, range, extendedSpecial);
+            return true;
         }
-
+        return false;
     }
 
     public int getRange() {
@@ -279,13 +282,11 @@ public class Player {
         previousFraction = newFraction;
     }
 
-    public int[][] getCore() {
+    public String getCore() {
         return core;
     }
 
-    public void setCore(int[][] core) {
-        this.core = core;
-    }
+    
 
     public int getAbsTime() {
         return absTime;

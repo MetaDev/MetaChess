@@ -17,7 +17,7 @@ public class PlayerAI extends Player {
 
     private Random rn = new Random();
 
-    public PlayerAI(int side, ExtendedPieceModel controlledModel, String name, int[][] core) {
+    public PlayerAI(int side, ExtendedPieceModel controlledModel, String name, String core) {
         super(side, controlledModel, name, core);
         decreaseLivesOnKill = true;
 

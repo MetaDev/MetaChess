@@ -39,10 +39,10 @@ public class KeyMapEditor extends Editor {
         player.setPiecTypeKeyMapping(PieceType.PAWN, mapping);
         player.setPiecTypeKeyMapping(PieceType.KNIGHT, mapping);
 
-        player.setRangeKeyMapping(1, GLFW.GLFW_KEY_KP_1);
-        player.setRangeKeyMapping(2, GLFW.GLFW_KEY_KP_2);
-        player.setRangeKeyMapping(3, GLFW.GLFW_KEY_E);
-        player.setRangeKeyMapping(4, GLFW.GLFW_KEY_KP_3);
+        player.setRangeKeyMapping(1, GLFW.GLFW_KEY_H);
+        player.setRangeKeyMapping(2, GLFW.GLFW_KEY_J);
+        player.setRangeKeyMapping(3, GLFW.GLFW_KEY_K);
+        player.setRangeKeyMapping(4, GLFW.GLFW_KEY_L);
         player.setSpecialKey(GLFW.GLFW_KEY_SPACE);
         player.setSwitchKey(GLFW.GLFW_KEY_ENTER);
     }

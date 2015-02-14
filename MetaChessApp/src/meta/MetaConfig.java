@@ -8,7 +8,7 @@ import java.util.Set;
 import engine.board.ExtendedBoardModel;
 import engine.board.ExtendedTileModel;
 
-import userinterface.init.IconLoader;
+import res.BitGrids;
 import view.renderer.BoardRenderer;
 import view.renderer.GUIRenderer;
 
@@ -85,13 +85,8 @@ public class MetaConfig {
     // multiplayer or not
     public static boolean multiPlayer = false;
 
-    public static int[][] getIcon(String name) {
-        return decisionsIcons.get(name);
-    }
-
-    public static void setIcon(String name, int[][] icon) {
-        decisionsIcons.put(name, icon);
-    }
+  
+   
 
     public static ExtendedBoardModel getBoardModel() {
         return boardModel;
@@ -120,7 +115,7 @@ public class MetaConfig {
         MetaConfig.setBoardModel(new ExtendedBoardModel(floor));
 
         // load icons
-        IconLoader.loadIcons();
+       BitGrids.loadBitgrids();
         //set keys
         
 

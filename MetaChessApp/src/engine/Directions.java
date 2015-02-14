@@ -57,6 +57,13 @@ public class Directions {
         return directionsOrthDiagOrder.get((directionsOrthDiagOrder.indexOf(allDirections.get(direction.getName())) + turn) % directionsOrthDiagOrder.size());
     }
 
+    public static int getTurnFromDirection(Direction direction) {
+        return directionsOrthDiagOrder.indexOf(direction);
+    }
+    public static Direction getDirectionFromTurn(int turn){
+        return directionsOrthDiagOrder.get(turn);
+    }
+
     private static void init() {
         Direction d;
         //orhtogonal and diagonal directions
@@ -74,7 +81,7 @@ public class Directions {
         allDirections.put(d.getName(), d);
         directionsOrthDiagOrder.add(d);
         //upright,right,downright
-        indices = new int[]{-1, 0, 1};
+        indices = new int[]{1, 0, -1};
         for (int y : indices) {
             d = new Direction(1, y);
             allDirections.put(d.getName(), d);
@@ -85,13 +92,13 @@ public class Directions {
         allDirections.put(d.getName(), d);
         directionsOrthDiagOrder.add(d);
 
-         //all knight directions
+        //all knight directions
         indices = new int[]{-2, -1, 1, 2};
         for (int x : indices) {
             for (int y : indices) {
                 if (Math.abs(x) != Math.abs(y)) {
-                     d = new Direction(x,y);
-                     allDirections.put(d.getName(), d);
+                    d = new Direction(x, y);
+                    allDirections.put(d.getName(), d);
                 }
             }
         }
@@ -112,7 +119,7 @@ public class Directions {
 
     public static void getOrthoDirections(Collection<Direction> coll) {
         //all knight directions
-        int[] indices = new int[]{-1, 0,1};
+        int[] indices = new int[]{-1, 0, 1};
         for (int x : indices) {
             for (int y : indices) {
                 if (Math.abs(x) != Math.abs(y)) {
@@ -121,14 +128,15 @@ public class Directions {
             }
         }
     }
+
     public static void getDiagDirections(Collection<Direction> coll) {
         //all knight directions
-        int[] indices = new int[]{-1,1};
+        int[] indices = new int[]{-1, 1};
         for (int x : indices) {
             for (int y : indices) {
-                
-                    coll.add(getDirection(x, y));
-                
+
+                coll.add(getDirection(x, y));
+
             }
         }
     }

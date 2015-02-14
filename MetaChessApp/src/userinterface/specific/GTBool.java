@@ -10,20 +10,20 @@ public class GTBool extends GUI1Tile {
 	// a second possibility for the grid depending on the players turn, this
     // grid represents not your turn
 
-    private int[][] grid1;
+    private String grid1;
 private PlayerStatsAccessObject paramObject;
     public GTBool(int color, GUITile container, int i, int j,PlayerStatsAccessObject paramObject) {
         super(color, container, i, j);
         // construct both grids
         this.paramObject=paramObject;
         this.transparant=true;
-        grid = MetaConfig.getIcon("YOURTURN");
-        grid1 = MetaConfig.getIcon("NOTYOURTURN");
+        grid = "plus";
+        grid1 = "minus";
 
     }
 
     @Override
-    public int[][] getGrid() {
+    public String getGrid() {
         boolean on = PlayerStatsAccessObject.intToBoolean(paramObject.getParam());
         // get fraction and side form player singleton
         if (on) {

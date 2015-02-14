@@ -2,7 +2,6 @@ package engine.piece;
 
 import engine.player.Player;
 import engine.Directions.Direction;
-import engine.MetaClock;
 import java.util.HashSet;
 import java.util.Set;
 import engine.board.BoardLogic;
@@ -34,10 +33,9 @@ public abstract class ExtendedPieceModel {
     // until a depth of 2^abs(killOnHooverTiles) lower than current depth
     //if it's non negative only one of the tiles hoovered is targeted
     protected int killOnHooverTiles = 0;
-    protected boolean penetrateLowerFraction = false;
     protected PieceType type;
     //the icon for the special in the gui
-    protected static int[] specialIcon;
+    protected static String specialIcon;
     //save icons as long, 64 bit bitstring
     //save icon of decision and type
 
@@ -62,20 +60,12 @@ public abstract class ExtendedPieceModel {
         return type;
     }
 
-    public boolean isPenetrateLowerFraction() {
-        return penetrateLowerFraction;
-    }
-
-    public void setPenetrateLowerFraction(boolean penetrateLowerFraction) {
-        this.penetrateLowerFraction = penetrateLowerFraction;
-    }
-
-    public int[][] getGrid() {
-        return MetaConfig.getIcon(type.name());
-    }
-
     public int getIncreasedTileview() {
         return increasedTileView;
+    }
+
+    public String getName() {
+        return type.name();
     }
 
     public void propagateViewInfluence(int range) {
@@ -128,7 +118,7 @@ public abstract class ExtendedPieceModel {
     }
 
     public boolean isRunner() {
-        return penetrateLowerFraction || increasedMovementRange > 0;
+        return increasedMovementRange > 0;
     }
 
     public boolean getViewing() {
@@ -145,11 +135,11 @@ public abstract class ExtendedPieceModel {
     public boolean handleMovement(Direction direction, int range, boolean extendedSpecial) {
         int i = direction.getX() * range;
         int j = direction.getY() * range;
-        List<ExtendedTileModel> path = findPath(getTilePosition(),i, j, extendedSpecial);
+        List<ExtendedTileModel> path = findPath(getTilePosition(), i, j, extendedSpecial);
         if (path == null) {
             return false;
         }
-        //
+        //chech if all but last tile is occupied by any piece
         if (!checkPath(path)) {
             return false;
         }
@@ -162,39 +152,62 @@ public abstract class ExtendedPieceModel {
         // if there's a piece on the new tile
         ExtendedPieceModel pieceOnnewTile = MetaConfig.getBoardModel()
                 .getPieceByPosition(lastTileInPath);
-        if (pieceOnnewTile == null) {
-            // set new position for model
-            setTilePosition(lastTileInPath);
-            return true;
-        } else if (pieceOnnewTile.getColor() != getColor()) {
-            handlePieceTaken(pieceOnnewTile);
-            System.out.println("piece killed");
-            // set new position for model
-            setTilePosition(lastTileInPath);
-            return true;
+        if (pieceCanBeTaken(pieceOnnewTile)) {
+            takePiece(pieceOnnewTile);
+        } else if (pieceOnnewTile != null) {
+            return false;
         }
+        setTilePosition(lastTileInPath);
 
-        // move not made
-        return false;
+        return true;
     }
 
     protected boolean checkPath(List<ExtendedTileModel> path) {
-        //check if path doesn't contain any other pieces
+        //check if path (all tiles except last) doesn't contain any other pieces
         for (int i = 0; i < path.size() - 2; i++) {
-            if (MetaConfig.getBoardModel().getPieceByPosition(path.get(i)) != null) {
+            if (path.get(i).isOccupied()) {
                 return false;
             }
         }
         return true;
     }
 
-    protected List<ExtendedTileModel> findPath(ExtendedTileModel previousTile,int i, int j, boolean extendedSpecial) {
+    protected List<ExtendedTileModel> findPath(ExtendedTileModel startTile, int i, int j, boolean extendedSpecial) {
+        //use direction coordinates to construct a tile path
+        int verMov;
+        int horMov;
+        int remainingHorMov = i;
 
+        int remainingVerMov = j;
         boolean hoover = extendedSpecial;
         List<ExtendedTileModel> path = new ArrayList<>();
-        BoardLogic.findTilePath(previousTile,
-                i, j, hoover,
-                isPenetrateLowerFraction(), path);
+        ExtendedTileModel previousTile = startTile;
+        int startFraction = startTile.getAbsFraction();
+        //continue while movement left
+        while (Math.abs(remainingHorMov) + Math.abs(remainingVerMov) > 0) {
+            //calculate singel tile directions
+            verMov = Integer.signum(j);
+            horMov = Integer.signum(i);
+            //decrease remaining movement
+            remainingHorMov = remainingHorMov - horMov;
+            remainingVerMov = remainingVerMov - verMov;
+            //on the last step of the movement hoover is always false
+            if (Math.abs(remainingHorMov) + Math.abs(remainingVerMov) == 0) {
+                previousTile = BoardLogic.findTileNeighBour(previousTile,
+                        horMov, verMov, false, startFraction);
+
+            } else {
+                previousTile = BoardLogic.findTileNeighBour(previousTile,
+                        horMov, verMov, hoover, startFraction);
+
+            }
+            if (previousTile == null) {
+                return null;
+            }
+            path.add(previousTile);
+
+        }
+
         ExtendedTileModel lastTile = path.get(path.size() - 1);
         // movement did not succeed
         if (lastTile == null) {
@@ -207,27 +220,25 @@ public abstract class ExtendedPieceModel {
         return axis;
     }
 
-  
     //set all non-type vars to initial value;
     //used when a player leaves a piece
-
     public void reset() {
 //TODO
     }
 
-    //here starts the logic for movement
-    // handle logic when 2 pieces are on same tile, return of piece can make
-    // move or not
-    protected void handlePieceTaken(ExtendedPieceModel pieceOnnewTile) {
-        if (MetaConfig.getBoardModel().getPlayerByPiece(pieceOnnewTile).isDecreaseLivesOnKill()) {
-            //decrease side lives
-            MetaConfig.getBoardModel().decreaseSideLives(pieceOnnewTile.getColor(),
-                    pieceOnnewTile.getLives());
+    protected boolean pieceCanBeTaken(ExtendedPieceModel piece) {
+        //check if player in piece can be killed
+        return piece != null && piece.getColor() != getColor() && MetaConfig.getBoardModel().getPlayerByPiece(piece).isDecreaseLivesOnKill();
+    }
 
-        }
+    protected void takePiece(ExtendedPieceModel pieceOnnewTile) {
+
+        //decrease side lives
+        MetaConfig.getBoardModel().decreaseSideLives(pieceOnnewTile.getColor(),
+                pieceOnnewTile.getLives());
+        System.out.println("piece killed");
         //put player on a random tile
-        pieceOnnewTile.setTilePosition(BoardLogic.getRandomTile(
-                MetaClock.getMaxFraction(), false));
+        pieceOnnewTile.setTilePosition(BoardLogic.getRandomTile(false));
 
     }
 

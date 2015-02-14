@@ -11,12 +11,12 @@ import engine.piece.ExtendedPieceModel;
  *
  * @author Harald
  */
-//empty player, pushable but not killable
-public class PlayerEmpty extends Player{
+//a dummy for a real player, pushable and killable
+public class PlayerDummy extends PlayerEmpty{
 
-    public PlayerEmpty(int side, ExtendedPieceModel controlledModel, String name, String core) {
+    public PlayerDummy(int side, ExtendedPieceModel controlledModel, String name, String core) {
         super(side, controlledModel, name, core);
-        pushable=true;
+        decreaseLivesOnKill = true;
     }
-    //empty player does nothing
+    
 }

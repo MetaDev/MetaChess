@@ -41,6 +41,9 @@ public class BoardLogic {
         return it;
     }
 
+    private static boolean isCoord(int mov) {
+        return mov == 0 || mov == 1 || mov == -1;
+    }
     /*
      * implementation; go to neighbour tile do remainingmovement -1 if
      * remainingmovement>0 do recursion parameters: floating, never go to lower
@@ -49,21 +52,15 @@ public class BoardLogic {
      * tile result: null if movement not allowed else desired tile save alle
      * encountered pieces on movement in a list
      */
-    public static void findTilePath(ExtendedTileModel tile,
-            int horDir, int vertDir, boolean hoover,
-            boolean penetrateHigherFraction, List<ExtendedTileModel> tilePath) {
+
+    public static ExtendedTileModel findTileNeighBour(ExtendedTileModel tile,
+            int horMov, int verMov, boolean hoover, int startFraction) {
         ExtendedTileModel it = tile;
-        int startFraction = it.getAbsFraction();
-        // root tile
-        if (it.getParent() == null) {
-            return;
+        // root tile or wrong move
+        if (it.getParent() == null || !isCoord(horMov) || !isCoord(verMov)) {
+            return null;
         }
-
-        int verMov = Integer.signum(vertDir);
-        int horMov = Integer.signum(horDir);
-        int remainingHorMov = horDir - horMov;
-
-        int remainingVerMov = vertDir - verMov;
+        //hor and vertDir have values -1, or 1
 
         // on the border of parent tile
         if (it.getI() + horMov > it.getParent().getChildFraction() - 1
@@ -78,44 +75,18 @@ public class BoardLogic {
         //at border of board
         if (it == null) {
             //add null to indicate that the path is terminated early
-            tilePath.add(it);
-            return;
+            return it;
         }
-        //boolean to save whether movement is continue
-        boolean cont = false;
         // if the new found tile contains children
         if (it.getChildren() != null) {
-            if (hoover) {
-                //if  there's movement remaining,
-                if (Math.abs(remainingHorMov) + Math.abs(remainingVerMov) != 0) {
-                    // and hoover is true, don't enter smaller tile 
-                    //continue movement
-                    tilePath.add(it);
-                    findTilePath(it, remainingHorMov, remainingVerMov,
-                            hoover, penetrateHigherFraction,
-                            tilePath);
-                    return;
-                }
+            if (!hoover) {
+                //if children and not hoover, enterlowest fraction of neighbour
+                it = enterLowerFractionOfTile(it, horMov, verMov);
             }
-            //if children and not hoover, enterlowest fraction of neighbour
-            it = enterLowerFractionOfTile(it, horMov, verMov);
-            //if movement left and penetrateHigherFraction is on continue movement
-            if (penetrateHigherFraction && Math.abs(remainingHorMov) + Math.abs(remainingVerMov) != 0) {
-                cont = true;
-            }
-        } else if (Math.abs(remainingHorMov) + Math.abs(remainingVerMov) != 0) {
-            //if no children, continue movement
-            cont = true;
-        }
-        //it won't change in this method anymore, add to path
-        tilePath.add(it);
 
-        //continue if there the tile on the path is not occupied
-        if (cont) {
-            findTilePath(it, remainingHorMov, remainingVerMov,
-                    hoover, penetrateHigherFraction,
-                    tilePath);
         }
+        return it;
+
     }
 
 //if the fraction you enter is smaller (bigger fractioning) than positioning is depended of move direction
@@ -177,6 +148,7 @@ public class BoardLogic {
                         + Math.pow((double) tile1.getAbsY() - tile2.getAbsY(),
                                 2));
     }
+    
 
     public static boolean isInrange(ExtendedPieceModel viewer,
             ExtendedPieceModel subject) {
@@ -201,7 +173,7 @@ public class BoardLogic {
     }
 
     // return a tile with an abs fraction smaller then the one given
-    public static ExtendedTileModel getRandomTile(int maxAbsFraction,
+    public static ExtendedTileModel getRandomTile(
             boolean canBeOccupied) {
         ExtendedTileModel tileIt;
         do {
@@ -210,11 +182,8 @@ public class BoardLogic {
             // now choose random tile
             int randCol;
             int randRow;
-            // pick a random max level of fraction, different from root (0)
-            int randAbsFraction = MetaUtil.randInt(8, maxAbsFraction);
 
-            while (tileIt.getChildren() != null
-                    && tileIt.getAbsFraction() <= randAbsFraction) {
+            while (tileIt.getChildren() != null) {
 
                 // pick random child on current tile
                 randCol = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
@@ -241,7 +210,7 @@ public class BoardLogic {
         for (Player neighbour : MetaConfig.getBoardModel()
                 .getPlayersOnBoard()) {
             piece = neighbour.getControlledModel();
-            if (!player.equals(neighbour) && player.getSide()==neighbour.getSide()
+            if (!player.equals(neighbour) && player.getSide() == neighbour.getSide()
                     && (tempDist = BoardLogic.calculateDistance(
                             player.getControlledModel().getTilePosition(),
                             piece.getTilePosition())) < compareDist) {
@@ -263,7 +232,7 @@ public class BoardLogic {
         for (Player neighbour : MetaConfig.getBoardModel()
                 .getPlayersOnBoard()) {
             piece = neighbour.getControlledModel();
-            if (!player.equals(neighbour)&& player.getSide()==neighbour.getSide()
+            if (!player.equals(neighbour) && player.getSide() == neighbour.getSide()
                     && (tempDist = BoardLogic.calculateDistance(
                             player.getControlledModel().getTilePosition(),
                             piece.getTilePosition())) > compareDist) {
