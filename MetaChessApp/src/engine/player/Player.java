@@ -20,7 +20,7 @@ public class Player {
     protected boolean locked = false;
     protected int absTime = 0;
     protected int previousFraction = 8;
-
+    //boolean to distinguish between input player
     protected String core;
     protected int range = 1;
     protected boolean extendedSpecial = false;
@@ -99,22 +99,22 @@ public class Player {
                 newPieceOwner = BoardLogic.getFurthestPlayer(this);
                 break;
             case 3:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.PAWN, side));
+                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.pawn, side));
                 break;
             case 4:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.KNIGHT, side));
+                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.knight, side));
                 break;
             case 5:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.BISHOP, side));
+                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.bischop, side));
                 break;
             case 6:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.ROOK, side));
+                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.rook, side));
                 break;
             case 7:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.KING, side));
+                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.king, side));
                 break;
             case 8:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.QUEEN, side));
+                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.queen, side));
                 break;
 
         }

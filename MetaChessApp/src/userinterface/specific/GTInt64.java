@@ -1,19 +1,20 @@
 package userinterface.specific;
 
+import res.BitGrids;
 import userinterface.accesobject.PlayerStatsAccessObject;
 import userinterface.generic.GUI1Tile;
 import userinterface.generic.GUITile;
 
-public class GTInt extends GUI1Tile {
+public class GTInt64 extends GUI1Tile {
 
     protected PlayerStatsAccessObject paramObject;
 
-    public GTInt(int color, GUITile container, int i, int j,
+    public GTInt64(int color, GUITile container, int i, int j,
             PlayerStatsAccessObject paramObject) {
         super(color, container, i, j);
         this.paramObject = paramObject;
         this.transparant = true;
-
+        this.grid="true";
     }
 
     protected int getParam() {
@@ -28,10 +29,9 @@ public class GTInt extends GUI1Tile {
 
     protected void updateRows() {
 
-        int oppositeColor = (color + 1) % 2;
-
-        int parameterValue = getParam();
+       
        //use param to get correct grid
+        grid=BitGrids.getNumericalGrid(getParam(), BitGrids.NumericalGridBase.sixtyfour);
 
     }
 

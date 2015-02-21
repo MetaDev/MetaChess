@@ -1,14 +1,11 @@
 # Files #
-.cache
-.target
-.classpath
+# .cache # 
 
 # Folders #
-MetaChess/dist
-MetaChess/bin
-.metadata
+# MetaChess/dist # 
+# .metadata # 
 
 # Package Files #
-*.jar
+# *.jar # 
 *.war
 *.ear

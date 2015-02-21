@@ -9,7 +9,7 @@ import engine.board.ExtendedTileModel;
 public class BoardEditor extends Editor {
 
 	public static void init() {
-		boolean fractionRandom = true;
+		boolean fractionRandom = false;
 		// number of fractions allowed under the maxfraction, where the game
 		// becomes real-time
 		int fractionUnderMaxFraction = 32;

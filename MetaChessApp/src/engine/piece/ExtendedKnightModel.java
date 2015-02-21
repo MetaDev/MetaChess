@@ -1,27 +1,19 @@
 package engine.piece;
 
 import engine.Directions;
-import engine.board.BoardLogic;
 import engine.board.ExtendedTileModel;
-import java.util.ArrayList;
 import java.util.List;
 import meta.MetaConfig;
 
 public class ExtendedKnightModel extends ExtendedPieceModel {
 
     public ExtendedKnightModel(int side) {
-        super(PieceType.KNIGHT, side, 2);
+        super(PieceType.knight, side, 2);
         Directions.getKnightDirections(allowedMovement);
+        specialIcon="dragon";
     }
 
-    @Override
-    public String getName() {
-        if (!isDragon()) {
-            return super.getName();
-        }
-        return "dragon";
-    }
-
+    
     @Override
     public void setSpecial(boolean yes, int range, boolean extendedSpecial) {
         if (yes) {

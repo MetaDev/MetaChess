@@ -5,7 +5,7 @@ import meta.MetaConfig;
 import userinterface.accesobject.POType;
 import userinterface.generic.GUITile;
 
-public class GTType extends GTInt {
+public class GTType extends GTInt64 {
 
     public GTType(int color, GUITile container, int i, int j) {
         super(color, container, i, j, new POType());

@@ -22,13 +22,17 @@ public class GTPlayerStatus extends GUITile {
 
     private void build() {
         addElement(new GTBool(color, this, 1, getRows() - 1, new POTurn()));
-        addElement(new GTIcon(color, this, 0, getRows() - 1, "YOURTURN"));
-        addElement(new GTInt(color, this, 1, getRows() - 2, new PORange()));
-        addElement(new GTInt(color, this, 1, getRows() - 3, new POCooldown()));
-        addElement(new GTInt(color, this, 1, getRows() - 4, new PORangeOfDecision()));
+        addElement(new GTIcon(color, this, 0, getRows() - 1, "turn"));
+        addElement(new GTInt8(color, this, 1, getRows() - 2, new PORange()));
+        addElement(new GTIcon(color, this, 0, getRows() - 2, "range"));
+        addElement(new GTInt64(color, this, 1, getRows() - 3, new POCooldown()));
+        addElement(new GTIcon(color, this, 0, getRows() - 3, "decisioncooldown"));
+        addElement(new GTInt8(color, this, 1, getRows() - 4, new PORangeOfDecision()));
+        addElement(new GTIcon(color, this, 0, getRows() - 4, "decisionrange"));
         addElement(new GTBool(color, this, 1, getRows() - 5, new POExtendeSpecial()));
-        addElement(new GTIcon(color, this, 0, getRows() - 6, "TURN"));
-        addElement(new GTInt(color, this, 1, getRows() - 6, new POAxis()));
+        addElement(new GTIcon(color, this, 0, getRows() - 5, "extended"));
+        addElement(new GTIcon(color, this, 0, getRows() - 6, "axis"));
+        addElement(new GTInt64(color, this, 1, getRows() - 6, new POAxis()));
 
     }
 

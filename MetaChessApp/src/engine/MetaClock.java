@@ -1,6 +1,5 @@
 package engine;
 
-import engine.piece.ExtendedPieceModel;
 import engine.player.Player;
 import engine.board.ExtendedTileModel;
 
@@ -8,8 +7,8 @@ import engine.board.ExtendedTileModel;
 public class MetaClock {
 
     // amount of ms the turn on the main board takes (turn= both players played)
-    private static int maxWaitTime = 16 * 64 * 64;
-    //private static int maxWaitTime = 64* 64;
+    //private static int maxWaitTime = 16 * 64 * 64;
+    private static int maxWaitTime = 64* 64;
     //decides what the highest fraction allowed of a tile is, this is chosen such that the shortest turn before becoming real time is 4 *64 ms
     private static int maxTileFraction =  64;
 

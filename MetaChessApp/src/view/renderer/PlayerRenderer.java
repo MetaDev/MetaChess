@@ -1,10 +1,12 @@
 package view.renderer;
 
+import engine.piece.ExtendedPawnModel;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import engine.piece.ExtendedPieceModel;
 import engine.player.Player;
+import meta.MetaConfig;
 
 public class PlayerRenderer {
 
@@ -16,6 +18,18 @@ public class PlayerRenderer {
         int invert = (main + 1) % 2;
         glPushMatrix();
         glTranslatef(piece.getTilePosition().getAbsX(), piece.getTilePosition().getAbsY(), 0);
+        //draw in opposite color of tile if a piece is controlled by a player
+        if (player.equals(MetaConfig.getBoardModel().getInputPlayer())) {
+             //draw special sign to emphasize the controlled piece
+            GridRenderer.transparentRender("pieceplayer", piece
+                    .getTilePosition().getAbsSize() / 8, (piece.getTilePosition().getColor() + 1) % 2);
+        }
+        //draw special sign to mark bound pawns
+        if (piece.getType() == ExtendedPieceModel.PieceType.pawn && ((ExtendedPawnModel) piece).isBound()) {
+             GridRenderer.transparentRender("piecebound", piece
+                    .getTilePosition().getAbsSize() / 8, (piece.getTilePosition().getColor() + 1) % 2);
+        }
+
         // draw from grid
         GridRenderer.transparentRender(piece.getName(), piece
                 .getTilePosition().getAbsSize() / 8, piece.getColor());
@@ -40,5 +54,4 @@ public class PlayerRenderer {
 
     }
 
-    
 }

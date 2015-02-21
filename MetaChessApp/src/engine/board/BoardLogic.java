@@ -29,7 +29,7 @@ public class BoardLogic {
         int i;
         int j;
         double childSize;
-        while (x > 0 && y > 0 && it.getChildren() != null && it.getAbsFraction() * it.getChildFraction() <= maxFraction) {
+        while (it.getChildren() != null && it.getAbsFraction() * it.getChildFraction() <= maxFraction) {
             childSize = it.getAbsSize() / it.getChildFraction();
             i = (int) Math.floor(x / childSize);
             j = (int) Math.floor(y / childSize);
@@ -37,6 +37,9 @@ public class BoardLogic {
             it = it.getChildren()[i][j];
             x -= i * childSize;
             y -= j * childSize;
+            //round to zero
+            x = Math.max(0, x);
+            y = Math.max(0, y);
         }
         return it;
     }
@@ -47,7 +50,7 @@ public class BoardLogic {
     /*
      * implementation; go to neighbour tile do remainingmovement -1 if
      * remainingmovement>0 do recursion parameters: floating, never go to lower
-     * fraction, float on it ignoreoccupation, allowed to jump over pieces
+     * fraction, float on neighbour ignoreoccupation, allowed to jump over pieces
      * penetraLowerFraction, continue movement when entering a lower fractioned
      * tile result: null if movement not allowed else desired tile save alle
      * encountered pieces on movement in a list
@@ -55,41 +58,68 @@ public class BoardLogic {
 
     public static ExtendedTileModel findTileNeighBour(ExtendedTileModel tile,
             int horMov, int verMov, boolean hoover, int startFraction) {
-        ExtendedTileModel it = tile;
+
+        ExtendedTileModel neighbour = tile;
         // root tile or wrong move
-        if (it.getParent() == null || !isCoord(horMov) || !isCoord(verMov)) {
+        if (neighbour.getParent() == null || !isCoord(horMov) || !isCoord(verMov)) {
             return null;
         }
         //hor and vertDir have values -1, or 1
 
         // on the border of parent tile
-        if (it.getI() + horMov > it.getParent().getChildFraction() - 1
-                || it.getI() + horMov < 0
-                || it.getJ() + verMov > it.getParent().getChildFraction() - 1
-                || it.getJ() + verMov < 0) {
+        if (tile.getI() + horMov > tile.getParent().getChildFraction() - 1
+                || tile.getI() + horMov < 0
+                || tile.getJ() + verMov > tile.getParent().getChildFraction() - 1
+                || neighbour.getJ() + verMov < 0) {
             //estimate neighbour from abs position
-            it = getTileFromAbsPosition(it.getAbsX() + it.getAbsSize() / 2 + horMov * it.getAbsSize(), it.getAbsY() + it.getAbsSize() / 2 + verMov * it.getAbsSize(), startFraction);
+            neighbour = getTileFromAbsPosition(tile.getAbsCenterX()+ horMov *  tile.getAbsSize(), tile.getAbsCenterY()+ verMov *  tile.getAbsSize(), startFraction);
         } else {
-            it = it.getParent().getChildren()[it.getI() + horMov][it.getJ() + verMov];
+            neighbour = neighbour.getParent().getChildren()[neighbour.getI() + horMov][neighbour.getJ() + verMov];
         }
         //at border of board
-        if (it == null) {
+        if (neighbour == null) {
             //add null to indicate that the path is terminated early
-            return it;
+            return neighbour;
         }
         // if the new found tile contains children
-        if (it.getChildren() != null) {
-            if (!hoover) {
-                //if children and not hoover, enterlowest fraction of neighbour
-                it = enterLowerFractionOfTile(it, horMov, verMov);
-            }
+        if (neighbour.getChildren() != null && !hoover) {
+            //if children and not hoover, enterlowest fraction of neighbour
+            neighbour = getClosestLargestFractionTileFromNeighbour(tile, neighbour);
 
         }
-        return it;
+        return neighbour;
 
     }
 
+    public static Double euclidianDistance(ExtendedTileModel tile1, ExtendedTileModel tile2) {
+        //calculate euclididan distance from center of tile
+        return Math.sqrt(Math.pow(tile1.getAbsCenterX()- tile2.getAbsCenterX(), 2) + Math.pow(tile1.getAbsCenterY()- tile2.getAbsCenterY(), 2));
+    }
+
+    public static ExtendedTileModel getClosestLargestFractionTileFromNeighbour(ExtendedTileModel tile, ExtendedTileModel neighbour) {
+        ExtendedTileModel it = neighbour;
+        double minDist;
+        ExtendedTileModel closestChild;
+        while (it.getChildren() != null) {
+
+            closestChild = it.getChildren()[0][0];
+            minDist = euclidianDistance(closestChild,tile);
+            //iterate all children
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 2; j++) {
+                    //if closer child found
+                    if (euclidianDistance(it.getChildren()[i][j],tile)<minDist) {
+                        closestChild=it.getChildren()[i][j];
+                        minDist=euclidianDistance(closestChild ,tile);
+                    }
+                }
+            }
+            it=closestChild;
+        }
+        return it;
+    }
 //if the fraction you enter is smaller (bigger fractioning) than positioning is depended of move direction
+
     public static ExtendedTileModel enterLowerFractionOfTile(
             ExtendedTileModel tile, int horMov, int verMov) {
         ExtendedTileModel it = tile;
@@ -148,7 +178,6 @@ public class BoardLogic {
                         + Math.pow((double) tile1.getAbsY() - tile2.getAbsY(),
                                 2));
     }
-    
 
     public static boolean isInrange(ExtendedPieceModel viewer,
             ExtendedPieceModel subject) {

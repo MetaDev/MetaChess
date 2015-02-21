@@ -5,6 +5,7 @@
         <group>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/ExtendedBoardModel.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/view/renderer/GridRenderer.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userDoc.txt</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/PieceEditor.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedKingModel.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/PieceMovementLogic.java</file>
@@ -24,7 +25,9 @@
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/todo.txt</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/player/PlayerDummy.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/view/MetaRenderer.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedQueenModel.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/exceptions/WrongCollectionLengthException.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/specific/GTInt64.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/accesobject/POExtendeSpecial.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/view/MetaView.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/view/renderer/RectangleRenderer.java</file>
@@ -37,12 +40,12 @@
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/generic/GUI1Tile.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/Directions.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/GUIEditor.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/specific/GTInt.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/player/Player.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/player/PlayerEmpty.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/BoardLogic.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedRookModel.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/ExtendedTileModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/specific/GTInt8.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/specific/GTPlayerStatus.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/Editor.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/KeyMapEditor.java</file>
@@ -50,6 +53,7 @@
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/specific/GTIcon.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/BoardEditor.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/MetaClock.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/features.txt</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/accesobject/POType.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/meta/MetaConfig.java</file>
             <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/generic/ExtendedGUI.java</file>

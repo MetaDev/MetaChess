@@ -15,7 +15,7 @@ public abstract class ExtendedPieceModel {
 
     public enum PieceType {
 
-        PAWN, ROOK, KNIGHT, BISHOP, KING, QUEEN
+        pawn, rook, knight, bischop, king, queen
     }
 
     protected int color;
@@ -28,7 +28,8 @@ public abstract class ExtendedPieceModel {
     // only the rook will adapt this
     protected boolean viewing = false;
     protected boolean typeVisible = true;
-
+    //is the piece controlled by the input player
+    protected boolean bound;
     //a very special var, if negative all tiles that are hoovered have a chance to kill piece on it
     // until a depth of 2^abs(killOnHooverTiles) lower than current depth
     //if it's non negative only one of the tiles hoovered is targeted
@@ -220,12 +221,6 @@ public abstract class ExtendedPieceModel {
         return axis;
     }
 
-    //set all non-type vars to initial value;
-    //used when a player leaves a piece
-    public void reset() {
-//TODO
-    }
-
     protected boolean pieceCanBeTaken(ExtendedPieceModel piece) {
         //check if player in piece can be killed
         return piece != null && piece.getColor() != getColor() && MetaConfig.getBoardModel().getPlayerByPiece(piece).isDecreaseLivesOnKill();
@@ -233,9 +228,11 @@ public abstract class ExtendedPieceModel {
 
     protected void takePiece(ExtendedPieceModel pieceOnnewTile) {
 
-        //decrease side lives
-        MetaConfig.getBoardModel().decreaseSideLives(pieceOnnewTile.getColor(),
-                pieceOnnewTile.getLives());
+        if (pieceCanBeTaken(pieceOnnewTile)) //decrease side lives
+        {
+            MetaConfig.getBoardModel().decreaseSideLives(pieceOnnewTile.getColor(),
+                    pieceOnnewTile.getLives());
+        }
         System.out.println("piece killed");
         //put player on a random tile
         pieceOnnewTile.setTilePosition(BoardLogic.getRandomTile(false));

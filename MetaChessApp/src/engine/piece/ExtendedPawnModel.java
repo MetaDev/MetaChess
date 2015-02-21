@@ -15,7 +15,7 @@ public class ExtendedPawnModel extends ExtendedPieceModel {
     }
 
     public ExtendedPawnModel(int side) {
-        super(PieceType.PAWN, side, 1);
+        super(PieceType.pawn, side, 1);
         allowedMovement.add(Directions.getDirection(0, 1));
     }
 
@@ -40,7 +40,7 @@ public class ExtendedPawnModel extends ExtendedPieceModel {
     public boolean handleMovement(Directions.Direction direction, int range, boolean extendedSpecial) {
         //use axis to alter direction
         boolean succeeded = super.handleMovement(Directions.turnDirection(direction, axis), 1, extendedSpecial);
-        if (succeeded) {
+        if (succeeded && commander!=null) {
             commander.removePawnFromWall(this);
             commander=null;
         }

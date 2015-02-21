@@ -15,7 +15,7 @@ import meta.MetaConfig;
 public class ExtendedKingModel extends ExtendedPieceModel {
 	// when position changes regret active ranged decision
 
-    // list of pawns around the king
+    // list of pawns around the king, can be changed accordgin to axis
     private ExtendedPawnModel[] pawnWall = new ExtendedPawnModel[8];
     // position of the head of pawns around the king, they coil around the king
     // clockwise, with index 0 left bottom, indexing is counterclockwise
@@ -53,44 +53,33 @@ public class ExtendedKingModel extends ExtendedPieceModel {
     @Override
     public void setSpecial(boolean yes, int range, boolean extendedSpecial) {
         if (yes) {
+            //shift formation of pawn wall
             this.axis = range;
-            setPawnWallHeadPos(this.axis);
             if (extendedSpecial) {
-                //regroup pawn wall
+                //group pawns in wall
             }
         } else {
             //reset position
-            //todo
-            //setPawnWallHeadPos(-1 * this.axis);
             this.axis = 0;
 
         }
-
+        setPawnWallHeadPos();
     }
 
-    public void setPawnWallHeadPos(int turnRange) {
-        ExtendedPawnModel[] newPawnWall = new ExtendedPawnModel[8];
-        //construct new pawn wall
-        for (int i = 0; i < 8; i++) {
-            //if pawn in wall
-            if (pawnWall[i] != null) {
-                newPawnWall[(i + turnRange + 8) % 8] = pawnWall[i];
-            }
+    //shift pawn formation, a pawn is killed if collision occurs between pawn and a piece of same side
+    public void setPawnWallHeadPos() {
 
-        }
-        ExtendedTileModel[] newPawnPos = findNewWallPositions(getTilePosition(), newPawnWall, new ExtendedTileModel[8]);
+        ExtendedTileModel[] newPawnPos = findNewWallPositions(getTilePosition(), new ExtendedTileModel[8]);
 
         if (newPawnPos != null) {
             //check new positions for collision conflicts, tile occupied by same color
-            List<ExtendedPieceModel> toTakePieces = checkPawnWallPositionForConflict(newPawnPos, new ArrayList<ExtendedPieceModel>());
+            List<ExtendedPieceModel> toTakePieces = checkPawnWallPositionForConflict(newPawnPos, new ArrayList<ExtendedPieceModel>(), true);
 
             if (toTakePieces == null) {
                 return;
             }
-            //save new pawnWall
-            pawnWall = newPawnWall;
-            //if so change axis and pawn positions and take pieces from other color upon collision
-            axis = (getAxis() + turnRange) % 8;
+
+            //if no conflict found in position and pieces on the new positions
             movePawnWallToPosition(newPawnPos);
             takeAllPieces(toTakePieces);
         }
@@ -103,8 +92,9 @@ public class ExtendedKingModel extends ExtendedPieceModel {
         }
     }
     //returns a list of pieces to take for new pawn wall positions if new positions allowed, else return null
+    //also check for conflicts with pieces of same side, if conflict both the confilcting pawn in wall and the piece are taken
 
-    private List<ExtendedPieceModel> checkPawnWallPositionForConflict(ExtendedTileModel[] newPawnPos, List<ExtendedPieceModel> toTakePieces) {
+    private List<ExtendedPieceModel> checkPawnWallPositionForConflict(ExtendedTileModel[] newPawnPos, List<ExtendedPieceModel> toTakePieces, boolean shift) {
         //check for collision conflict
         ExtendedPieceModel toTakePiece;
         for (int i = 0; i < 8; i++) {
@@ -113,22 +103,29 @@ public class ExtendedKingModel extends ExtendedPieceModel {
                 toTakePiece = MetaConfig.getBoardModel().getPieceByPosition(newPawnPos[i]);
                 //no conflict with king owning the pawn wall
                 if (toTakePiece != null) {
-                    //if on same side but not in wall
-                    if (toTakePiece.getColor() == getColor() && toTakePiece != this && !isPieceInWall(toTakePiece)) {
-                        return null;
-                    } //if from opposite side , take it
-                    else if (toTakePiece.getColor() != getColor()) {
-                        //there is a piece to take
+                    //if from opposite side , take it
+                    if (toTakePiece.getColor() != getColor()) {
                         toTakePieces.add(toTakePiece);
-                    }
-
+                    } //if on same side but not in wall and not the king 
+                    else if (toTakePiece != this && !isPieceInWall(toTakePiece)) {
+                        //and it's a shift, take piece
+                        if (shift) {
+                            toTakePieces.add(toTakePiece);
+                        } 
+                        //if no shift movement not allowed
+                        else {
+                            return null;
+                        }
+                    } 
                 }
+
             }
         }
         return toTakePieces;
     }
 
-    private ExtendedTileModel[] findNewWallPositions(ExtendedTileModel kingPosition, ExtendedPawnModel[] pawnWall, ExtendedTileModel[] pawnTiles) {
+    //find position for current formation of pawnwall, only check collisions with board borders, not pieces
+    private ExtendedTileModel[] findNewWallPositions(ExtendedTileModel kingPosition, ExtendedTileModel[] pawnTiles) {
         if (pawnTiles.length != 8) {
             try {
                 throw new WrongCollectionLengthException(8);
@@ -136,12 +133,15 @@ public class ExtendedKingModel extends ExtendedPieceModel {
                 Logger.getLogger(ExtendedKingModel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        int indexInWall;
         //check if every pawn can be moved to new tile in wall
         for (int i = 0; i < 8; i++) {
+            //calculate index based on axis
+            indexInWall = (i + axis) % 8;
             //if pawn in wall
             if (pawnWall[i] != null) {
-                //find new position
-                Direction pawnDirection = getDirectionFromWallIndex(i);
+                //find new position based on shifted index in wall
+                Direction pawnDirection = getDirectionFromWallIndex(indexInWall);
                 //hoover doesn't work on single tile movements
                 pawnTiles[i] = BoardLogic.findTileNeighBour(kingPosition, pawnDirection.getX(), pawnDirection.getY(), false, kingPosition.getAbsFraction());
                 if (pawnTiles[i] == null) {
@@ -173,13 +173,14 @@ public class ExtendedKingModel extends ExtendedPieceModel {
     }
 
     public ExtendedKingModel(int side) {
-        super(PieceType.KING, side, 32);
+        super(PieceType.king, side, 32);
         Directions.getOrthoDirections(allowedMovement);
         Directions.getDiagDirections(allowedMovement);
+
     }
 
     public boolean isPieceInWall(ExtendedPieceModel piece) {
-        return piece.getType() == PieceType.PAWN && piece.getColor() == getColor() && ((ExtendedPawnModel) piece).isBound();
+        return piece.getType() == PieceType.pawn && piece.getColor() == getColor() && ((ExtendedPawnModel) piece).isBound();
     }
 
     @Override
@@ -193,24 +194,24 @@ public class ExtendedKingModel extends ExtendedPieceModel {
         ExtendedPieceModel pieceOnnewTile = MetaConfig.getBoardModel()
                 .getPieceByPosition(newKingPos);
         //conflict if piece on new tile is from other color and not a pawn from the wall
+        //if piece on new tile is a pawn from this side add to wall if formation not shifted
         if (pieceOnnewTile != null) {
-            if (pieceOnnewTile.getColor() == getColor() && !isPieceInWall(pieceOnnewTile)) {
-                //if piece on new tile is a pawn from this side add to wall
-                if (pieceOnnewTile.getType() == PieceType.PAWN) {
-                    addPawnToWallWithKingMovementDirection((ExtendedPawnModel) pieceOnnewTile, direction);
-                }
+            if (pieceOnnewTile.getColor() == getColor() && !isPieceInWall(pieceOnnewTile)
+                    && pieceOnnewTile.getType() == PieceType.pawn && axis == 0) {
+                addPawnToWallWithKingMovementDirection((ExtendedPawnModel) pieceOnnewTile, direction);
                 return false;
+            } else if (pieceOnnewTile.getColor() != getColor()) {
+                //add piece to pieces to take
+                toTakePieces.add(pieceOnnewTile);
             }
-            //add piece to pieces to take
-            toTakePieces.add(pieceOnnewTile);
         }
 
-        ExtendedTileModel[] newPawnPos = findNewWallPositions(newKingPos, pawnWall, new ExtendedTileModel[8]);
+        ExtendedTileModel[] newPawnPos = findNewWallPositions(newKingPos, new ExtendedTileModel[8]);
         if (newPawnPos == null) {
             return false;
         }
         //check for collision conflict
-        toTakePieces = checkPawnWallPositionForConflict(newPawnPos, toTakePieces);
+        toTakePieces = checkPawnWallPositionForConflict(newPawnPos, toTakePieces, false);
         if (toTakePieces == null) {
             return false;
         }

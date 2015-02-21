@@ -1,0 +1,3 @@
+This is the "read me" for the user
+
+1. Watch out for key ghosting when choosing key mapping

@@ -32,12 +32,12 @@ public class KeyMapEditor extends Editor {
         putKnightMapping(mapping);
         
         //same for each piece, not neccesary
-        player.setPiecTypeKeyMapping(PieceType.ROOK, mapping);
-        player.setPiecTypeKeyMapping(PieceType.BISHOP, mapping);
-        player.setPiecTypeKeyMapping(PieceType.KING, mapping);
-        player.setPiecTypeKeyMapping(PieceType.QUEEN, mapping);
-        player.setPiecTypeKeyMapping(PieceType.PAWN, mapping);
-        player.setPiecTypeKeyMapping(PieceType.KNIGHT, mapping);
+        player.setPiecTypeKeyMapping(PieceType.rook, mapping);
+        player.setPiecTypeKeyMapping(PieceType.bischop, mapping);
+        player.setPiecTypeKeyMapping(PieceType.king, mapping);
+        player.setPiecTypeKeyMapping(PieceType.queen, mapping);
+        player.setPiecTypeKeyMapping(PieceType.pawn, mapping);
+        player.setPiecTypeKeyMapping(PieceType.knight, mapping);
 
         player.setRangeKeyMapping(1, GLFW.GLFW_KEY_H);
         player.setRangeKeyMapping(2, GLFW.GLFW_KEY_J);

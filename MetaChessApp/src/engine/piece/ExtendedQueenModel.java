@@ -8,7 +8,7 @@ public class ExtendedQueenModel extends ExtendedPieceModel {
     
 
     public ExtendedQueenModel(int side) {
-        super(PieceType.QUEEN, side, 8);
+        super(PieceType.queen, side, 8);
         Directions.getDiagDirections(allowedMovement);
         Directions.getOrthoDirections(allowedMovement);
     }

@@ -9,7 +9,7 @@ public class ExtendedBishopModel extends ExtendedPieceModel {
     
 
     public ExtendedBishopModel(int side) {
-        super(PieceType.BISHOP, side, 4);
+        super(PieceType.bischop, side, 4);
          Directions.getDiagDirections(allowedMovement);
         specialIcon = "runner";
     }

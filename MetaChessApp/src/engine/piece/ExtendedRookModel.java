@@ -7,7 +7,7 @@ import meta.MetaConfig;
 public class ExtendedRookModel extends ExtendedPieceModel {
 
     public ExtendedRookModel(int side) {
-        super(PieceType.ROOK, side, 4);
+        super(PieceType.rook, side, 4);
         Directions.getOrthoDirections(allowedMovement);
         specialIcon = "horizon";
 

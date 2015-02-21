@@ -152,6 +152,12 @@ public class ExtendedTileModel {
         }
 
     }
+    public float getAbsCenterX() {
+        return getAbsX()+getAbsSize()/2;
+    }
+    public float getAbsCenterY() {
+        return getAbsY()+getAbsSize()/2;
+    }
 
     public float getAbsY() {
         if (absPosY == 0 && parent != null) {

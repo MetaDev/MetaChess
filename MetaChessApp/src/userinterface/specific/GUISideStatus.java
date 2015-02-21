@@ -11,7 +11,7 @@ public class GUISideStatus extends GUITile{
 		
 		//show lives
 		addElement(new GTType(color, this, 0, 5));
-		addElement(new GTInt(color,this,1,5,new POLives()));
+		addElement(new GTInt64(color,this,1,5,new POLives()));
 		//show maxrange
 		
 		//show maxdecision range

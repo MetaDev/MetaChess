@@ -1,15 +1,15 @@
-gui volledige volgens hexToBit principe, ook nummers, alle bitgrids converteren
+Dump file for a never ending todo list
 
-gui debug, show on board if pawn isbound, show player more clearly same symbol is bound pawns
-change cooldwon of instant special liek piece switch, multiply by 8 or use fraction of position,... ofwel locken
+gui uitwerken
+
+
 min fraction moet hoger voor de speler meer controle te geven, sneller de hold voor move uitschakelen
-make king wall movement and grouping reversible
+implmenet king grouping and extended special of bischop, fast decision
 create a tutorial for each piece type
 
-save numbers 1b8 2b8,... 1b64, 2b64 as hex to use as icon (number + "b"+ base (8 or 64))
 save letters as hex
 
-
+make game creator classes: a tutorial board to exercice for each piece type
 
 
 define exceptions: 2 classes, fatal & non-fatal, all should be added to a log

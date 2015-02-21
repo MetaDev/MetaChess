@@ -17,8 +17,8 @@ private PlayerStatsAccessObject paramObject;
         // construct both grids
         this.paramObject=paramObject;
         this.transparant=true;
-        grid = "plus";
-        grid1 = "minus";
+        grid = "true";
+        grid1 = "false";
 
     }
 
