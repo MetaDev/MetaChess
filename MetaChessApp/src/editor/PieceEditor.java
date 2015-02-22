@@ -48,26 +48,24 @@ public class PieceEditor extends Editor {
     }
 
     public static void init() {
-            debug();
-//        List<ExtendedPieceModel> list1 = initPieces(1);
-//        List<ExtendedPieceModel> list0 = initPieces(0);
-//        initPiecePosition(list1);
-//        initPiecePosition(list0);
-//
-//        // assign pieces randomly to player(s)
-//        // PlayerModel player = new PlayerModel(1,
-//        // list1.get(MetaUtil.randInt(0, 3)), "HARALD",
-//        // MetaConfig.getIcon("HARALD"));
-//        //the input players piece
-//        ExtendedPieceModel myPiece = MetaConfig
-//                .getBoardModel().getPieceByTypeAndSide(PieceType.king, 1);
-//        MetaConfig.getBoardModel().removePlayerByPiece(myPiece);
-//        PlayerInput player = new PlayerInput(1, myPiece,
-//                "HARALD",
-//                "harald");
-//
-//        MetaConfig.getBoardModel().setInputPlayer(player);
-//        MetaConfig.getBoardModel().getPlayersOnBoard().add(player);
+        //    debug();
+        List<ExtendedPieceModel> list1 = initPieces(1);
+        List<ExtendedPieceModel> list0 = initPieces(0);
+        initPiecePosition(list1);
+        initPiecePosition(list0);
+
+        // assign pieces randomly to player(s)
+      
+        //the input players piece
+        ExtendedPieceModel myPiece = MetaConfig
+                .getBoardModel().getPieceByTypeAndSide(PieceType.king, 1);
+        MetaConfig.getBoardModel().removePlayerByPiece(myPiece);
+        PlayerInput player = new PlayerInput(1, myPiece,
+                "HARALD",
+                "harald");
+
+        MetaConfig.getBoardModel().setInputPlayer(player);
+        MetaConfig.getBoardModel().getPlayersOnBoard().add(player);
     }
 
     private static void debug() {

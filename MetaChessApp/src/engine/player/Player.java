@@ -24,6 +24,24 @@ public class Player {
     protected String core;
     protected int range = 1;
     protected boolean extendedSpecial = false;
+    protected int livesTaken;
+    protected int livesLost;
+
+    public int getLivesTaken() {
+        return livesTaken;
+    }
+
+    public void increaseLivesTaken(int livesTaken) {
+        this.livesTaken += livesTaken;
+    }
+
+    public int getLivesLost() {
+        return livesLost;
+    }
+
+    public void increaseLivesLost(int livesLost) {
+        this.livesLost += livesLost;
+    }
 
     //if this is true the player can get pushed out of it's controlling piece without needing extended special when switching
     protected boolean pushable = false;

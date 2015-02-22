@@ -1,6 +1,5 @@
 package engine.board;
 
-import java.util.List;
 
 import meta.MetaConfig;
 import meta.MetaUtil;
@@ -72,7 +71,7 @@ public class BoardLogic {
                 || tile.getJ() + verMov > tile.getParent().getChildFraction() - 1
                 || neighbour.getJ() + verMov < 0) {
             //estimate neighbour from abs position
-            neighbour = getTileFromAbsPosition(tile.getAbsCenterX()+ horMov *  tile.getAbsSize(), tile.getAbsCenterY()+ verMov *  tile.getAbsSize(), startFraction);
+            neighbour = getTileFromAbsPosition(tile.getAbsCenterX() + horMov * tile.getAbsSize(), tile.getAbsCenterY() + verMov * tile.getAbsSize(), startFraction);
         } else {
             neighbour = neighbour.getParent().getChildren()[neighbour.getI() + horMov][neighbour.getJ() + verMov];
         }
@@ -84,7 +83,7 @@ public class BoardLogic {
         // if the new found tile contains children
         if (neighbour.getChildren() != null && !hoover) {
             //if children and not hoover, enterlowest fraction of neighbour
-            neighbour = getClosestLargestFractionTileFromNeighbour(tile, neighbour);
+            neighbour = getClosestLargestFractionTileFromNeighbour(tile, neighbour, verMov, horMov);
 
         }
         return neighbour;
@@ -93,28 +92,30 @@ public class BoardLogic {
 
     public static Double euclidianDistance(ExtendedTileModel tile1, ExtendedTileModel tile2) {
         //calculate euclididan distance from center of tile
-        return Math.sqrt(Math.pow(tile1.getAbsCenterX()- tile2.getAbsCenterX(), 2) + Math.pow(tile1.getAbsCenterY()- tile2.getAbsCenterY(), 2));
+        return Math.sqrt(Math.pow(tile1.getAbsCenterX() - tile2.getAbsCenterX(), 2) + Math.pow(tile1.getAbsCenterY() - tile2.getAbsCenterY(), 2));
     }
 
-    public static ExtendedTileModel getClosestLargestFractionTileFromNeighbour(ExtendedTileModel tile, ExtendedTileModel neighbour) {
-        ExtendedTileModel it = neighbour;
+    public static ExtendedTileModel getClosestLargestFractionTileFromNeighbour(ExtendedTileModel tile, ExtendedTileModel neighbour, int verMov, int horMov) {
         double minDist;
         ExtendedTileModel closestChild;
+        //for the first iteration of children we start at different positions as they have equal euclidian distance but every child should be 
+        //equally used to enter higer fraction
+        ExtendedTileModel it = enterLowerFractionOfTile(neighbour, horMov, verMov);
         while (it.getChildren() != null) {
 
-            closestChild = it.getChildren()[0][0];
-            minDist = euclidianDistance(closestChild,tile);
+            closestChild = it.getChildren()[1][1];
+            minDist = euclidianDistance(closestChild, tile);
             //iterate all children
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 2; j++) {
                     //if closer child found
-                    if (euclidianDistance(it.getChildren()[i][j],tile)<minDist) {
-                        closestChild=it.getChildren()[i][j];
-                        minDist=euclidianDistance(closestChild ,tile);
+                    if (euclidianDistance(it.getChildren()[i][j], tile) < minDist) {
+                        closestChild = it.getChildren()[i][j];
+                        minDist = euclidianDistance(closestChild, tile);
                     }
                 }
             }
-            it=closestChild;
+            it = closestChild;
         }
         return it;
     }
@@ -122,52 +123,44 @@ public class BoardLogic {
 
     public static ExtendedTileModel enterLowerFractionOfTile(
             ExtendedTileModel tile, int horMov, int verMov) {
-        ExtendedTileModel it = tile;
         int i = 0;
         int j = 0;
 
-        // go to second lowest fraction with random position
-        while (it.getChildren() != null) {
-            int centerFloor = (it.getChildFraction() - 1) / 2;
-            int centerCeiling = it.getChildFraction() / 2;
-            int border = it.getChildFraction() - 1;
-            //right
-            if (horMov == 1 && verMov == 0) {
-                i = 0;
-                j = centerCeiling;
-            } //left
-            else if (horMov == -1 && verMov == 0) {
-                i = border;
-                j = centerFloor;
-            } //up
-            else if (horMov == 0 && verMov == 1) {
-                i = centerFloor;
-                j = 0;
-            } //down
-            else if (horMov == 0 && verMov == -1) {
-                i = centerCeiling;
-                j = border;
-            } //up right
-            else if (horMov == 1 && verMov == 1) {
-                i = 0;
-                j = 0;
-            } //down right
-            else if (horMov == 1 && verMov == -1) {
-                i = 0;
-                j = border;
-            } //down left
-            else if (horMov == -1 && verMov == -1) {
-                i = 0;
-                j = border;
-            } //up left
-            else if (horMov == -1 && verMov == 1) {
-                i = border;
-                j = 0;
-            }
-            it = it.getChildren()[i][j];
+        //right
+        if (horMov == 1 && verMov == 0) {
+            i = 0;
+            j = 1;
+        } //left
+        else if (horMov == -1 && verMov == 0) {
+            i = 1;
+            j = 0;
+        } //up
+        else if (horMov == 0 && verMov == 1) {
+            i = 0;
+            j = 0;
+        } //down
+        else if (horMov == 0 && verMov == -1) {
+            i = 1;
+            j = 1;
+        } //up right
+        else if (horMov == 1 && verMov == 1) {
+            i = 0;
+            j = 0;
+        } //down right
+        else if (horMov == 1 && verMov == -1) {
+            i = 0;
+            j = 1;
+        } //down left
+        else if (horMov == -1 && verMov == -1) {
+            i = 1;
+            j = 1;
+        } //up left
+        else if (horMov == -1 && verMov == 1) {
+            i = 1;
+            j = 0;
         }
 
-        return it;
+        return tile.getChildren()[i][j];
     }
 
     // Euclidian distance of tiles

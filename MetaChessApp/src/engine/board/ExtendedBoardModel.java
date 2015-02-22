@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import meta.MetaConfig;
 
 public class ExtendedBoardModel {
 
@@ -16,9 +17,25 @@ public class ExtendedBoardModel {
     private ExtendedTileModel rootTile;
     private Set<Player> playersOnBoard = new HashSet<>();
 
-    private Map<Integer, Integer> teamLives = new ConcurrentHashMap<>();
+    private Map<Integer, Integer> sideLives = new ConcurrentHashMap<>();
     private PlayerInput inputPlayer;
 
+    public void pieceTaken(ExtendedPieceModel pieceTaken,ExtendedPieceModel pieceTaker){
+        Player playerTaken = getPlayerByPiece(pieceTaken);
+        Player playerTaker = getPlayerByPiece(pieceTaker);
+        //decrease team lives
+        if(playerTaken.isDecreaseLivesOnKill()){
+                 decreaseSideLives(pieceTaken.getColor(),
+                    pieceTaken.getLives());
+                 //adapt player lives lost and taken
+                 playerTaken.increaseLivesLost(pieceTaken.getLives());
+                 playerTaker.increaseLivesTaken( pieceTaken.getLives());
+        }
+        //put piecetaken on a random tile
+        pieceTaken.setTilePosition(BoardLogic.getRandomTile(false));
+        
+   
+    }
     public Set<Player> getPlayersOnBoard() {
         return playersOnBoard;
     }
@@ -43,16 +60,16 @@ public class ExtendedBoardModel {
 
     public ExtendedBoardModel(ExtendedTileModel rootTile) {
         this.rootTile = rootTile;
-        teamLives.put(0, 32);
-        teamLives.put(1, 32);
+        sideLives.put(0, 32);
+        sideLives.put(1, 32);
     }
 
     public int getSideLives(int team) {
-        return teamLives.get(team);
+        return sideLives.get(team);
     }
 
     public void decreaseSideLives(int team, int lives) {
-        teamLives.put(team, getSideLives(team) - lives);
+        sideLives.put(team, getSideLives(team) - lives);
     }
 
     public ExtendedTileModel getRootTile() {

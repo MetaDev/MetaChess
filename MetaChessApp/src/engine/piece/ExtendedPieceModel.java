@@ -223,20 +223,11 @@ public abstract class ExtendedPieceModel {
 
     protected boolean pieceCanBeTaken(ExtendedPieceModel piece) {
         //check if player in piece can be killed
-        return piece != null && piece.getColor() != getColor() && MetaConfig.getBoardModel().getPlayerByPiece(piece).isDecreaseLivesOnKill();
+        return piece != null && piece.getColor() != getColor();
     }
 
     protected void takePiece(ExtendedPieceModel pieceOnnewTile) {
-
-        if (pieceCanBeTaken(pieceOnnewTile)) //decrease side lives
-        {
-            MetaConfig.getBoardModel().decreaseSideLives(pieceOnnewTile.getColor(),
-                    pieceOnnewTile.getLives());
-        }
-        System.out.println("piece killed");
-        //put player on a random tile
-        pieceOnnewTile.setTilePosition(BoardLogic.getRandomTile(false));
-
+        MetaConfig.getBoardModel().pieceTaken(pieceOnnewTile, this);
     }
 
 }

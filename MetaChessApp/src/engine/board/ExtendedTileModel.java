@@ -128,7 +128,7 @@ public class ExtendedTileModel {
     }
 
     // implement recursive positioning and size
-    public float getRelX() {
+    private float getRelX() {
         if (parent != null) {
             return i * getRelSize();
         } else {
@@ -136,7 +136,7 @@ public class ExtendedTileModel {
         }
     }
 
-    public float getRelY() {
+    private float getRelY() {
         if (parent != null) {
             return j * getRelSize();
         } else {

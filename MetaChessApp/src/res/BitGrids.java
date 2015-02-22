@@ -54,9 +54,9 @@ public class BitGrids {
         saveHex("runner", "8142001818004281");
         saveHex("wall", "0377730000777700");
         saveHex("turn", "0000207c7c200000");
-        saveHex("teamlives", "0066661818666600");
-        saveHex("lostlives", "0018180018181818");
-        saveHex("takenlives", "00181800183c3c18");
+        saveHex("livesside", "0066661818666600");
+        saveHex("liveslost", "0018180018181818");
+        saveHex("livestaken", "00181800183c3c18");
         
 
         //save numbers
@@ -80,7 +80,7 @@ public class BitGrids {
 
             //set correct bits to 1
             for (int j = 0; j < 8; j++) {
-                bin[7 - j + i * 8] = '1';
+                bin[7-i + j * 8] = '1';
                 saveBin((j + i * 8 + 1) + ":" + NumericalGridBase.sixtyfour.name(), new String(bin));
             }
         }
