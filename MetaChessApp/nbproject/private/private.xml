@@ -2,29 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/view/renderer/GridRenderer.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/accesobject/POLivesLost.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/PieceEditor.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/res/BitGrids.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/specific/GTPlayerStatus.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/todo.txt</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/view/renderer/PlayerRenderer.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/player/PlayerDummy.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/KeyMapEditor.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedKingModel.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/accesobject/PORemainingTeamLives.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/BoardEditor.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/MetaClock.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/accesobject/POLivesTaken.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/features.txt</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedPawnModel.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/player/Player.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/player/PlayerEmpty.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/BoardLogic.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/ExtendedTileModel.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/player/PlayerInput.java</file>
-            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userinterface/specific/GUISideStatus.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

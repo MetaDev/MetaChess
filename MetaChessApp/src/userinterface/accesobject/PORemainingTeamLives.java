@@ -5,6 +5,7 @@
  */
 package userinterface.accesobject;
 
+import engine.board.ExtendedBoardModel;
 import meta.MetaConfig;
 
 /**
@@ -13,9 +14,11 @@ import meta.MetaConfig;
  */
 public class PORemainingTeamLives extends PlayerStatsAccessObject{
 
+  
+
     @Override
-    public int getParam() {
-        return MetaConfig.getBoardModel().getSideLives(getPlayer().getSide());
+    public int getParam(ExtendedBoardModel board) {
+        return board.getSideLives(getPlayer(board).getSide());
     }
     
 }

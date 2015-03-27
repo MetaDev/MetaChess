@@ -1,5 +1,6 @@
 package view.renderer;
 
+import engine.board.ExtendedBoardModel;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
@@ -8,23 +9,22 @@ import userinterface.generic.GUITile;
 
 public class GUIRenderer {
 
-    public void render(GUITile rootTile) {
-        recursiveRender(rootTile);
+    public void render(ExtendedBoardModel board,GUITile rootTile) {
+        recursiveRender(board,rootTile);
     }
 
-    private void recursiveRender(GUITile tile) {
-
+    private void recursiveRender(ExtendedBoardModel board,GUITile tile) {
         glPushMatrix();
         // move GUI to correct position of Tile
         // if tile is not a container draw it's grid
         if (tile.getColumns() == 1 && tile.getRows() == 1) {
             //System.out.println(tile.getWidth());
             glTranslatef(tile.getX(), tile.getY(), 0);
-            GridRenderer.render(((GUI1Tile) tile));
+            GridRenderer.render(board,(GUI1Tile) tile);
 
         } else if (tile.getElements() != null) {
             // draw container
-            RectangleRenderer.drawRectangle(tile.getX(), tile.getY(), tile.getWidth(),
+            RectangleRenderer.drawRectangle( tile.getX(), tile.getY(), tile.getWidth(),
                     tile.getHeight(), tile.getColor());
             // iterate children
             GUITile child;
@@ -33,7 +33,7 @@ public class GUIRenderer {
                     child = tile.getElements()[i][j];
                     // if the tile contains a tile, draw it
                     if (child != null) {
-                        recursiveRender(child);
+                        recursiveRender(board,child);
                     }
                 }
             }

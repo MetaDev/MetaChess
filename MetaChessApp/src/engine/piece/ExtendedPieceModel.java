@@ -5,26 +5,27 @@ import engine.Directions.Direction;
 import java.util.HashSet;
 import java.util.Set;
 import engine.board.BoardLogic;
+import engine.board.ExtendedBoardModel;
 
-import meta.MetaConfig;
 import engine.board.ExtendedTileModel;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ExtendedPieceModel {
 
+    protected ExtendedPieceModel commander;
+
     public enum PieceType {
 
         pawn, rook, knight, bischop, king, queen
     }
 
-    protected int color;
-
+    protected float color;
+    protected boolean onFire = false;
     protected int lives;
-    protected ExtendedTileModel position;
     protected boolean propagateTileView = false;
     protected int increasedTileView = 0;
-    protected int increasedMovementRange = 0;
+    protected int nrOfWallTiles = 0;
     // only the rook will adapt this
     protected boolean viewing = false;
     protected boolean typeVisible = true;
@@ -41,6 +42,8 @@ public abstract class ExtendedPieceModel {
     //save icon of decision and type
 
     protected Set<Direction> allowedMovement = new HashSet<>();
+
+    protected ExtendedBoardModel board;
 
     public Set<Direction> getAllowedMovement() {
         return allowedMovement;
@@ -70,7 +73,7 @@ public abstract class ExtendedPieceModel {
     }
 
     public void propagateViewInfluence(int range) {
-        for (Player player : MetaConfig.getBoardModel().getPlayersOnBoard()) {
+        for (Player player : board.getPlayersOnBoard()) {
             ExtendedPieceModel piece = player.getControlledModel();
             //don't increase for self, out of range or already increased
             if (!piece.equals(this) && piece.getIncreasedTileview() == 0 && BoardLogic.isInrange(this, piece)) {
@@ -85,33 +88,29 @@ public abstract class ExtendedPieceModel {
         return lives;
     }
 
-    public ExtendedPieceModel(PieceType type, int color, int lives) {
+    public ExtendedPieceModel(PieceType type, ExtendedBoardModel board, float color, int lives) {
+        this.board = board;
         this.color = color;
         this.type = type;
         this.lives = lives;
     }
 
-    public int getColor() {
+    public float getColor() {
         return color;
     }
 
-    public void setColor(int color) {
-        this.color = color;
-    }
+    
 
     public float getRelSize() {
-        return position.getRelSize();
+        return getTilePosition().getRelSize();
     }
 
     public ExtendedTileModel getTilePosition() {
-        return position;
+        return board.getPieceTile(this);
     }
 
     public void setTilePosition(ExtendedTileModel position) {
-        this.position = position;
-        if (propagateTileView) {
-            propagateViewInfluence(increasedTileView);
-        }
+        board.changePiecePosition(this, position);
     }
 
     public boolean isDragon() {
@@ -119,7 +118,7 @@ public abstract class ExtendedPieceModel {
     }
 
     public boolean isRunner() {
-        return increasedMovementRange > 0;
+        return nrOfWallTiles > 0;
     }
 
     public boolean getViewing() {
@@ -140,36 +139,81 @@ public abstract class ExtendedPieceModel {
         if (path == null) {
             return false;
         }
-        //chech if all but last tile is occupied by any piece
-        if (!checkPath(path)) {
-            return false;
-        }
+
+        return moveWithPath(path);
+    }
+
+    protected boolean moveWithPath(List<ExtendedTileModel> path) {
+        //chech if path and last tile are valid
+
         ExtendedTileModel lastTile = path.get(path.size() - 1);
-        return handleLastTileInPath(lastTile);
+        //remove last tile from path
+        path.remove(path.size() - 1);
+        //first check last tile for move to be made, than check path
+        if (checkLastTileInPath(lastTile) && checkPath(path)) {
+            handleLastTileInPath(lastTile);
+            return true;
+        }
+        return false;
+    }
+
+    //check if movement can be made
+    protected boolean checkLastTileInPath(ExtendedTileModel lastTileInPath) {
+        ExtendedPieceModel pieceOnnewTile = board
+                .getTilePiece(lastTileInPath);
+        //if not occupied continue
+        if (pieceOnnewTile == null) {
+            return true;
+        } //if occupied only continue movement if piece can be taken
+        else if ( pieceIsDeadly(pieceOnnewTile)) {
+            return true;
+        }
+        return false;
 
     }
 
+    //handle movement on last tile, and set position
     protected boolean handleLastTileInPath(ExtendedTileModel lastTileInPath) {
-        // if there's a piece on the new tile
-        ExtendedPieceModel pieceOnnewTile = MetaConfig.getBoardModel()
-                .getPieceByPosition(lastTileInPath);
-        if (pieceCanBeTaken(pieceOnnewTile)) {
-            takePiece(pieceOnnewTile);
-        } else if (pieceOnnewTile != null) {
-            return false;
+        ExtendedPieceModel pieceOnnewTile = board
+                .getTilePiece(lastTileInPath);
+        if (pieceIsDeadly(pieceOnnewTile)) {
+            if (pieceOnnewTile.onFire) {
+                ExtendedPieceModel fireMan = pieceOnnewTile.commander;
+                //find owner of firewall
+                board.pieceTaken(fireMan, this);
+                //no movement made
+                return false;
+            }
+            //not on fire so kill it
+            board.pieceTaken(this, pieceOnnewTile);
+
         }
         setTilePosition(lastTileInPath);
-
         return true;
     }
 
+    //check if path can be taken
     protected boolean checkPath(List<ExtendedTileModel> path) {
+        ExtendedPieceModel pieceOnPath;
         //check if path (all tiles except last) doesn't contain any other pieces
-        for (int i = 0; i < path.size() - 2; i++) {
-            if (path.get(i).isOccupied()) {
+        for (int i = 0; i < path.size() - 1; i++) {
+            pieceOnPath = board.getTilePiece(path.get(i));
+            //if path occupied, bad path
+            if (pieceOnPath != null) {
+                //killed by fire
+                if (pieceOnPath.onFire) {
+                    ExtendedPieceModel fireMan = pieceOnPath.commander;
+                    //find owner of firewall
+                    if (pieceIsDeadly(fireMan)) {
+                        board.pieceTaken(fireMan, this);
+                    }
+
+                }
+                //no movement made
                 return false;
             }
         }
+
         return true;
     }
 
@@ -194,11 +238,11 @@ public abstract class ExtendedPieceModel {
             remainingVerMov = remainingVerMov - verMov;
             //on the last step of the movement hoover is always false
             if (Math.abs(remainingHorMov) + Math.abs(remainingVerMov) == 0) {
-                previousTile = BoardLogic.findTileNeighBour(previousTile,
+                previousTile = board.findTileNeighBour(previousTile,
                         horMov, verMov, false, startFraction);
 
             } else {
-                previousTile = BoardLogic.findTileNeighBour(previousTile,
+                previousTile = board.findTileNeighBour(previousTile,
                         horMov, verMov, hoover, startFraction);
 
             }
@@ -217,17 +261,21 @@ public abstract class ExtendedPieceModel {
         return path;
     }
 
+    public ExtendedBoardModel getBoard() {
+        return board;
+    }
+
     public int getAxis() {
         return axis;
     }
 
-    protected boolean pieceCanBeTaken(ExtendedPieceModel piece) {
+    protected boolean pieceIsDeadly(ExtendedPieceModel piece) {
         //check if player in piece can be killed
         return piece != null && piece.getColor() != getColor();
     }
 
     protected void takePiece(ExtendedPieceModel pieceOnnewTile) {
-        MetaConfig.getBoardModel().pieceTaken(pieceOnnewTile, this);
+        board.pieceTaken(pieceOnnewTile, this);
     }
 
 }

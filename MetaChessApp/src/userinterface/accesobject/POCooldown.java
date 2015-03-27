@@ -5,6 +5,7 @@
  */
 package userinterface.accesobject;
 
+import engine.board.ExtendedBoardModel;
 import engine.piece.ExtendedPieceModel;
 
 /**
@@ -13,9 +14,11 @@ import engine.piece.ExtendedPieceModel;
  */
 public class POCooldown extends PlayerStatsAccessObject {
 
+   
+
     @Override
-    public int getParam() {
-       return getPlayer().getRelativeCooldown();
+    public int getParam(ExtendedBoardModel board) {
+       return getPlayer(board).getRelativeCooldown();
     }
 
 

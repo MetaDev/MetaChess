@@ -5,6 +5,7 @@
  */
 package userinterface.accesobject;
 
+import engine.board.ExtendedBoardModel;
 import engine.piece.ExtendedPieceModel;
 
 /**
@@ -13,9 +14,11 @@ import engine.piece.ExtendedPieceModel;
  */
 public class POExtendeSpecial extends PlayerStatsAccessObject {
 
+   
+
     @Override
-    public int getParam() {
-        return booleanToInt(getPlayer().isExtendeSpecial());
+    public int getParam(ExtendedBoardModel board) {
+        return booleanToInt(getPlayer(board).isExtendeSpecial());
 
     }
 

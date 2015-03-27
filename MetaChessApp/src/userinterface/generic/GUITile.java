@@ -14,7 +14,7 @@ public class GUITile {
     protected int rows;
     protected int columns;
 
-    protected int color;
+    protected float color;
     protected GUITile container;
     protected int i;
     protected int j;
@@ -39,13 +39,11 @@ public class GUITile {
         this.columns = columns;
     }
 
-    public int getColor() {
+    public float getColor() {
         return color;
     }
 
-    public void setColor(int color) {
-        this.color = color;
-    }
+
 
     public int getI() {
         return i;
@@ -113,7 +111,7 @@ public class GUITile {
     }
 
     public GUITile(int columnsInContainer, int rowsInContainer, int columns,
-            int rows, int color, GUITile container, int i, int j) {
+            int rows, float color, GUITile container, int i, int j) {
         this.rowsInContainer = rowsInContainer;
         this.columnsInContainer = columnsInContainer;
         this.rows = rows;
@@ -125,7 +123,7 @@ public class GUITile {
     }
 
     // root container
-    public GUITile(int columns, int rows, int color, GUITile container, int i,
+    public GUITile(int columns, int rows, float color, GUITile container, int i,
             int j) {
         this.rowsInContainer = 1;
         this.columnsInContainer = 1;

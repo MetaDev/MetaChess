@@ -1,13 +1,13 @@
 package userinterface.accesobject;
 
-import meta.MetaConfig;
+import engine.board.ExtendedBoardModel;
 import engine.player.Player;
 
 public abstract class PlayerStatsAccessObject {
-    public abstract int getParam();
-  
-    protected Player getPlayer(){
-        return MetaConfig.getBoardModel().getInputPlayer();
+    public abstract int getParam(ExtendedBoardModel board);
+    
+    protected Player getPlayer(ExtendedBoardModel board){
+        return board.getInputPlayer();
     }
     public static int booleanToInt(boolean bool) {
         if (bool) {

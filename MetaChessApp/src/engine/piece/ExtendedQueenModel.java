@@ -1,14 +1,15 @@
 package engine.piece;
 
 import engine.Directions;
+import engine.board.ExtendedBoardModel;
 
 public class ExtendedQueenModel extends ExtendedPieceModel {
 //Keep a set of decisionmodels with all allowed decisions for this piece
 
     
 
-    public ExtendedQueenModel(int side) {
-        super(PieceType.queen, side, 8);
+    public ExtendedQueenModel(ExtendedBoardModel board,int side) {
+        super(PieceType.queen,board, side, 8);
         Directions.getDiagDirections(allowedMovement);
         Directions.getOrthoDirections(allowedMovement);
     }

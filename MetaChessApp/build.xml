@@ -10,6 +10,7 @@
 <project name="MetaChess" default="default" basedir=".">
     <description>Builds, tests, and runs the project MetaChess.</description>
     <import file="nbproject/build-impl.xml"/>
+
     <!--
 
     There exist several targets which are by default empty and which can be 
@@ -70,4 +71,47 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <!-- provide a path where executable distros should be saved  -->
+    <property name="release.dir" value="${basedir}/release"/>
+    <!-- provide the path to the shared native libraries directory -->
+    <property name="native.dir" value="../SharedLibraries/lwjgl/native/"/>
+    <property name="library.dir" value="../SharedLibraries/lwjgl/jar/"/>
+    <!-- provide a base name for your executable. -->
+    <property name="standalone.jar.name" value="MetaChess"/>
+    
+    <import file="one-jar-ant-task.xml" />
+
+    <target name="dist-all" depends="jar"
+            description="copies all necessary libs">
+<!--  the jvm flag should be set heres      <java fork="true" classname="MetaWindow" >
+            <classpath path = "${targetdir}" />
+
+            
+            <jvmarg value="-XstartOnFirstThread"/>
+           
+        </java>-->
+        <!-- copy jar   -->
+        <copy todir="${dist.jar.dir}/SharedLibraries">
+            <fileset dir="${library.dir}"  includes="*.jar"/>
+        </copy>
+        <!-- copy natives   -->
+        <copy todir="${dist.jar.dir}/SharedLibraries/lwjgl/native/linux/x86">
+            <fileset dir="${native.dir}/linux/x86"  includes="*.so"/>
+        </copy>
+        <copy todir="${dist.jar.dir}/SharedLibraries/lwjgl/native/linux/x64">
+            <fileset dir="${native.dir}/linux/x64"  includes="*.so"/>
+        </copy>
+        <copy todir="${dist.jar.dir}/SharedLibraries/lwjgl/native/windows/x86">
+            <fileset dir="${native.dir}/windows/x86"  includes="*.dll"/>
+        </copy>
+        <copy todir="${dist.jar.dir}/SharedLibraries/lwjgl/native/windows/x64">
+            <fileset dir="${native.dir}/windows/x64"  includes="*.dll"/>
+        </copy>
+        <copy todir="${dist.jar.dir}/SharedLibraries/lwjgl/native/macosx/x64">
+            <fileset dir="${native.dir}/macosx/x64"  includes="*.dylib"/>
+            <fileset dir="${native.dir}/macosx/x64"  includes="*.jnilib"/>
+        </copy>
+        
+       
+    </target>
 </project>

@@ -1,5 +1,6 @@
 package view.renderer;
 
+import engine.board.ExtendedBoardModel;
 import res.BitGrids;
 import userinterface.generic.GUI1Tile;
 
@@ -8,11 +9,8 @@ public class GridRenderer {
     public static void render(String grid, float cellSize) {
         render(grid, cellSize, 1);
     }
-    public static void render(int[][] grid, float cellSize) {
-        render(grid, cellSize, 1);
-    }
-
-    public static void render(String grid, float cellSize, int color) {
+    
+    public static void render(String grid, float cellSize, float color) {
         if (grid == null) {
             return;
         }
@@ -23,33 +21,9 @@ public class GridRenderer {
             }
         }
     }
-    public static void render(int[][] grid, float cellSize, int color) {
-        if (grid == null) {
-            return;
-        }
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                RectangleRenderer.drawRectangle(i * cellSize, j * cellSize, cellSize, cellSize, (grid[i][j] + color) % 2);
+    
 
-            }
-        }
-    }
-
-    public static void transparentRender(int[][] grid, float cellSize, int color) {
-        if (grid == null) {
-            return;
-        }
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid.length; j++) {
-                //don't overwrite underlying color if pixel is not colored
-                if (grid[i][j] == 1) {
-                    RectangleRenderer.drawRectangle(i * cellSize, j * cellSize, cellSize, cellSize, (color) % 2);
-                }
-
-            }
-        }
-    }
-    public static void transparentRender(String grid, float cellSize, int color) {
+    public static void transparentRender(String grid, float cellSize, float color) {
         if (grid == null) {
             return;
         }
@@ -64,8 +38,8 @@ public class GridRenderer {
         }
     }
 
-    public static void render(GUI1Tile tile) {
-        String grid = tile.getGrid();
+    public static void render(ExtendedBoardModel board,GUI1Tile tile) {
+        String grid = tile.getGrid(board);
         float cellSize = tile.getHeight() / 8;
         if (grid == null) {
             return;

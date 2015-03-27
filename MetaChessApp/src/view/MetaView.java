@@ -29,21 +29,25 @@ import engine.board.ExtendedBoardModel;
 import userinterface.generic.ExtendedGUI;
 import engine.player.Player;
 import engine.board.ExtendedTileModel;
+import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
 
 import userinterface.generic.GUITile;
+import view.renderer.RectangleRenderer;
 
 public class MetaView {
 
     private static int height = 8 * 64 * 2;
     private static int width = 8 * 64 * 2;
 
-    public static void setWindowSize(int height, int width) {
+    public static void setWindowSize(ExtendedBoardModel board, int height, int width) {
         MetaView.height = height * 2;
         MetaView.width = width * 2;
-        refresh();
+        render(board);
     }
 
-    public static void refresh() {
+    public static void render(ExtendedBoardModel board) {
 
         float centerBoardX = 0;
         float centerBoardY = 0;
@@ -57,7 +61,6 @@ public class MetaView {
         //float startSize = Math.max(height,width);
         //float resizeToDisplay = min/startSize ;
 
-        ExtendedBoardModel board = MetaConfig.getBoardModel();
         Player player = board.getInputPlayer();
         ExtendedTileModel PlayerTile = player.getControlledModel().getTilePosition();
 
@@ -70,32 +73,29 @@ public class MetaView {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        glLoadIdentity();
         //set view size; equals window
         glViewport(0, 0, (int) width, (int) height);
-        
+
         //move and scale the view to fit the board 
         glPushMatrix();
-        
+
         //move the board to center of the screen
         glTranslatef(centerBoardX, centerBoardY, 0);
         //cut everything outside center space of window
         glScissor((int) centerBoardX, (int) centerBoardY, (int) min, (int) min);
         glEnable(GL_SCISSOR_TEST);
 
-     
         int tiles = player.getControlledModel().getNrOfViewTiles();
         float singleTileSize = min / (2 * tiles + 1);
         float scaleCurrentTileToDesiredTileSize = singleTileSize / PlayerTile.getAbsSize();
-       
+
         //zoom such that the tiles fill exactly the view
         glScalef(scaleCurrentTileToDesiredTileSize, scaleCurrentTileToDesiredTileSize, 1);
-        
+
         //after scaling the coordinates of the board can be used
         //move board such that the player is in the exact middle
+        glTranslatef(-PlayerTile.getAbsX() + tiles * PlayerTile.getAbsSize(), -PlayerTile.getAbsY() + tiles * PlayerTile.getAbsSize(), 0);
 
-        glTranslatef(-PlayerTile.getAbsX() + tiles*PlayerTile.getAbsSize(), -PlayerTile.getAbsY()+tiles*PlayerTile.getAbsSize() , 0);
-        
         
         // render board
         MetaConfig.getBoardRenderer().render(board);
@@ -129,9 +129,10 @@ public class MetaView {
                 guiBlock.setHeight(centerBoardY);
                 guiBlock.setY((height - centerBoardY));
             }
-            MetaConfig.getGuiRenderer().render(guiBlock);
+            MetaConfig.getGuiRenderer().render(board, guiBlock);
 
         }
+        System.out.println(RectangleRenderer.count);
 
     }
 }

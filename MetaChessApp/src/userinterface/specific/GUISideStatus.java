@@ -7,7 +7,7 @@ import userinterface.generic.GUITile;
 
 public class GUISideStatus extends GUITile {
 
-    public GUISideStatus(int color,
+    public GUISideStatus(float color,
             GUITile container, int i, int j) {
         super(container.getColumns(), container.getRows(), container.getColumns(), container.getRows(), color, container, i, j);
 

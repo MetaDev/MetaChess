@@ -12,11 +12,12 @@ import engine.piece.ExtendedPieceModel;
  * @author Harald
  */
 //a dummy for a real player, pushable and killable
-public class PlayerDummy extends PlayerEmpty{
+public class PlayerDummy extends Player{
 
-    public PlayerDummy(int side, ExtendedPieceModel controlledModel, String name, String core) {
-        super(side, controlledModel, name, core);
+    public PlayerDummy( ExtendedPieceModel controlledModel) {
+        super((int)controlledModel.getColor(), controlledModel, "dummy", "pawn");
         decreaseLivesOnKill = true;
+        name="dummy";
     }
     
 }

@@ -5,15 +5,19 @@
  */
 package userinterface.accesobject;
 
+import engine.board.ExtendedBoardModel;
+
 /**
  *
  * @author Harald
  */
 public class POAxis extends PlayerStatsAccessObject {
 
+   
+
     @Override
-    public int getParam() {
-        return getPlayer().getControlledModel().getAxis();
+    public int getParam(ExtendedBoardModel board) {
+        return getPlayer(board).getControlledModel().getAxis();
     }
 
     

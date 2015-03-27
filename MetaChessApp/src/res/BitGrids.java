@@ -57,7 +57,7 @@ public class BitGrids {
         saveHex("livesside", "0066661818666600");
         saveHex("liveslost", "0018180018181818");
         saveHex("livestaken", "00181800183c3c18");
-        
+        saveHex("onfire", "0006186060180600");
 
         //save numbers
         //64 bit bitstring 0
@@ -95,9 +95,12 @@ public class BitGrids {
     private static void saveHex(String name, String hex) {
         saveBin(name, convertHexToBin(hex));
     }
-
+    private static Map<String,String> hexToBin=new HashMap<>();
     public static String convertHexToBin(String hex) {
-        return String.format("%64s", new BigInteger(hex, 16).toString(2)).replace(' ', '0');
+        if(!hexToBin.containsKey(hex)){
+            hexToBin.put(hex,String.format("%64s", new BigInteger(hex, 16).toString(2)).replace(' ', '0'));
+        }
+        return hexToBin.get(hex);
     }
 
 }

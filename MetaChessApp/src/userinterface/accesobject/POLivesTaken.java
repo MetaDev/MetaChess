@@ -5,15 +5,19 @@
  */
 package userinterface.accesobject;
 
+import engine.board.ExtendedBoardModel;
+
 /**
  *
  * @author Harald
  */
 public class POLivesTaken extends PlayerStatsAccessObject{
 
+   
+
     @Override
-    public int getParam() {
-        return getPlayer().getLivesTaken();
+    public int getParam(ExtendedBoardModel board) {
+        return getPlayer(board).getLivesTaken();
     }
     
 }

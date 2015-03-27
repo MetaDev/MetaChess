@@ -1,5 +1,6 @@
 package editor;
 
+import engine.board.ExtendedBoardModel;
 import meta.MetaConfig;
 import meta.MetaConfig.GUIPosition;
 import userinterface.generic.ExtendedGUI;
@@ -7,10 +8,9 @@ import userinterface.generic.GUITile;
 import userinterface.specific.GTPlayerStatus;
 import userinterface.specific.GUISideStatus;
 
-public class GUIEditor extends Editor {
-	public static void init() {
-		int playerColor = MetaConfig.getBoardModel().getInputPlayer().getControlledModel().getColor();
-		int oppositePlayerColor = (playerColor+1)%2;
+public class GUIEditor {
+	public static void init(ExtendedBoardModel board) {
+		float playerColor = board.getInputPlayer().getControlledModel().getColor();
 		GUITile rootLeft = new GUITile(2, 8, playerColor, null, 0, 0);
 		GUITile rootRight = new GUITile(2, 8, playerColor, null, 0, 0);
 		rootRight.addElement(new GUISideStatus(playerColor, rootRight, 0,0));

@@ -1,6 +1,6 @@
 Here come possible new features
 
--Endless board: the root tile is itself a child tile from a tile on the board, creating a loop, there can be several such "portals" back to the root tile 
+-Endless board:because the tiles are now a circular tree, the abs fraction is derived from the position of the grey pawn,  the root tile is itself a child tile from a tile on the board, creating a loop, there can be several such "portals" back to the root tile 
 -Use fractals to construct the board
 -Dream: a tile can be dynamically fractioned, the fraction animation originates from the corners of the tile
 -Dream: a more organic board, dynamically fractioning and de-fractioning, with more smooth figures like ellipses, torus', moon slices,... 

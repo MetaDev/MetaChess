@@ -1,5 +1,6 @@
 package userinterface.specific;
 
+import engine.board.ExtendedBoardModel;
 import res.BitGrids;
 import userinterface.accesobject.PlayerStatsAccessObject;
 import userinterface.generic.GUI1Tile;
@@ -9,7 +10,7 @@ public class GTInt64 extends GUI1Tile {
 
     protected PlayerStatsAccessObject paramObject;
 
-    public GTInt64(int color, GUITile container, int i, int j,
+    public GTInt64(float color, GUITile container, int i, int j,
             PlayerStatsAccessObject paramObject) {
         super(color, container, i, j);
         this.paramObject = paramObject;
@@ -17,21 +18,21 @@ public class GTInt64 extends GUI1Tile {
         this.grid="true";
     }
 
-    protected int getParam() {
-        return paramObject.getParam();
+    protected int getParam(ExtendedBoardModel board) {
+        return paramObject.getParam(board);
     }
 
     @Override
-    public String getGrid() {
-        updateRows();
+    public String getGrid(ExtendedBoardModel board) {
+        updateRows(board);
         return grid;
     }
 
-    protected void updateRows() {
+    protected void updateRows(ExtendedBoardModel board) {
 
        
        //use param to get correct grid
-        grid=BitGrids.getNumericalGrid(getParam(), BitGrids.NumericalGridBase.sixtyfour);
+        grid=BitGrids.getNumericalGrid(getParam(board), BitGrids.NumericalGridBase.sixtyfour);
 
     }
 

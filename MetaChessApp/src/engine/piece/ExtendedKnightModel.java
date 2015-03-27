@@ -1,26 +1,27 @@
 package engine.piece;
 
 import engine.Directions;
+import engine.board.ExtendedBoardModel;
 import engine.board.ExtendedTileModel;
 import java.util.List;
 import meta.MetaConfig;
 
 public class ExtendedKnightModel extends ExtendedPieceModel {
 
-    public ExtendedKnightModel(int side) {
-        super(PieceType.knight, side, 2);
+    public ExtendedKnightModel(ExtendedBoardModel board, int side) {
+        super(PieceType.knight, board, side, 2);
         Directions.getKnightDirections(allowedMovement);
-        specialIcon="dragon";
+        specialIcon = "dragon";
     }
+    private boolean killOnSecondTile;
 
-    
     @Override
     public void setSpecial(boolean yes, int range, boolean extendedSpecial) {
         if (yes) {
             killOnHooverTiles = range;
             if (extendedSpecial) {
                 //set negative
-                killOnHooverTiles *= -1;
+                killOnSecondTile = true;
             }
         } //reset
         else {
@@ -63,28 +64,14 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
         }
         //continue movement, last move never hoovers
         path1 = findPath(path2.get(1), lastHorMov, lastVerMov, false);
+        //check if path exists
         if (path1 == null) {
             return false;
         }
-        ExtendedTileModel firstTile = path2.get(0);
-        ExtendedTileModel intermediaryTile = path2.get(1);
-        ExtendedTileModel lastTile = path1.get(path1.size() - 1);
+        //add last tile to path
+        path2.add(path1.get(0));
+        return moveWithPath(path2);
 
-        //handle last tile first to check if no problem occured
-        if (!handleLastTileInPath(lastTile)) {
-            return false;
-        }
-        if (isDragon()) {
-            //the dragon fire kill happens recursively on the first tile of long path
-            //handle dragon fire
-            dragonFire(firstTile, getTilePosition().getAbsFraction(), (int) Math.pow(2, Math.ceil(range / 2)));
-            //if extended special k
-            if (extendedSpecial) {
-                dragonFire(intermediaryTile, getTilePosition().getAbsFraction(), (int) Math.pow(2, range / 2));
-            }
-        }
-
-        return true;
     }
 
     //valid input for this method is the 3 tile path of the first part of the dragon movement
@@ -93,8 +80,7 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
         ExtendedPieceModel pieceOnHooveredTile;
         if (tile.getChildren() == null) {
             // if there's a piece on the hoovered tile
-            pieceOnHooveredTile = MetaConfig
-                    .getBoardModel().getPieceByPosition(tile);
+            pieceOnHooveredTile = board.getTilePiece(tile);
             //take if from opposite tile
             takePiece(pieceOnHooveredTile);
 
@@ -111,8 +97,7 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
             for (int i = 0; i < tile.getChildFraction(); i++) {
                 for (int j = 0; j < tile.getChildFraction(); j++) {
                     // if there's a piece on the hoovered tile
-                    ExtendedPieceModel pieceOnHooveredTile = MetaConfig
-                            .getBoardModel().getPieceByPosition(tile.getChildren()[i][j]);
+                    ExtendedPieceModel pieceOnHooveredTile = board.getTilePiece(tile.getChildren()[i][j]);
                     takePiece(pieceOnHooveredTile);
                     //continue recursion
                     recursiveTileKill(tile.getChildren()[i][j], startFraction, depth);
@@ -124,6 +109,34 @@ public class ExtendedKnightModel extends ExtendedPieceModel {
 
     @Override
     protected boolean checkPath(List<ExtendedTileModel> path) {
+        for (int i = 0; i < path.size() - 1; i++) {
+            ExtendedPieceModel pieceOnPath = board.getTilePiece(path.get(i));
+            pieceOnPath = board.getTilePiece(path.get(i));
+            //if path occupied, bad path
+            if (pieceOnPath != null) {
+                //killed by fire
+                if (pieceOnPath.onFire) {
+                    ExtendedPieceModel fireMan = pieceOnPath.commander;
+                    //find owner of firewall
+                    if (pieceIsDeadly(fireMan)) {
+                        board.pieceTaken(fireMan, this);
+                    }
+                    //no movement made, only stop movement if on fire
+                    return false;
+                }
+            }
+            if (isDragon()) {
+                //the dragon fire kill happens recursively on the first tile of long path
+                //handle dragon 
+                if (i == 0) {
+                    dragonFire(path.get(i), getTilePosition().getAbsFraction(), (int) Math.pow(2, Math.ceil(killOnHooverTiles / 2)));
+                }
+                //if extended special k
+                if (killOnSecondTile && i == 1) {
+                    dragonFire(path.get(i), getTilePosition().getAbsFraction(), (int) Math.pow(2, killOnHooverTiles / 2));
+                }
+            }
+        }
         return true;
     }
 }

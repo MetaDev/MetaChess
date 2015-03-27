@@ -1,10 +1,10 @@
 package engine.piece;
 
 import engine.Directions;
+import engine.board.ExtendedBoardModel;
 
 public class ExtendedPawnModel extends ExtendedPieceModel {
 
-    private ExtendedKingModel commander;
 
     public boolean isBound() {
         return commander!=null;
@@ -14,8 +14,8 @@ public class ExtendedPawnModel extends ExtendedPieceModel {
         this.commander = commander;
     }
 
-    public ExtendedPawnModel(int side) {
-        super(PieceType.pawn, side, 1);
+    public ExtendedPawnModel(ExtendedBoardModel board,int side) {
+        super(PieceType.pawn,board, side, 1);
         allowedMovement.add(Directions.getDirection(0, 1));
     }
 
@@ -41,7 +41,7 @@ public class ExtendedPawnModel extends ExtendedPieceModel {
         //use axis to alter direction
         boolean succeeded = super.handleMovement(Directions.turnDirection(direction, axis), 1, extendedSpecial);
         if (succeeded && commander!=null) {
-            commander.removePawnFromWall(this);
+            ((ExtendedKingModel)commander).removePawnFromWall(this);
             commander=null;
         }
         return succeeded;

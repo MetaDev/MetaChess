@@ -1,18 +1,29 @@
 Dump file for a never ending todo list
 
-
+wall for bischop, wall on fire refactory in knoight and bischop + test
+find how to set jvm flag with build script
+update lwjgl lib
+gray tile debug debug, the the parent of gray tiles are also overmaxfraction
 make game creator classes: a tutorial board to exercice for each piece type + debug board + turns per minute is a var from the board
 refactor with differen builds for boards, and active board saved in window, passed to board renderer
-remove ugly meta classes and logic classes
+refactor tile on fire and occupied by using a special piece that follows the bischop
+test queen
+save root in tile
+
 
 make build script to compile with natives for win, lin and mac, and test them
+remove ugly meta classes and logic classes
 
 save letters as hex
 implmenet king grouping and extended special of bischop, fast decision
 START gui, a board where tiles stand for certain game modes (tutorial, client,server,...)
 
-refactor drawing, draw tiles and pieces relative to the tile the players currently standing on, only draw tiles that can be seen
+simple network game (local)
 
+profile game, optimise !!!
+
+refactor drawing, draw tiles and pieces relative to the tile the players currently standing on, only draw tiles that can be seen
+refactor piece, only use 1 var for special and one for Extendespecial
 
 different possible implimentations of piece taken
 if pieces can be removed from board add gui tile with pices left per type

@@ -1,12 +1,7 @@
 package meta;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
-import engine.board.ExtendedBoardModel;
-import engine.board.ExtendedTileModel;
 
 import res.BitGrids;
 import view.renderer.BoardRenderer;
@@ -36,10 +31,7 @@ public class MetaConfig {
 
     // board renderer
     private static BoardRenderer boardRenderer;
-    // also keep extended models here
-
-    private static ExtendedBoardModel boardModel;
-
+    
     // turn cycle of 3 types of movement, only needed for pawn
     private static String[] directionTurn = new String[]{"[-1,-1]", "[0,-1]",
         "[1,-1]", "[1,0]", "[1,1]", "[0,1]", "[-1,1]", "[-1,0]"};
@@ -86,24 +78,11 @@ public class MetaConfig {
     public static boolean multiPlayer = false;
 
   
-   
-
-    public static ExtendedBoardModel getBoardModel() {
-        return boardModel;
-    }
-
-    public static void setBoardModel(ExtendedBoardModel boardModel) {
-        MetaConfig.boardModel = boardModel;
-    }
 
     // guirenderers
     private static GUIRenderer guiRenderer;
 
-    private static int tileSize = 8 * 64;
 
-    public static int getTileSize() {
-        return tileSize;
-    }
 
     // init all necessary constants
     public static void initConstants() {
@@ -111,8 +90,6 @@ public class MetaConfig {
         //init singletons
         boardRenderer = new BoardRenderer();
         guiRenderer = new GUIRenderer();
-        ExtendedTileModel floor = new ExtendedTileModel(1, tileSize);
-        MetaConfig.setBoardModel(new ExtendedBoardModel(floor));
 
         // load icons
        BitGrids.loadBitgrids();

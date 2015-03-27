@@ -1,6 +1,5 @@
 package engine.board;
 
-
 import meta.MetaConfig;
 import meta.MetaUtil;
 import engine.piece.ExtendedPieceModel;
@@ -8,118 +7,17 @@ import engine.player.Player;
 
 public class BoardLogic {
 
-    public static ExtendedTileModel getTile(int[] I, int[] J) {
-        ExtendedTileModel currTile = (ExtendedTileModel) MetaConfig
-                .getBoardModel().getRootTile();
-        int i = 0;
-        while (currTile.getChildren() != null && i < I.length && i < J.length) {
-            currTile = currTile.getChildren()[I[i]][J[i]];
-            i++;
-        }
-        return currTile;
-    }
-
-    public static ExtendedTileModel getTileFromAbsPosition(double x, double y, int maxFraction) {
-        //check if position is inside the main board
-        if (x < 0 || y < 0 || x > MetaConfig.getTileSize() || y > MetaConfig.getTileSize()) {
-            return null;
-        }
-        ExtendedTileModel it = MetaConfig.getBoardModel().getRootTile();
-        int i;
-        int j;
-        double childSize;
-        while (it.getChildren() != null && it.getAbsFraction() * it.getChildFraction() <= maxFraction) {
-            childSize = it.getAbsSize() / it.getChildFraction();
-            i = (int) Math.floor(x / childSize);
-            j = (int) Math.floor(y / childSize);
-
-            it = it.getChildren()[i][j];
-            x -= i * childSize;
-            y -= j * childSize;
-            //round to zero
-            x = Math.max(0, x);
-            y = Math.max(0, y);
-        }
-        return it;
-    }
-
-    private static boolean isCoord(int mov) {
+    //return wether the movement is a single tile movement
+    public static boolean isSingleTileMovement(int mov) {
         return mov == 0 || mov == 1 || mov == -1;
     }
-    /*
-     * implementation; go to neighbour tile do remainingmovement -1 if
-     * remainingmovement>0 do recursion parameters: floating, never go to lower
-     * fraction, float on neighbour ignoreoccupation, allowed to jump over pieces
-     * penetraLowerFraction, continue movement when entering a lower fractioned
-     * tile result: null if movement not allowed else desired tile save alle
-     * encountered pieces on movement in a list
-     */
-
-    public static ExtendedTileModel findTileNeighBour(ExtendedTileModel tile,
-            int horMov, int verMov, boolean hoover, int startFraction) {
-
-        ExtendedTileModel neighbour = tile;
-        // root tile or wrong move
-        if (neighbour.getParent() == null || !isCoord(horMov) || !isCoord(verMov)) {
-            return null;
-        }
-        //hor and vertDir have values -1, or 1
-
-        // on the border of parent tile
-        if (tile.getI() + horMov > tile.getParent().getChildFraction() - 1
-                || tile.getI() + horMov < 0
-                || tile.getJ() + verMov > tile.getParent().getChildFraction() - 1
-                || neighbour.getJ() + verMov < 0) {
-            //estimate neighbour from abs position
-            neighbour = getTileFromAbsPosition(tile.getAbsCenterX() + horMov * tile.getAbsSize(), tile.getAbsCenterY() + verMov * tile.getAbsSize(), startFraction);
-        } else {
-            neighbour = neighbour.getParent().getChildren()[neighbour.getI() + horMov][neighbour.getJ() + verMov];
-        }
-        //at border of board
-        if (neighbour == null) {
-            //add null to indicate that the path is terminated early
-            return neighbour;
-        }
-        // if the new found tile contains children
-        if (neighbour.getChildren() != null && !hoover) {
-            //if children and not hoover, enterlowest fraction of neighbour
-            neighbour = getClosestLargestFractionTileFromNeighbour(tile, neighbour, verMov, horMov);
-
-        }
-        return neighbour;
-
-    }
+   
 
     public static Double euclidianDistance(ExtendedTileModel tile1, ExtendedTileModel tile2) {
         //calculate euclididan distance from center of tile
         return Math.sqrt(Math.pow(tile1.getAbsCenterX() - tile2.getAbsCenterX(), 2) + Math.pow(tile1.getAbsCenterY() - tile2.getAbsCenterY(), 2));
     }
 
-    public static ExtendedTileModel getClosestLargestFractionTileFromNeighbour(ExtendedTileModel tile, ExtendedTileModel neighbour, int verMov, int horMov) {
-        double minDist;
-        ExtendedTileModel closestChild;
-        //for the first iteration of children we start at different positions as they have equal euclidian distance but every child should be 
-        //equally used to enter higer fraction
-        ExtendedTileModel it = enterLowerFractionOfTile(neighbour, horMov, verMov);
-        while (it.getChildren() != null) {
-
-            closestChild = it.getChildren()[1][1];
-            minDist = euclidianDistance(closestChild, tile);
-            //iterate all children
-            for (int i = 0; i < 2; i++) {
-                for (int j = 0; j < 2; j++) {
-                    //if closer child found
-                    if (euclidianDistance(it.getChildren()[i][j], tile) < minDist) {
-                        closestChild = it.getChildren()[i][j];
-                        minDist = euclidianDistance(closestChild, tile);
-                    }
-                }
-            }
-            it = closestChild;
-        }
-        return it;
-    }
-//if the fraction you enter is smaller (bigger fractioning) than positioning is depended of move direction
 
     public static ExtendedTileModel enterLowerFractionOfTile(
             ExtendedTileModel tile, int horMov, int verMov) {
@@ -194,75 +92,5 @@ public class BoardLogic {
         return false;
     }
 
-    // return a tile with an abs fraction smaller then the one given
-    public static ExtendedTileModel getRandomTile(
-            boolean canBeOccupied) {
-        ExtendedTileModel tileIt;
-        do {
-            // start from root tile always
-            tileIt = MetaConfig.getBoardModel().getRootTile();
-            // now choose random tile
-            int randCol;
-            int randRow;
-
-            while (tileIt.getChildren() != null) {
-
-                // pick random child on current tile
-                randCol = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
-                randRow = MetaUtil.randInt(0, tileIt.getChildren().length - 1);
-                tileIt = tileIt.getChildren()[randCol][randRow];
-            }
-        } // if the tile can't be occupied restart the search if the found random
-        // tile is occupied
-        while (!canBeOccupied
-                && MetaConfig.getBoardModel().getPieceByPosition(tileIt) != null);
-
-        return tileIt;
-
-    }
-
-    public static Player getClosestPlayer(Player player) {
-        double compareDist;
-        double tempDist;
-        Player closestNeighbour = null;
-        ExtendedPieceModel piece;
-
-        // closest
-        compareDist = Double.MAX_VALUE;
-        for (Player neighbour : MetaConfig.getBoardModel()
-                .getPlayersOnBoard()) {
-            piece = neighbour.getControlledModel();
-            if (!player.equals(neighbour) && player.getSide() == neighbour.getSide()
-                    && (tempDist = BoardLogic.calculateDistance(
-                            player.getControlledModel().getTilePosition(),
-                            piece.getTilePosition())) < compareDist) {
-                compareDist = tempDist;
-                closestNeighbour = neighbour;
-            }
-        }
-        return closestNeighbour;
-    }
-
-    public static Player getFurthestPlayer(Player player) {
-        double compareDist;
-        double tempDist;
-        Player closestNeighbour = null;
-        ExtendedPieceModel piece;
-
-        // furthest
-        compareDist = Double.MIN_VALUE;
-        for (Player neighbour : MetaConfig.getBoardModel()
-                .getPlayersOnBoard()) {
-            piece = neighbour.getControlledModel();
-            if (!player.equals(neighbour) && player.getSide() == neighbour.getSide()
-                    && (tempDist = BoardLogic.calculateDistance(
-                            player.getControlledModel().getTilePosition(),
-                            piece.getTilePosition())) > compareDist) {
-                compareDist = tempDist;
-                closestNeighbour = neighbour;
-            }
-        }
-        return closestNeighbour;
-    }
 
 }

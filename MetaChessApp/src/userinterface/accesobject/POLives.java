@@ -1,13 +1,12 @@
 package userinterface.accesobject;
 
-import meta.MetaConfig;
-import engine.piece.ExtendedPieceModel;
+import engine.board.ExtendedBoardModel;
 
 public class POLives extends PlayerStatsAccessObject{
 
     @Override
-    public int getParam() {
-        return getPlayer().getControlledModel().getLives();
+    public int getParam(ExtendedBoardModel board) {
+        return getPlayer(board).getControlledModel().getLives();
     }
 
   

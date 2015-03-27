@@ -13,7 +13,7 @@ import userinterface.generic.GUITile;
 public class GTPlayerStatus extends GUITile {
 
     // show cooldown of all decisions of the players piece
-    public GTPlayerStatus(int color, GUITile container, int i, int j) {
+    public GTPlayerStatus(float color, GUITile container, int i, int j) {
         super(container.getColumns(), container.getRows(), container
                 .getColumns(), container.getRows(), color, container, i, j);
 

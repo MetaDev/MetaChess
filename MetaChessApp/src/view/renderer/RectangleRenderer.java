@@ -1,5 +1,6 @@
 package view.renderer;
 
+import engine.board.ExtendedBoardModel;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glColor3f;
@@ -13,17 +14,19 @@ import meta.MetaConfig;
 
 public class RectangleRenderer {
 
+    public static int count;
+
     public static void drawRectangle(float x, float y, float width,
-            float height, int c) {
+            float height, float c) {
         //only draw white square
         drawRectangle(x, y, 0, width, height, c);
 
     }
 
     public static void drawRectangle(float x, float y, float angle,
-            float width, float height, int c) {
+            float width, float height, float c) {
         glPushMatrix();
-
+        count++;
         //translate to center of rectangle
         glTranslatef(width / 2, height / 2, 0);
         glRotatef(angle, 0, 0, 1);
@@ -34,11 +37,8 @@ public class RectangleRenderer {
         glBegin(GL_QUADS);
         // Set the color to white.
         //color depends on player position
-        if (MetaConfig.getBoardModel().getInputPlayer().playerIsOverMaxFraction()) {
-            glColor3f(c, 0, 0);
-        } else {
-            glColor3f(c, c, c);
-        }
+        glColor3f(c, c, c);
+
         // glVertex2f function
         glVertex2f(0, height); // Top left corner
         glVertex2f(0, 0); // Bottom left corner

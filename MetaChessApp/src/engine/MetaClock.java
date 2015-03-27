@@ -1,5 +1,6 @@
 package engine;
 
+import engine.board.ExtendedBoardModel;
 import engine.player.Player;
 import engine.board.ExtendedTileModel;
 
@@ -8,16 +9,13 @@ public class MetaClock {
 
     // amount of ms the turn on the main board takes (turn= both players played)
     private static int maxWaitTime = 16 * 64 * 64;
-    //private static int maxWaitTime = 64* 64;
-    //decides what the highest fraction allowed of a tile is, this is chosen such that the shortest turn before becoming real time is 4 *64 ms
-    private static int maxTileFraction =  64;
 
 	// based on the fraction of the parent tile give absolute counter of turn on
     // return tile turn based on absolute time
     public static int getTileTurn(int fraction, int time) {
         // real-time
         return (int) (((float) (time) / maxWaitTime)
-                * Math.min(fraction, maxTileFraction) * 2);
+                * Math.min(fraction, ExtendedBoardModel.maxTileFraction) * 2);
     }
 
     // return turn based on given time
@@ -43,6 +41,6 @@ public class MetaClock {
 
    
     public static int getMaxFraction() {
-        return maxTileFraction;
+        return ExtendedBoardModel.maxTileFraction;
     }
 }

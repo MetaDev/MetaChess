@@ -6,6 +6,7 @@
 package engine.piece;
 
 import engine.Directions;
+import engine.board.ExtendedBoardModel;
 import meta.MetaConfig;
 
 /**
@@ -22,8 +23,8 @@ import meta.MetaConfig;
 */
 public class ExtendedGhostModel extends ExtendedPieceModel{
 
-    public ExtendedGhostModel(PieceType type, int side, int lives) {
-        super(type, side, lives);
+    public ExtendedGhostModel(PieceType type,ExtendedBoardModel board, int side, int lives) {
+        super(type,board, side, lives);
     }
     //TODO
     //override behoaviour of 

@@ -1,5 +1,7 @@
 package engine.board;
 
+import engine.piece.ExtendedBishopModel;
+import engine.piece.ExtendedPieceModel;
 import meta.MetaConfig;
 
 public class ExtendedTileModel {
@@ -13,27 +15,11 @@ public class ExtendedTileModel {
     private ExtendedTileModel parent;
     private int level;
     private int childFraction = 1;
-
     // relative position in parent
     private int i;
     private int j;
 
-    public boolean isOccupied() {
-        if (MetaConfig.getBoardModel().getPieceByPosition(this) != null) {
-            return true;
-        }
-        if (children == null) {
-            return false;
-        }
-        for (ExtendedTileModel[] childrow : children) {
-            for (ExtendedTileModel child : childrow) {
-                if (child.isOccupied()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+  
 
     // mothertile aka "The Board"
     public ExtendedTileModel(int color, float size) {

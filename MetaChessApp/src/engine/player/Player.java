@@ -4,6 +4,7 @@ import engine.Directions.Direction;
 
 import engine.board.BoardLogic;
 import engine.MetaClock;
+import engine.board.ExtendedBoardModel;
 import engine.piece.ExtendedPieceModel;
 import engine.board.ExtendedTileModel;
 import meta.MetaConfig;
@@ -26,6 +27,7 @@ public class Player {
     protected boolean extendedSpecial = false;
     protected int livesTaken;
     protected int livesLost;
+    protected boolean switchable = true;
 
     public int getLivesTaken() {
         return livesTaken;
@@ -45,6 +47,10 @@ public class Player {
 
     //if this is true the player can get pushed out of it's controlling piece without needing extended special when switching
     protected boolean pushable = false;
+
+    public boolean isPushable() {
+        return pushable;
+    }
 
     public ExtendedPieceModel getControlledModel() {
         return controlledModel;
@@ -103,61 +109,59 @@ public class Player {
         if (!hasTurn() || locked || cooldown > 0) {
             return false;
         }
-        ExtendedPieceModel newPiece;
+        ExtendedPieceModel newPiece = null;
         Player newPieceOwner = null;
         //if the found piece is occupied, only switch is push is true, which makes the previous player switching to the next piece
         boolean push = isExtendeSpecial();
         //the mapping of switch type to range can be altered by input player
         // closest
+
         switch (range) {
             case 1:
-                newPieceOwner = BoardLogic.getClosestPlayer(this);
+                newPiece = controlledModel.getBoard().getClosestPiece(this.controlledModel,side);
                 break;
             case 2:
-                newPieceOwner = BoardLogic.getFurthestPlayer(this);
+                newPiece = controlledModel.getBoard().getFurthestPiece(this.controlledModel,side);
                 break;
             case 3:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.pawn, side));
+                newPiece = controlledModel.getBoard().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.pawn, side);
                 break;
             case 4:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.knight, side));
+                newPiece = (controlledModel.getBoard().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.knight, side));
                 break;
             case 5:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.bischop, side));
+                newPiece = (controlledModel.getBoard().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.bischop, side));
                 break;
             case 6:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.rook, side));
+                newPiece = (controlledModel.getBoard().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.rook, side));
                 break;
             case 7:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.king, side));
+                newPiece = (controlledModel.getBoard().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.king, side));
                 break;
             case 8:
-                newPieceOwner = MetaConfig.getBoardModel().getPlayerByPiece(MetaConfig.getBoardModel().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.queen, side));
+                newPiece = (controlledModel.getBoard().getPieceByTypeAndSide(ExtendedPieceModel.PieceType.queen, side));
                 break;
 
         }
-        if (range == 1) {
-
-        } // furthest
-        else if (range == 2) {
-            newPieceOwner = BoardLogic.getFurthestPlayer(this);
-        } else if (range == 2) {
-            newPieceOwner = BoardLogic.getFurthestPlayer(this);
-        }
-        if (newPieceOwner != null) {
-            newPiece = newPieceOwner.getControlledModel();
-            //check if player is pushable if not check if push activated
-            if (newPiece != null) {
-                //switch of controlled model
-                newPieceOwner.setControlledModel(controlledModel);
-                setControlledModel(newPiece);
-                //set cooldown and lock
-                payForSwitch();
+        if (newPiece != null) {
+            //set cooldown and lock, if there's a piece, which means that if the piece is occupied and push is not enabled
+            //cooldown is paid for nothing
+            payForSwitch();
+            newPieceOwner = controlledModel.getBoard().getPlayerByPiece(newPiece);
+            if (newPieceOwner == null || push) {
+                if(newPieceOwner!=null){
+                    newPieceOwner.setControlledModel(controlledModel);
+                }
+                controlledModel=newPiece;
                 return true;
+
             }
         }
+
         return false;
     }
+
+    
 
     //check if turn changed, decrease or increase cooldown
     //if the turn calculated from current is different from turn calculated from the abs time from the latest registered turnchange
@@ -278,7 +282,7 @@ public class Player {
     // cooldown is paid after every turn, with the highest range in that turn
     // cooldown is payed after making decision, and while it stays active after
     // every turn change
-    public void turnChange() {
+    protected void turnChange() {
         int newFraction = getFraction();
         if (previousFraction >= newFraction && rangeOfActiveDecision == 0 && cooldown > 0) {
             cooldown -= portionOfFraction(newFraction);
@@ -303,8 +307,6 @@ public class Player {
     public String getCore() {
         return core;
     }
-
-    
 
     public int getAbsTime() {
         return absTime;

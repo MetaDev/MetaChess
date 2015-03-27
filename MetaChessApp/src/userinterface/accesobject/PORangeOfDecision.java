@@ -5,15 +5,19 @@
  */
 package userinterface.accesobject;
 
+import engine.board.ExtendedBoardModel;
+
 /**
  *
  * @author Harald
  */
 public class PORangeOfDecision extends PlayerStatsAccessObject{
 
+    
+
     @Override
-    public int getParam() {
-        return getPlayer().getRangeOfActiveDecision();
+    public int getParam(ExtendedBoardModel board) {
+        return getPlayer(board).getRangeOfActiveDecision();
     }
     
 }

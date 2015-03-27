@@ -5,15 +5,15 @@
  */
 package engine;
 
-import meta.MetaConfig;
+import engine.board.ExtendedBoardModel;
 import engine.player.Player;
 
 public class MetaLoop {
 
-    public static void update() {
+    public static void update(ExtendedBoardModel board) {
         //update every player model on the board
 
-        for (Player player : MetaConfig.getBoardModel()
+        for (Player player : board
                 .getPlayersOnBoard()) {
             player.decide();
         }

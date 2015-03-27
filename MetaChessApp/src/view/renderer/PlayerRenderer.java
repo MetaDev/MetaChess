@@ -1,5 +1,6 @@
 package view.renderer;
 
+import engine.board.ExtendedBoardModel;
 import engine.piece.ExtendedPawnModel;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
@@ -11,45 +12,30 @@ import meta.MetaConfig;
 public class PlayerRenderer {
 
     public static void render(Player player) {
+        ExtendedBoardModel board = player.getControlledModel().getBoard();
         ExtendedPieceModel piece = player.getControlledModel();
         float w_8 = (piece.getRelSize()) / 8;
         float w_16 = (piece.getRelSize()) / 16;
-        int main = piece.getColor();
-        int invert = (main + 1) % 2;
+       
         glPushMatrix();
         glTranslatef(piece.getTilePosition().getAbsX(), piece.getTilePosition().getAbsY(), 0);
         //draw in opposite color of tile if a piece is controlled by a player
-        if (player.equals(MetaConfig.getBoardModel().getInputPlayer())) {
-             //draw special sign to emphasize the controlled piece
+        if (player.equals(board.getInputPlayer())) {
+            //draw special sign to emphasize the controlled piece
             GridRenderer.transparentRender("pieceplayer", piece
                     .getTilePosition().getAbsSize() / 8, (piece.getTilePosition().getColor() + 1) % 2);
         }
         //draw special sign to mark bound pawns
         if (piece.getType() == ExtendedPieceModel.PieceType.pawn && ((ExtendedPawnModel) piece).isBound()) {
-             GridRenderer.transparentRender("piecebound", piece
+            GridRenderer.transparentRender("piecebound", piece
                     .getTilePosition().getAbsSize() / 8, (piece.getTilePosition().getColor() + 1) % 2);
         }
 
-        // draw from grid
-        GridRenderer.transparentRender(piece.getName(), piece
-                .getTilePosition().getAbsSize() / 8, piece.getColor());
+        glTranslatef(3 * w_8 + w_16, 3 * w_8, 0);
+        // draw players personal core
+        GridRenderer
+                .render(player.getCore(), w_8 / 8, player.getSide());
 
-        // if a player is present
-        // draw players core
-        glPushMatrix();
-        if (piece.equals(player.getControlledModel())
-                && player.getCore() != null) {
-
-            glTranslatef(3 * w_8 + w_16, 3 * w_8, 0);
-            // draw players personal core
-            GridRenderer
-                    .render(player.getCore(), w_8 / 8, player.getSide());
-
-        } else {
-            RectangleRenderer.drawRectangle(3 * w_8 + w_16, 3 * w_8, w_8,
-                    w_8, invert);
-        }
-        glPopMatrix();
         glPopMatrix();
 
     }
