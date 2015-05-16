@@ -2,6 +2,23 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/ExtendedBoardModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/userDoc.txt</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/todo.txt</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedBishopModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedKingModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedPieceModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/MetaWindow.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/types/CompleteTestBoard.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/editor/KeyMapping.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/features.txt</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/BoardLogic.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedRookModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/ExtendedTileModel.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/player/PlayerInput.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/piece/ExtendedBischopPawn.java</file>
+            <file>file:/Users/Harald/Github/MetaChess/MetaChessApp/src/engine/board/types/QueenTestBoard.java</file>
+        </group>
     </open-files>
 </project-private>

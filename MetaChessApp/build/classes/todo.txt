@@ -1,5 +1,6 @@
 Dump file for a never ending todo list
 
+bischop range was stuck
 wall for bischop, wall on fire refactory in knoight and bischop + test
 find how to set jvm flag with build script
 update lwjgl lib
