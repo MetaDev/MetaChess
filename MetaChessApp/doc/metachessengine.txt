@@ -1,0 +1,74 @@
+At it's core the game is chess with a fixed turnrate (moves per second).
+An extension of this is metachess.
+Starting with the board.
+The tiles on the board can recursively be divided into 4 (2x2) tiles.
+the color of these new tiles is decided by: (i + j) % 2 (equal 0 means black, 1 white)
+with i the row and j the column.
+The board is fractioned like this an undefined amount of times on any tile of the original 8x8 board.
+
+Movement is of course according to the original gameplay of chess.
+There's only 1 modification, if the piece moves to a tile that is relatively fractioned (contains smaller tiles).
+Than the piece has multiple legal choices, this is decided by a mapping that uses direction, side of the piece and fraction amount of the target tile.
+Moving to a larger tile is trivial, there’s no other choice than the one in the correct direction.
+
+The turnrate of the piece is proportionate to the fraction of it's tile, thus the smaller the tile the higher the turnrate.
+
+taking a piece reduces the lives of a side equal to a score assigned to a piece.
+
+lives of a piece (for the moment):
+pawn 1
+knight 2
+bischop 4
+tower 4
+queen 8
+king 32
+
+the total amount of team lives can be changed
+
+any decision can only be made if it’s your sides turn
+
+a special decision can only ba made if the codlin is 0 as well
+
+Special decision
+------------
+some pieces can move with a certain range
+
+range can be changed by adding 1 and/or 2 and/or 4
+range is default 1
+range is additive: holding range 1 and 2 results in: 1 + 1 + 2 = 4 range
+range can be extended, this also increases respective cooldown
+
+when a king moves onto a pawn of it's own side the pawn is bound to the king and moves with it as a defending wall
+to remove a pawn from the wall a player has to take back control
+
+a player can switch between pieces, paying a cooldown
+
+Piece specific decision
+---------
+
+
+these are activated by holding the special decision button, they have a cooldown equal to number of turns multiplied with range active but relative to tile fraction
+
+Pawn: Turn, change direction of pawn which makes it possible to move in 4 orthogonal directions and in 4 diagonal directions, the direction (one of 8) is equal to the next direction 
+folowing the rotation of a clock. if range is extended the directions possible include the both type of directions (8), if else only orthogonal (4).
+
+Bischop: Followers of belief , can set tiles on fire, these fire tiles are like a tail (they are the n last visited tiles), with a variable amount of tilelength n. 
+if extended these tiles are lethal, a piece stepping on it is killed. if not it only blocks it’s path
+
+Rook: Horizon, increase numner of viewed tiles with range (radius).
+if extended this increase in view propagates itself among friendly pieces of the rooks range.
+
+Knight: Dragon, can kill a piece when jumping over it, also jumps over fractioned tiles and can kill pieces n fractions deep.
+n is equal to 2^range.
+if not extended only pieces on the first tile of the knights movement (L) can be killed
+
+King: Command, wall of pawns, change the head position of the wall of pawns surrounding the king, if the king has no wall command shifts the balance of his influence
+if extended the pawns in the wall are grouped around the direction chosen by range, the same way the direction is chosen for the pawn when extended is on.
+
+
+A note on te movement.
+In my implementation the piece moves to the neighbour tile by using the target position and calculating the corresponding tile on that position.
+This is a continous method. Previously a discrete method was used, by calculating the correct index of the tile and its parent, but this had many cases which were hard to debug especially 
+when introducing new features using the piece's move.
+This also solves the mapping problem, when entering a smaller tile the one closest to the center of the current tile.
+This still leaves a choice between 2 tiles, than they are chosen in the direction of the pointers of a clock.
