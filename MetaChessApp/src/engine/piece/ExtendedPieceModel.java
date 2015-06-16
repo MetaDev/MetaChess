@@ -99,8 +99,6 @@ public abstract class ExtendedPieceModel {
         return color;
     }
 
-    
-
     public float getRelSize() {
         return getTilePosition().getRelSize();
     }
@@ -139,37 +137,18 @@ public abstract class ExtendedPieceModel {
         if (path == null) {
             return false;
         }
-
         return moveWithPath(path);
     }
 
     protected boolean moveWithPath(List<ExtendedTileModel> path) {
         //chech if path and last tile are valid
 
-        ExtendedTileModel lastTile = path.get(path.size() - 1);
-        //remove last tile from path
-        path.remove(path.size() - 1);
         //first check last tile for move to be made, than check path
-        if (checkLastTileInPath(lastTile) && checkPath(path)) {
-            handleLastTileInPath(lastTile);
+        if (checkPath(path)) {
+            handleLastTileInPath(path.get(path.size() - 1));
             return true;
         }
         return false;
-    }
-
-    //check if movement can be made
-    protected boolean checkLastTileInPath(ExtendedTileModel lastTileInPath) {
-        ExtendedPieceModel pieceOnnewTile = board
-                .getTilePiece(lastTileInPath);
-        //if not occupied continue
-        if (pieceOnnewTile == null) {
-            return true;
-        } //if occupied only continue movement if piece can be taken
-        else if ( pieceIsDeadly(pieceOnnewTile)) {
-            return true;
-        }
-        return false;
-
     }
 
     //handle movement on last tile, and set position
@@ -177,16 +156,7 @@ public abstract class ExtendedPieceModel {
         ExtendedPieceModel pieceOnnewTile = board
                 .getTilePiece(lastTileInPath);
         if (pieceIsDeadly(pieceOnnewTile)) {
-            if (pieceOnnewTile.onFire) {
-                ExtendedPieceModel fireMan = pieceOnnewTile.commander;
-                //find owner of firewall
-                board.pieceTaken(fireMan, this);
-                //no movement made
-                return false;
-            }
-            //not on fire so kill it
             board.pieceTaken(this, pieceOnnewTile);
-
         }
         setTilePosition(lastTileInPath);
         return true;
@@ -194,20 +164,23 @@ public abstract class ExtendedPieceModel {
 
     //check if path can be taken
     protected boolean checkPath(List<ExtendedTileModel> path) {
+        ExtendedPieceModel pieceOnnewTile = board
+                .getTilePiece(path.get(path.size() - 1));
+        //first check last tile for move to be made, than check path
+        if (pieceOnnewTile != null && !pieceIsDeadly(pieceOnnewTile)) {
+            return false;
+        }
+        //if not occupied continue
         ExtendedPieceModel pieceOnPath;
-        //check if path (all tiles except last) doesn't contain any other pieces
-        for (int i = 0; i < path.size() - 1; i++) {
+        //check if path doesn't contain any other pieces that are in the way or burning
+        for (int i = path.size() - 1; i >= 0; i--) {
             pieceOnPath = board.getTilePiece(path.get(i));
             //if path occupied, bad path
             if (pieceOnPath != null) {
-                //killed by fire
-                if (pieceOnPath.onFire) {
-                    ExtendedPieceModel fireMan = pieceOnPath.commander;
-                    //find owner of firewall
-                    if (pieceIsDeadly(fireMan)) {
-                        board.pieceTaken(fireMan, this);
-                    }
-
+                //piece on path is on fire , you get killed by fire
+               //find owner of firewall
+                if (pieceOnPath.commander!=null && pieceOnPath.commander.onFire) {
+                    board.pieceTaken(pieceOnPath.commander, this);
                 }
                 //no movement made
                 return false;

@@ -114,7 +114,7 @@ public class MetaWindow {
 
         // initialize editors
         //create new board
-        renderedBoard = new CompleteTestBoard(true, "Harald", "harald");
+        renderedBoard = new BischopTestBoard(true, "Harald", "harald");
         //initialize key mapping
         KeyMapping.init(renderedBoard);
         
@@ -269,8 +269,6 @@ public class MetaWindow {
     }
 
     public void startLoop() {
-        //long sleepTime = 1000L / 60L;
-        long time = System.currentTimeMillis();
         while (glfwWindowShouldClose(window) == GL_FALSE) {
             // Poll for window events. The key callback above will only be
             // invoked during this call.
@@ -280,14 +278,7 @@ public class MetaWindow {
             
             //render game based on updated state
             render();
-            //sleep
-//            try {
-//                Thread.sleep(sleepTime);
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(MetaWindow.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-            System.out.println(1000/(System.currentTimeMillis()-time+1));
-            time=System.currentTimeMillis();
+        
         }
 
     }

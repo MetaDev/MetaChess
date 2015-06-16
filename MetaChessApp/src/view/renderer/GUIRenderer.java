@@ -18,7 +18,6 @@ public class GUIRenderer {
         // move GUI to correct position of Tile
         // if tile is not a container draw it's grid
         if (tile.getColumns() == 1 && tile.getRows() == 1) {
-            //System.out.println(tile.getWidth());
             glTranslatef(tile.getX(), tile.getY(), 0);
             GridRenderer.render(board,(GUI1Tile) tile);
 

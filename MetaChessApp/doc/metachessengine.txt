@@ -52,8 +52,9 @@ these are activated by holding the special decision button, they have a cooldown
 Pawn: Turn, change direction of pawn which makes it possible to move in 4 orthogonal directions and in 4 diagonal directions, the direction (one of 8) is equal to the next direction 
 folowing the rotation of a clock. if range is extended the directions possible include the both type of directions (8), if else only orthogonal (4).
 
-Bischop: Followers of belief , can set tiles on fire, these fire tiles are like a tail (they are the n last visited tiles), with a variable amount of tilelength n. 
-if extended these tiles are lethal, a piece stepping on it is killed. if not it only blocks it’s path
+Bischop: Followers of belief , these followers tiles are gray pawns that follow as a tail (they are the n last visited tiles), with a variable amount of tile length n. 
+if extended these pawns are lethal(commander on fire), a piece stepping on it is killed. if not it only blocks it’s path.
+if the bischop steps on lethal followers it is killed as well.
 
 Rook: Horizon, increase numner of viewed tiles with range (radius).
 if extended this increase in view propagates itself among friendly pieces of the rooks range.

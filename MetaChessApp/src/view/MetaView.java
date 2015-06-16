@@ -99,7 +99,6 @@ public class MetaView {
         
         // render board
         MetaConfig.getBoardRenderer().render(board);
-        //System.out.println(width + ";" + height + ";" + centerBoardX + ";" +centerBoardY + ";" + tiles);
         glDisable(GL_SCISSOR_TEST);
 
         glPopMatrix();
@@ -132,7 +131,5 @@ public class MetaView {
             MetaConfig.getGuiRenderer().render(board, guiBlock);
 
         }
-        System.out.println(RectangleRenderer.count);
-
     }
 }

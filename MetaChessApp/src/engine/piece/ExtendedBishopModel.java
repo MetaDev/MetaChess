@@ -9,7 +9,6 @@ import java.util.Queue;
 
 public class ExtendedBishopModel extends ExtendedPieceModel {
 
-    private boolean wallsOnFire;
     private List<ExtendedBischopPawn> tail = new LinkedList<>();
 
     private List<ExtendedTileModel> lastPath = new LinkedList<>();
@@ -19,7 +18,7 @@ public class ExtendedBishopModel extends ExtendedPieceModel {
         Directions.getDiagDirections(allowedMovement);
         //add 8 bischop pawns to tail
         for (int i = 0; i < 8; i++) {
-            tail.add(new ExtendedBischopPawn(board));
+            tail.add(new ExtendedBischopPawn(board,this));
         }
         specialIcon = "runner";
     }
@@ -29,52 +28,67 @@ public class ExtendedBishopModel extends ExtendedPieceModel {
     public void setSpecial(boolean yes, int range, boolean extendedSpecial) {
         if (yes) {
             if (extendedSpecial) {
-                wallsOnFire = true;
+                onFire = true;
             }
             nrOfWallTiles = range;
         } else {
             nrOfWallTiles = 0;
-            wallsOnFire = false;
-            tail.clear();
+            onFire = false;
+            lastPath.clear();
         }
+        resetPositionTail();
 
     }
 
-    private void addToTail(List<ExtendedTileModel> path) {
+    private void addTileToTail(ExtendedTileModel tile) {
+        //add to to front
+        lastPath.add(0, tile);
+        //keep correct size, remove last tile
+        if (lastPath.size() > nrOfWallTiles) {
+            lastPath.remove(lastPath.size() - 1);
+        }
+    }
 
-        //traverse path in reverse order
-        for (int i = path.size() - 1; i > 0; i--) {
-            //add to the back
-            lastPath.add(path.get(i));
-            //keep correct size, remove first tile
-            if (lastPath.size() > nrOfWallTiles) {
-                lastPath.remove(0);
-            }
+    private void addPathToTail(List<ExtendedTileModel> path) {
+
+        //traverse path order of closest tile (last added to path) first, including the tile bischop is currently standing on
+        for (int i = path.size() - 2; i >= 0; i--) {
+            addTileToTail(path.get(i));
         }
     }
 
     @Override
-    protected boolean checkPath(List<ExtendedTileModel> path) {
-        if (super.checkPath(path)) {
-            if (nrOfWallTiles > 0) {
-                addToTail(path);
-                //update position of pieces in tail
-                resetPositionTail();
-            }
-            return true;
+    protected boolean moveWithPath(List<ExtendedTileModel> path) {
+        //save old tile position and add as first to lastPath
+        ExtendedTileModel oldTile = getTilePosition();
+        boolean pathMoved = super.moveWithPath(path);
+        if (pathMoved && nrOfWallTiles > 0) {
+            addTileToTail(oldTile);
+            addPathToTail(path);
+            System.out.println("tail k. " + path.size() + " nrof wall: " + nrOfWallTiles);
         }
-
-        return false;
+        return pathMoved;
     }
 
     private void resetPositionTail() {
         for (int i = 0; i < tail.size(); i++) {
             if (i < lastPath.size()) {
+                System.out.println("position of bischop pawn changed");
                 board.changePiecePosition(tail.get(i), lastPath.get(i));
-
             } else {
                 board.changePiecePosition(tail.get(i), null);
             }
         }
+    }
+
+    @Override
+    public boolean handleMovement(Directions.Direction direction, int range, boolean extendedSpecial) {
+        boolean moved = super.handleMovement(direction, range, extendedSpecial);
+        if (moved) {
+            System.out.println("reset tail" + lastPath.size());
+            resetPositionTail();
+        }
+        return moved;
+
     }
 }

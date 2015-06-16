@@ -13,9 +13,9 @@ import engine.board.ExtendedBoardModel;
  */
 public class ExtendedBischopPawn extends ExtendedPieceModel{
     
-    public ExtendedBischopPawn(ExtendedBoardModel board) {
+    public ExtendedBischopPawn(ExtendedBoardModel board,ExtendedBishopModel commander) {
         super(PieceType.pawn, board, 0.5f, 0);
-        onFire=true;
+        this.commander=commander;
     }
 
     @Override

@@ -332,5 +332,12 @@ public class Player {
     public boolean isExtendeSpecial() {
         return extendedSpecial;
     }
+    
+    //todo
+    //implement how to take piece
+    //consider taking yourself
+    public void takePiece(ExtendedPieceModel piece){
+        
+    }
 
 }

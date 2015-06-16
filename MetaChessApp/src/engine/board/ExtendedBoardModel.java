@@ -185,12 +185,15 @@ public class ExtendedBoardModel {
         Player playerTaken = getPlayerByPiece(pieceTaken);
         Player playerTaker = getPlayerByPiece(pieceTaker);
         //decrease team lives
-        if (playerTaken.isDecreaseLivesOnKill()) {
+        if (playerTaken != null && playerTaken.isDecreaseLivesOnKill()) {
             decreaseSideLives(playerTaken.getSide(),
                     pieceTaken.getLives());
             //adapt player lives lost and taken
             playerTaken.increaseLivesLost(pieceTaken.getLives());
-            playerTaker.increaseLivesTaken(pieceTaken.getLives());
+            //lives not added to your own score if a bischop step on burning tail
+            if (!playerTaken.equals(playerTaker)) {
+                playerTaker.increaseLivesTaken(pieceTaken.getLives());
+            }
         }
         //put piecetaken on a random tile
         pieceTaken.setTilePosition(getRandomTile(false));
