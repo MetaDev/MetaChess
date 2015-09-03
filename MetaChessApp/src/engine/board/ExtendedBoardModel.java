@@ -59,7 +59,7 @@ public class ExtendedBoardModel {
         double compareDist;
         double tempDist;
         ExtendedPieceModel closestNeighbour = null;
-        compareDist = Double.MIN_VALUE;
+        compareDist = 0;
         for (Map.Entry<ExtendedPieceModel, ExtendedTileModel> entry : getPieceToTile().entrySet()) {
             ExtendedPieceModel neighbour = entry.getKey();
             if (neighbour != piece && side == neighbour.getColor() && (tempDist = BoardLogic.calculateDistance(entry.getValue(), piece.getTilePosition())) > compareDist) {
